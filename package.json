@@ -1,0 +1,16 @@
+{
+  "name": "squishy-party-site",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Squishy Party by Tom & Stefanie: party planner page + request API that notifies the owner on Telegram.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node dev/server.mjs",
+    "chat-id": "node dev/get-chat-id.mjs",
+    "test": "node tests/unit.mjs && node tests/e2e.mjs",
+    "catalogue": "node dev/extract-catalogue.mjs public/index.html lib/catalogue.js"
+  }
+}
