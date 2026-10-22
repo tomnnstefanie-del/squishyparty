@@ -37,6 +37,7 @@ tests/                 npm test (unit + full browser end-to-end)
 | `PAYNOW_UEN` *or* `PAYNOW_MOBILE` | Where deposits go: your business UEN (e.g. `53123456X`) or a PayNow mobile (`91234567`) | Deposit QR |
 | `PAYNOW_NAME` | Name shown in the banking app, e.g. `Tom & Stefanie` | Deposit QR |
 | `MAIL_FROM` *(optional)* | Sender shown to parents, e.g. `Squishy Party <squishyparty.sg@gmail.com>` | |
+| `MAIL_REPLY_TO` *(optional)* | Where parents' replies go, if not the sending Gmail | |
 | `SMTP_HOST`, `SMTP_PORT` *(optional)* | Only if you don't use Gmail (defaults `smtp.gmail.com`, `465`) | |
 
 After adding or changing variables, go to **Deployments → ⋯ → Redeploy**.
