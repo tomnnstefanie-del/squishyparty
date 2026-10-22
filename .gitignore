@@ -1,0 +1,7 @@
+node_modules/
+.env
+.env.local
+.vercel/
+dev/.outbox.json
+dev/.outbox.json.fail
+dev/.mailbox.json

@@ -1,19 +1,54 @@
-# Squishy Party: party planner + request alerts on Telegram
+# Squishy Party: party planner, email check, PayNow deposit and Telegram alerts
 
-Parents plan a party on the page. When they press **Send my request**, the server re-prices the order and sends you a Telegram message with everything: contact details, date and time, venue and address, guests, the Squishy Party lines, the 50% deposit, every add-on, the estimated total, budget and notes. The message has a **WhatsApp the customer** button that opens a chat with a greeting already typed.
+How a request works:
 
-Nothing is charged and nothing is booked automatically. You confirm on WhatsApp, then collect the 50% deposit.
+1. **Parent plans the party** and, on the last step, verifies their email with a 6-digit code (free, sent from your Gmail).
+2. **They press Send my request.** The server re-prices the order and sends you a Telegram message with everything: contact details (email marked ✅ verified), date and time, address and exact location, guests, the Squishy Party lines, the 10% holding deposit, add-ons, total, budget and notes. A **WhatsApp the customer** button opens a chat with a greeting typed.
+3. **The parent gets an email:** "Your request is currently being verified by our team, and we'll reach out to you on WhatsApp", with their details and the PayNow QR.
+4. **The page shows a PayNow QR** for the 10% holding deposit. Their banking app fills in the exact amount and the reference (e.g. `SP-261121-AB12`). When they tap **I've paid the deposit**, you get a second Telegram message: "Deposit marked as paid… check your bank for reference SP-…".
+5. You check the payment in your bank app (search the reference), then WhatsApp them to confirm.
+
+Fine print shown on the page, in the FAQ and in the email: the 10% holding deposit is refunded in full if you're unable to attend on their date, deducted from the full amount if they go ahead with the package, and non-refundable if they cancel.
 
 ```
 public/index.html      the whole website (one file)
-api/request.js         the request endpoint (Vercel serverless function)
+api/request.js         sends the request (Vercel serverless function)
+api/otp.js             emails and checks the 6-digit code
+api/paid.js            "I've paid" -> Telegram note
 lib/pricing.js         server-side prices (browser totals are never trusted)
 lib/catalogue.js       price list, generated from public/index.html
 lib/validate.js        checks every field before anything is sent
 lib/telegram.js        builds and sends the Telegram message
+lib/otp.js             signed codes and tokens (no database needed)
+lib/mail.js, emails.js sends the code and confirmation emails
+lib/paynow.js          PayNow QR with amount + reference (SGQR format)
 dev/                   local server, mock Telegram, chat-ID helper
 tests/                 npm test (unit + full browser end-to-end)
 ```
+
+## Environment variables (Vercel → Project → Settings → Environment Variables)
+
+| Name | What it is | Needed for |
+|---|---|---|
+| `TELEGRAM_BOT_TOKEN` | Token from @BotFather | Requests |
+| `TELEGRAM_CHAT_ID` | Your group's chat ID (starts with `-`) | Requests |
+| `SMTP_USER` | The Gmail address that sends emails, e.g. `squishyparty.sg@gmail.com` | Email codes + confirmation |
+| `SMTP_PASS` | A Gmail **app password** (16 letters, not your normal password) | Email codes + confirmation |
+| `PAYNOW_UEN` *or* `PAYNOW_MOBILE` | Where deposits go: your business UEN (e.g. `53123456X`) or a PayNow mobile (`91234567`) | Deposit QR |
+| `PAYNOW_NAME` | Name shown in the banking app, e.g. `Tom & Stefanie` | Deposit QR |
+| `MAIL_FROM` *(optional)* | Sender shown to parents, e.g. `Squishy Party <squishyparty.sg@gmail.com>` | |
+| `SMTP_HOST`, `SMTP_PORT` *(optional)* | Only if you don't use Gmail (defaults `smtp.gmail.com`, `465`) | |
+
+After adding or changing variables, go to **Deployments → ⋯ → Redeploy**.
+
+- **Without the Telegram or email variables,** the site refuses requests with "Requests are not switched on yet". It never pretends a request was sent.
+- **Without the PayNow variables,** requests still work, and the page says the PayNow details will come on WhatsApp.
+
+### Gmail app password (for SMTP_PASS)
+1. Use a Gmail account for the business (a new one like `squishyparty.sg@gmail.com` is best).
+2. Turn on **2-Step Verification**: Google Account → Security.
+3. Go to **myaccount.google.com/apppasswords**, create one named "Squishy Party", and copy the 16-letter password into `SMTP_PASS` (no spaces).
+4. Gmail sends up to about 500 emails a day for free, which is plenty for codes and confirmations.
 
 ## 1. Create your Telegram bot (5 minutes)
 
@@ -31,11 +66,8 @@ tests/                 npm test (unit + full browser end-to-end)
 
 1. Put this folder in a **private** GitHub repo and import it in Vercel (Framework preset: **Other**, no build command).
 2. Add the variables under **Project → Settings → Environment Variables**:
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_CHAT_ID`
-3. Deploy. Then send yourself a test request from the live site and check Telegram.
-
-Until both variables are set, the site refuses requests with "Requests are not switched on yet." It never pretends a request was sent.
+   - all the variables in the table above.
+3. Deploy. Then send yourself a test request from the live site: you should get the code by email, the Telegram message, the confirmation email, and a working PayNow QR.
 
 ## 3. Analytics (page views, speed, and where parents drop off)
 
@@ -68,6 +100,7 @@ PostHog runs **without cookies** (`persistence: 'memory'`) with session recordin
 | `planner_opened` | "I want a party" is pressed | none |
 | `step_viewed` | a planner step is shown | `step` (1–5), `step_name` |
 | `planner_exited` | they leave the planner | `at_step`, `step_name` |
+| `home_tab_viewed` | a home tab is opened (How it works, On the day, Safety, FAQ) | `tab` |
 | `budget_set` | a budget is entered | `mode` (total / per child) |
 | `experience_selected` | Jelly / Crunchy / Duo is chosen | `experience` |
 | `wax_toggled` | Wax Cracking is switched | `on`, `experience` |
@@ -116,4 +149,4 @@ npm test                     # needs Playwright: npm i -D playwright
 
 - **PDPA:** you're collecting names, phone numbers, emails and addresses. Add a short privacy notice (what you collect, why, how long you keep it, and who to contact), and delete old Telegram messages you no longer need.
 - **Partner prices:** the food, styling and activity partners are still sample listings with demo prices, and cakes are "on quote". Replace them with your agreed vendors and rates.
-- **Deposits:** decide how you'll collect the 50% deposit (e.g. PayNow QR in WhatsApp) and your cancellation and refund terms.
+- **Deposits:** the fine print covers the 10% holding deposit (refunded if you can't attend, deducted from the full amount, non-refundable if they cancel). Publish full terms for the rest of the payment.

@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import { priceRequest } from '../lib/pricing.js';
 import { validateRequest, RequestError } from '../lib/validate.js';
 import { buildMessage, whatsappLink, customerGreeting } from '../lib/telegram.js';
+process.env.TELEGRAM_BOT_TOKEN = 'unit:token';
+const otp = await import('../lib/otp.js');
+const { paynowPayload, _test } = await import('../lib/paynow.js');
+const { confirmationEmail } = await import('../lib/emails.js');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
@@ -18,6 +22,30 @@ t('Deposit is 50% of the Squishy Party total', () => assert.equal(priceRequest(p
 t('Per-child add-on is charged per child (favour bags, 10 × $6)', () => { const p = priceRequest(plan({ addons: ['s-favours'] })); assert.equal(p.addons[0].quantity, 10); assert.equal(p.addons[0].cents, 6000); });
 t('Removed vendors are no longer accepted', () => { assert.throws(() => priceRequest(plan({ addons: ['f-bento'] }))); });
 t('Cakes are on quote, never counted as $0', () => { const p = priceRequest(plan({ addons: ['bs-custom'] })); assert.equal(p.addons[0].cents, null); assert.equal(p.onQuote.length, 1); assert.equal(p.totalCents, 43000); });
+
+t('10% holding deposit: Duo for 10 = $430 → $43', () => assert.equal(priceRequest(plan()).holdCents, 4300));
+
+console.log('email codes');
+t('a correct code verifies; a wrong code, other email or expired token does not', () => {
+  const { code, token } = otp.issueCode('Sarah@Example.com');
+  assert.ok(otp.checkCode('sarah@example.com', code, token));
+  assert.ok(!otp.checkCode('sarah@example.com', code === '123456' ? '654321' : '123456', token));
+  assert.ok(!otp.checkCode('other@example.com', code, token));
+  assert.ok(!otp.checkCode('sarah@example.com', code, token, Date.now() + 11 * 60 * 1000));
+});
+t('verified token only works for the same email and expires', () => {
+  const v = otp.issueVerified('a@b.co'); assert.ok(otp.checkVerified('A@B.co', v)); assert.ok(!otp.checkVerified('c@b.co', v));
+  assert.ok(!otp.checkVerified('a@b.co', v, Date.now() + 3 * 3600 * 1000)); assert.ok(!otp.checkVerified('a@b.co', 'garbage'));
+});
+t('payment signature is tied to reference and amount', () => { const s = otp.signPayment('SP-1', 4300); assert.ok(otp.checkPayment('SP-1', 4300, s)); assert.ok(!otp.checkPayment('SP-1', 100, s)); assert.ok(!otp.checkPayment('SP-2', 4300, s)); });
+
+console.log('paynow');
+t('CRC16 matches the standard check value', () => assert.equal(_test.crc16('123456789'), '29B1'));
+t('PayNow QR carries UEN, fixed amount and reference', () => {
+  const p = paynowPayload({ type: '2', proxy: '53123456X', name: 'Tom & Stefanie', amountCents: 4300, ref: 'SP-261121-AB12' });
+  for (const s of ['SG.PAYNOW', '010120', '53123456X', '03010', '540543.00', '5303702', '0114SP-261121-AB12']) assert.ok(p.includes(s), s);
+  assert.equal(p.slice(-4), _test.crc16(p.slice(0, -4)));
+});
 
 console.log('validation');
 const good = () => ({ v: 1, plan: { ...plan(), date: '2099-01-01', start: '14:00', end: '16:00', budgetCents: 120000 }, contact: { parentName: 'Sarah Tan', phone: '8123 4567', email: 'sarah@example.com', venueName: 'Condo function room', address: '1 Example Road', postalCode: '123456', notes: '' }, consent: true, website: '' });
@@ -43,6 +71,11 @@ t('includes contact, date, venue, address, postal', () => { for (const s of ['Sa
 t('lists squishy lines, deposit and every add-on', () => { for (const s of ['Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', '50% deposit', 'Custom cake', 'Butter Studio', 'on quote', 'Party favour bags ×10', 'Face painting']) assert.ok(msg.includes(s), s); });
 t('escapes HTML in customer text', () => assert.ok(msg.includes('Lift &lt;b&gt;B&lt;/b&gt;, level 2')));
 t('flags when the page total differs from the server total', () => assert.ok(msg.includes('server price above is the one to quote')));
+t('confirmation email says it’s being verified and we’ll WhatsApp them', () => {
+  const e = confirmationEmail({ ref: 'SP-TEST-0001', plan: v.plan, contact: v.contact, price, paynow: null });
+  for (const s of ['SP-TEST-0001', 'currently being verified by our team', 'WhatsApp', '+65 8123 4567', '$48.00', 'refunded in full', '15 minutes before']) assert.ok(e.text.includes(s), s);
+  assert.ok(!e.html.includes('<b>B</b>'));
+});
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));
 

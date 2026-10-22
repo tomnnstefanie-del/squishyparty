@@ -12,5 +12,9 @@
     "chat-id": "node dev/get-chat-id.mjs",
     "test": "node tests/unit.mjs && node tests/e2e.mjs",
     "catalogue": "node dev/extract-catalogue.mjs public/index.html lib/catalogue.js"
+  },
+  "dependencies": {
+    "nodemailer": "10.0.16",
+    "qrcode": "1.5.4"
   }
 }

@@ -1413,6 +1413,158 @@ html:has(body.planning){scroll-padding-top:150px}
 .ss-item.wide{grid-column:1/-1}
 .ss-item.wide .ss-ph{aspect-ratio:2/1}
 @media (min-width:641px){.retail-photo .retail-bg{object-position:50% 82%}}
+
+/* v17 basics notes, email verification, PayNow deposit */
+.early-hint{display:flex;align-items:center;gap:6px;margin-top:6px;color:var(--cobalt-700);font-weight:600}
+.early-hint .icon{width:15px;height:15px;flex:none}
+.opt-tag{font-weight:400;color:var(--muted);font-size:.875em}
+.otp-field label{display:block}
+.otp-row{display:flex;gap:8px;align-items:stretch;margin-top:6px}
+.otp-row input{flex:1;min-width:0}
+.otp-btn{flex:none;min-height:48px;padding:0 16px;white-space:nowrap}
+.otp-btn[hidden]{display:none}
+#otp-code{letter-spacing:.3em;font-variant-numeric:tabular-nums;font-weight:700}
+.otp-status{margin-top:6px}
+.otp-status.ok{color:#0f7a4a}
+.otp-status.err{color:#b4233a}
+.otp-field.verified #req-email{border-color:#2fa36b;background:#f1fbf5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232fa36b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") no-repeat right 14px center/18px}
+.pay-card{margin:18px 0;padding:18px;border-radius:20px;background:linear-gradient(135deg,#f6efff,#eef0ff);box-shadow:inset 0 0 0 1.5px #e2d6fb;text-align:left}
+.pay-card h4{font-family:var(--sans);font-weight:800;font-size:1.25rem;margin:4px 0 12px;color:var(--ink)}
+.pay-body{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.pay-body[hidden]{display:none}
+.pay-qr{flex:none;width:190px;height:190px;background:#fff;border-radius:16px;padding:8px;box-shadow:var(--shadow-sm)}
+.pay-qr svg{width:100%;height:100%;display:block}
+.pay-steps{flex:1;min-width:200px;margin:0;padding-left:20px;font-size:.9375rem;color:var(--ink-2)}
+.pay-steps li{margin:4px 0}
+.pay-policy{font-size:.8125rem;color:var(--muted);margin:12px 0}
+.pay-card .btn{width:100%;min-height:48px}
+.pay-card .btn[hidden]{display:none}
+.pay-status{margin-top:10px;font-weight:700;font-size:.9375rem}
+.pay-status.ok{color:#0f7a4a}.pay-status.err{color:#b4233a}
+@media (max-width:640px){.pay-body{flex-direction:column;align-items:stretch}.pay-qr{margin:0 auto;width:220px;height:220px}}
+.form-panel .otp-btn{width:auto;margin-top:0;min-height:50px}
+@media (max-width:640px){.form-panel .otp-btn{min-height:44px;padding:0 14px}}
+.fine-print{font-size:.8125rem;line-height:1.5;color:var(--muted);margin-top:10px;text-align:left}
+.fine-print b{color:var(--ink-2)}
+
+/* v18 "How it works" 3-step scrolling timeline */
+.tl{list-style:none;position:relative;margin:26px 0 10px;padding:0;--tl-fill:0%}
+.tl::before,.tl::after{content:"";position:absolute;left:22px;top:30px;width:3px;border-radius:3px;transform:translateX(-50%)}
+.tl::before{bottom:30px;background:var(--line)}
+.tl::after{height:calc((100% - 60px) * var(--tl-p,0));background:linear-gradient(180deg,var(--rose),var(--cobalt));transition:height 120ms linear}
+.tl:not(.tl-anim)::after{display:none}
+.tl-step{position:relative;display:grid;grid-template-columns:44px minmax(0,.85fr) minmax(0,1.25fr);gap:12px 32px;padding:26px 0;align-items:start}
+.tl-dot{position:relative;z-index:1;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:inset 0 0 0 2px var(--line);font-weight:800;font-size:.875rem;color:var(--muted);transition:background-color 300ms ease,color 300ms ease,box-shadow 300ms ease,transform 300ms var(--ease-out-strong)}
+.tl:not(.tl-anim) .tl-dot,.tl-step.on .tl-dot{background:var(--cobalt);color:#fff;box-shadow:0 0 0 6px var(--cobalt-50)}
+.tl-step.on .tl-dot{transform:scale(1.05)}
+.tl-text{padding-top:4px}
+.tl-k{font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--rose)}
+.tl-text h3{font-family:var(--display);font-weight:500;font-size:1.75rem;line-height:1.15;margin:6px 0 8px;color:var(--ink)}
+.tl-text p:not(.tl-k){color:var(--ink-2);font-size:1rem;line-height:1.55}
+.tl-text .perks{margin-top:16px}
+.tl-visual{background:var(--card);border-radius:24px;padding:16px;box-shadow:var(--shadow-md);min-width:0}
+.tl-anim:not(.tl-still) .tl-text,.tl-anim:not(.tl-still) .tl-visual{opacity:0;transform:translateY(14px);transition:opacity 450ms var(--ease-out-strong),transform 450ms var(--ease-out-strong)}
+.tl-anim:not(.tl-still) .tl-visual{transition-delay:90ms}
+.tl-anim .tl-step.in .tl-text,.tl-anim .tl-step.in .tl-visual{opacity:1;transform:none}
+.tl-exp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tl-exp-card{position:relative;background:var(--cobalt-50);border-radius:16px;padding:10px 8px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tl-exp-card.best{background:linear-gradient(160deg,#fff7c9,#ffe7f1);box-shadow:inset 0 0 0 1.5px #f3df86}
+.tl-exp-card img{width:78%;aspect-ratio:1;object-fit:cover;border-radius:50%;margin-bottom:6px}
+.tl-exp-card b{font-weight:800;color:var(--ink)}
+.tl-exp-card span{font-size:.8125rem;color:var(--muted)}
+.tl-exp-card i{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-style:normal;font-size:.625rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--lemon);color:var(--ink);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.tl-visual .hw-making{margin-top:14px}
+.tl-vendors{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tl-vendors::-webkit-scrollbar{display:none}
+.tl-vcard{flex:0 0 46%;scroll-snap-align:start;border-radius:18px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.tl-vpic{position:relative;aspect-ratio:4/3;overflow:hidden}
+.tl-vpic img{width:100%;height:100%;object-fit:cover;display:block}
+.tl-vpic.noimg{display:grid;place-items:center}
+.tl-vpic.noimg .icon{width:40px;height:40px}
+.tl-vbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}
+.tl-vcat{font-size:.6875rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--rose)}
+.tl-vbody b{font-weight:800;color:var(--ink);line-height:1.25}
+.tl-vfrom{font-size:.8125rem;font-weight:700;color:var(--cobalt-700)}
+.tl-swipe{display:flex;align-items:center;gap:6px;justify-content:flex-end;font-size:.75rem;font-weight:700;color:var(--muted);margin-top:8px}
+.tl-swipe .icon{width:14px;height:14px}
+.tl-together{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:14px;align-items:center}
+.tl-invite{border-radius:14px;overflow:hidden;box-shadow:var(--shadow-md);aspect-ratio:210/297;background:#eef0ff}
+.tl-invite svg{width:100%;height:100%;display:block}
+.tl-check{background:var(--cobalt-50);border-radius:16px;padding:14px}
+.tl-check-h{font-weight:800;color:var(--ink);margin-bottom:8px}
+.tl-check ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tl-check li{display:flex;align-items:center;gap:8px;font-size:.875rem;color:var(--ink-2)}
+.tl-check li .icon{width:20px;height:20px;flex:none;padding:3px;border-radius:50%;background:#2fa36b;color:#fff}
+.tl-check li.done{color:var(--ink)}
+.tl-box{width:20px;height:20px;flex:none;border-radius:6px;box-shadow:inset 0 0 0 2px var(--line-2);background:#fff}
+@media (max-width:760px){
+  .tl::before,.tl::after{left:18px;top:24px}
+  .tl::after{height:calc((100% - 48px) * var(--tl-p,0))}
+  .tl::before{bottom:24px}
+  .tl-step{grid-template-columns:36px minmax(0,1fr);gap:12px 14px;padding:18px 0}
+  .tl-dot{width:36px;height:36px;font-size:.75rem}
+  .tl-visual{grid-column:2;padding:12px;border-radius:20px}
+  .tl-text h3{font-size:1.4rem}
+  .tl-text p:not(.tl-k){font-size:.9375rem}
+  .tl-vcard{flex-basis:72%}
+  .tl-exp{gap:8px}
+  .tl-together{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:10px}
+  .tl-check{padding:10px}
+  .tl-check li{font-size:.8125rem}
+}
+@media (prefers-reduced-motion:reduce){.tl::after{transition:none}.tl-dot{transition:none}}
+/* v19 centred card stack */
+.hw-card{left:0;right:0;bottom:3%;margin:0 auto;transform-origin:50% 60%}
+/* v20 Pricing + On the day tabs */
+.price-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.price-card{position:relative;background:var(--card);border-radius:20px;padding:18px 16px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.price-card.best{background:linear-gradient(160deg,#fff7c9,#ffe7f1);box-shadow:inset 0 0 0 1.5px #f3df86}
+.price-card b{font-weight:800;font-size:1.0625rem;color:var(--ink)}
+.price-amt{font-family:var(--display);font-size:2.2rem;line-height:1.1;color:var(--cobalt);margin:6px 0 4px}
+.price-amt small{font-family:var(--sans);font-size:.875rem;color:var(--muted)}
+.price-card p:not(.price-amt){font-size:.875rem;color:var(--ink-2)}
+.price-tag{position:absolute;top:12px;right:12px;font-size:.625rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--lemon);padding:3px 8px;border-radius:999px}
+.price-list{margin:16px 0 0;background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 1.5px var(--line);padding:4px 18px}
+.price-list>div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line)}
+.price-list>div:first-child{border-top:0}
+.price-list dt{color:var(--ink-2);font-size:.9375rem}
+.price-list dd{margin:0;text-align:right;font-weight:800;color:var(--ink);white-space:nowrap}
+.price-list dd span{display:block;font-weight:500;font-size:.75rem;color:var(--muted);white-space:normal}
+.price-example{margin-top:16px;padding:16px 18px;border-radius:20px;background:var(--cobalt-50)}
+.price-example p{margin-top:4px}
+.price-note{margin-top:12px;font-size:.875rem;color:var(--muted)}
+.day-list{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.day-list li{display:flex;gap:14px;align-items:flex-start;background:var(--card);border-radius:20px;padding:16px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.day-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--blush);color:var(--rose)}
+.day-ic .icon{width:20px;height:20px}
+.day-list b{font-weight:800;color:var(--ink)}
+.day-list p{font-size:.875rem;color:var(--ink-2);margin-top:2px}
+@media (max-width:760px){
+  .price-grid{grid-template-columns:1fr;gap:8px}
+  .price-card{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:10px;padding:14px 16px}
+  .price-card b{grid-column:1}.price-amt{grid-column:2;grid-row:1 / span 2;margin:0;font-size:1.8rem;text-align:right}
+  .price-card p:not(.price-amt){grid-column:1}
+  .price-tag{position:static;justify-self:start;grid-column:1;margin-bottom:4px}
+  .day-list{grid-template-columns:1fr}
+}
+@media (max-width:640px){.tabs .tablist [role=tab]{padding:0 11px;font-size:.875rem}.tabs .tablist{gap:2px;padding:5px}}
+/* v21 Safety tab */
+.myths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+.myth{background:var(--card);border-radius:20px;padding:18px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.myth h3{font-family:var(--display);font-weight:500;font-size:1.25rem;line-height:1.25;margin:4px 0 12px;color:var(--ink);text-decoration:line-through;text-decoration-color:rgba(194,56,79,.55);text-decoration-thickness:2px}
+.myth-k,.fact-k{display:inline-block;font-size:.6875rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.myth-k{background:#ffe3e8;color:#b4233a}
+.fact-k{background:#e3f6ec;color:#0f7a4a;margin-bottom:6px}
+.myth p:last-child{font-size:.9375rem;color:var(--ink-2);line-height:1.55}
+.safe-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.safe-card{border-radius:20px;padding:18px;background:var(--cobalt-50)}
+.safe-card.care{background:#fff5e6}
+.safe-card h3{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.0625rem;color:var(--ink);margin-bottom:8px}
+.safe-card h3 .icon{width:20px;height:20px;color:var(--cobalt)}
+.safe-card.care h3 .icon{color:#c26a00}
+.safe-card ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.9375rem;color:var(--ink-2)}
+.safe-card b{color:var(--ink)}
+@media (max-width:760px){.myths,.safe-grid{grid-template-columns:1fr}.myth h3{font-size:1.125rem}}
 </style>
 </head>
 <body>
@@ -1463,7 +1615,7 @@ html:has(body.planning){scroll-padding-top:150px}
       <span class="brand-text"><span class="brand-name">Squishy Party</span><span class="brand-by">by Tom &amp; Stefanie</span></span>
     </a>
     <nav class="nav" aria-label="Explore">
-      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-making">Squishy Activity</a><a href="#explore" data-tab-link="tab-vendors">Other vendors</a><a href="#explore" data-tab-link="tab-faq">FAQ</a>
+      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a>
     </nav>
     <a class="btn btn-primary header-cta" href="#plan-1">I want a party</a>
   </div>
@@ -1508,17 +1660,68 @@ html:has(body.planning){scroll-padding-top:150px}
       <div class="tabs" data-tabs>
         <div class="tablist" role="tablist" aria-label="About Squishy Party">
           <button type="button" role="tab" id="tab-how" aria-controls="panel-how" aria-selected="true">How it works</button>
-          <button type="button" role="tab" id="tab-making" aria-controls="panel-making" aria-selected="false" tabindex="-1">Squishy Activity</button>
-          <button type="button" role="tab" id="tab-vendors" aria-controls="panel-vendors" aria-selected="false" tabindex="-1">Other vendors</button>
+          <button type="button" role="tab" id="tab-day" aria-controls="panel-day" aria-selected="false" tabindex="-1">On the day</button>
+          <button type="button" role="tab" id="tab-safety" aria-controls="panel-safety" aria-selected="false" tabindex="-1">Safety</button>
           <button type="button" role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false" tabindex="-1">FAQ</button>
         </div>
 
         <div class="tabpanel" role="tabpanel" id="panel-how" aria-labelledby="tab-how" tabindex="0">
           <p class="how-lead">We help organise everything for your party, from the squishy activity to the cake.</p>
-          <ol class="how-points">
-            <li><span class="hp-n">1</span><div><h3>Tell us the basics</h3><p>Start with your budget, number of guests and location. We suggest a plan that fits.</p></div></li>
-            <li><span class="hp-n">2</span><div><h3>Add vendors to complete your party</h3><p>Styling, activities and cakes from our partners, at exclusive rates, all in one quote.</p></div></li>
-            <li><span class="hp-n">3</span><div><h3>Checklist &amp; digital invitation</h3><p>A to-do list for everything you still need, and a ready-to-send WhatsApp invitation.</p></div></li>
+          <ol class="tl" id="how-tl">
+            <li class="tl-step">
+              <span class="tl-dot" aria-hidden="true">01</span>
+              <div class="tl-text">
+                <p class="tl-k">Step 01</p>
+                <h3>Choose your Squishy Party</h3>
+                <p>Choose your experience and share your party details: date, guests, budget and where it’s happening.</p>
+                <div class="perks"><div class="toppings"><strong>20+</strong><span>toppings to explore</span></div><div class="toppings perk"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span>Birthday Girl sash &amp; tiara to wear on the day</span></div></div>
+              </div>
+              <div class="tl-visual">
+                <div class="tl-exp" id="tl-exp" aria-label="Squishy DIY options"></div>
+                <section class="hw hw-making" id="mk" aria-roledescription="carousel" aria-label="Squishy Activity, step by step">
+              <div class="hw-stage" tabindex="0" aria-label="Making steps. Use the left and right arrow keys to move between steps."></div>
+              <div class="hw-caption" aria-live="polite"><p class="hw-no"></p><b class="hw-cap-title"></b><p class="hw-cap-text"></p></div>
+              <div class="hw-controls">
+                <button type="button" class="hw-btn hw-prev" aria-label="Previous step"><svg class="icon flip" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+                <div class="hw-dots" role="group" aria-label="Choose a step"></div>
+                <button type="button" class="hw-btn hw-next" aria-label="Next step"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              </div>
+            </section>
+              </div>
+            </li>
+            <li class="tl-step">
+              <span class="tl-dot" aria-hidden="true">02</span>
+              <div class="tl-text">
+                <p class="tl-k">Step 02</p>
+                <h3>Complete your celebration</h3>
+                <p>Add cakes, styling and activities from our partners to suit your budget, at exclusive rates and all in one quote.</p>
+              </div>
+              <div class="tl-visual">
+                <div class="tl-vendors" id="tl-vendors" role="list" aria-label="Partner vendors"></div>
+                <p class="tl-swipe" aria-hidden="true">Swipe to see more <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></p>
+              </div>
+            </li>
+            <li class="tl-step">
+              <span class="tl-dot" aria-hidden="true">03</span>
+              <div class="tl-text">
+                <p class="tl-k">Step 03</p>
+                <h3>Your party, coming together</h3>
+                <p>Keep your checklist, digital invitation and arrangements in one place, then send one request to our team.</p>
+              </div>
+              <div class="tl-visual tl-together">
+                <div class="tl-invite" id="tl-invite" role="img" aria-label="Example digital invitation"></div>
+                <div class="tl-check" aria-label="Example checklist">
+                  <p class="tl-check-h">Your checklist</p>
+                  <ul>
+                    <li class="done"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Squishy DIY: Duo for 15</li>
+                    <li class="done"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Cake from Butter Studio</li>
+                    <li class="done"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Invitation sent on WhatsApp</li>
+                    <li><span class="tl-box" aria-hidden="true"></span>Book your venue</li>
+                    <li><span class="tl-box" aria-hidden="true"></span>Sort out party food</li>
+                  </ul>
+                </div>
+              </div>
+            </li>
           </ol>
           <a class="btn btn-primary how-cta" href="#plan-1">Start planning <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <aside class="story" aria-labelledby="story-h">
@@ -1528,38 +1731,57 @@ html:has(body.planning){scroll-padding-top:150px}
           </aside>
         </div>
 
-        <div class="tabpanel" role="tabpanel" id="panel-making" aria-labelledby="tab-making" tabindex="0" hidden>
-          <div class="makers-grid">
-            <div>
-              <h3 class="panel-title">Squishy Activity</h3>
-              <p class="lead" style="margin-top:12px">More than 20 toppings to explore. We bring the squishy bar experience to the comfort of your venue, with hosts, materials and set-up included.</p>
-              <div class="perks"><div class="toppings"><strong>20+</strong><span>toppings to explore</span></div><div class="toppings perk"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span>Birthday Girl sash &amp; tiara to wear on the day</span></div></div>
-            </div>
-            <section class="hw hw-making" id="mk" aria-roledescription="carousel" aria-label="Squishy Activity, step by step">
-              <div class="hw-stage" tabindex="0" aria-label="Making steps. Use the left and right arrow keys to move between steps."></div>
-              <div class="hw-caption" aria-live="polite"><p class="hw-no"></p><b class="hw-cap-title"></b><p class="hw-cap-text"></p></div>
-              <div class="hw-controls">
-                <button type="button" class="hw-btn hw-prev" aria-label="Previous step"><svg class="icon flip" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-                <div class="hw-dots" role="group" aria-label="Choose a step"></div>
-                <button type="button" class="hw-btn hw-next" aria-label="Next step"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-              </div>
-            </section>
-          </div>
+        <div class="tabpanel" role="tabpanel" id="panel-day" aria-labelledby="tab-day" tabindex="0" hidden>
+          <p class="how-lead">What happens on the day, and what to have ready.</p>
+          <ol class="day-list">
+            <li><span class="day-ic"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></span><div><b>We arrive 15 minutes early</b><p>Our team sets up before your start time, then runs 45 minutes of guided squishy making. We’re on site for up to 2 hours.</p></div></li>
+            <li><span class="day-ic"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg></span><div><b>Tell us exactly where</b><p>Add the exact spot, like “Clubhouse II, function room level 2”, so our team finds you straight away.</p></div></li>
+            <li><span class="day-ic"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span><div><b>Have the space ready</b><p>You provide the venue, plus tables and chairs for the children. We bring all the materials, trays and tools.</p></div></li>
+            <li><span class="day-ic"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span><div><b>A moment for the birthday girl</b><p>We bring a sparkly Birthday Girl sash and tiara for her to wear during the party, and take them back afterwards.</p></div></li>
+            <li><span class="day-ic"><svg class="icon" aria-hidden="true"><use href="#i-jar"/></svg></span><div><b>Every child takes one home</b><p>Each child decorates a squishy capsule with rhinestone stickers, and their squishy goes home in it.</p></div></li>
+            <li><span class="day-ic"><svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg></span><div><b>Food and cake</b><p>We don’t cater food, so please arrange it. Add a Butter Studio cake in the planner, or bring your own.</p></div></li>
+          </ol>
         </div>
 
-        <div class="tabpanel" role="tabpanel" id="panel-vendors" aria-labelledby="tab-vendors" tabindex="0" hidden>
-          <h3 class="panel-title">Other vendors</h3>
-          <p class="lead" style="margin-top:8px">Complete your party with our partner vendors. We book and coordinate them for you, and add everything to one quotation.</p>
-          <ul class="vendor-cats">
-            <li><span class="vc-ic"><svg class="icon" aria-hidden="true"><use href="#i-cake"/></svg></span><div><b>Cakes</b><p>Butter Studio</p></div></li>
-            <li><span class="vc-ic"><svg class="icon" aria-hidden="true"><use href="#i-smile"/></svg></span><div><b>Activities</b><p>Face painting, balloon sculpting and a magic show</p></div></li>
-            <li><span class="vc-ic"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg></span><div><b>Photography</b><p>A party photographer to capture the day</p></div></li>
-            <li><span class="vc-ic"><svg class="icon" aria-hidden="true"><use href="#i-balloon"/></svg></span><div><b>Styling</b><p>Balloon backdrops, dessert tables, party props and favour bags</p></div></li>
-          </ul>
-          <div class="acc-group" style="margin-top:14px">
-            <details class="acc"><summary>How are vendors priced?</summary><div class="acc-body"><p>Most add-ons show their price as you plan. Cake prices depend on size and flavour, so we add them to your quotation.</p></div></details>
-            <details class="acc"><summary>Who coordinates the vendors?</summary><div class="acc-body"><p>We do. We confirm each vendor for your date, arrange timings and delivery, and send you one quotation.</p></div></details>
-            <details class="acc"><summary>Can I arrange my own cake or food?</summary><div class="acc-body"><p>Yes. We don’t cater food, so your to-do list reminds you to arrange it. If you’re bringing your own cake, just skip Cakes in the planner.</p></div></details>
+        <div class="tabpanel" role="tabpanel" id="panel-safety" aria-labelledby="tab-safety" tabindex="0" hidden>
+          <p class="how-lead">Are squishies safe? The facts, and when to take care.</p>
+          <div class="myths">
+            <article class="myth">
+              <p class="myth-k">Myth</p><h3>“All squishies are toxic.”</h3>
+              <p class="fact-k">Fact</p>
+              <p>The well-known 2018 warning from Denmark was about mass-produced <b>foam</b> squishies, which gave off solvents such as dimethylformamide, styrene and toluene. Ours aren’t foam squishies off a shelf: each child fills a soft squishy with their own toppings, and our team seals it for them.</p>
+            </article>
+            <article class="myth">
+              <p class="myth-k">Myth</p><h3>“Slime is full of borax.”</h3>
+              <p class="fact-k">Fact</p>
+              <p>Boron is what makes many slimes stretchy, and the amount is what matters. EU toy rules cap boron in toy slime at 300 mg per kg, and tests have found some cheap slimes well over that. It’s a good reason to choose slime from a supplier you trust, rather than mixing your own with laundry products.</p>
+            </article>
+            <article class="myth">
+              <p class="myth-k">Myth</p><h3>“Small parts are fine if it’s a toy.”</h3>
+              <p class="fact-k">Fact</p>
+              <p>Charms, beads and sprinkles are small parts, and children under 3 are most at risk of choking on them. That’s why our hosts stay at the table and guide every step, and why we ask you to keep toddlers away from the toppings.</p>
+            </article>
+          </div>
+          <div class="safe-grid">
+            <div class="safe-card">
+              <h3><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>How we keep it safe</h3>
+              <ul>
+                <li>Our hosts guide and watch every step, from choosing toppings to the finished squishy.</li>
+                <li>Our team helps fill and securely ties each squishy, so nothing comes loose.</li>
+                <li>Every squishy goes home sealed in its own capsule.</li>
+              </ul>
+            </div>
+            <div class="safe-card care">
+              <h3><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg>When to take care</h3>
+              <ul>
+                <li><b>Under-3s:</b> keep babies and toddlers, including younger siblings, away from the toppings table.</li>
+                <li><b>Not food:</b> some toppings look like sweets. Remind children not to put them in their mouths.</li>
+                <li><b>Wash hands</b> after making and playing.</li>
+                <li><b>If a squishy tears or leaks,</b> throw it away, and don’t let children bite or chew it.</li>
+                <li><b>Allergies or sensitive skin:</b> tell us when you request, and stop and wash if skin gets red or itchy.</li>
+                <li><b>If a child swallows a part</b> and seems unwell, get medical help straight away.</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -1567,10 +1789,13 @@ html:has(body.planning){scroll-padding-top:150px}
           <div class="acc-group">
             <details class="acc" open><summary>How much does Squishy DIY cost?</summary><div class="acc-body"><p>Jelly is $16, Crunchy $18 and the Duo $26 per child, plus $2 per child for the take-home squishy capsule and a one-time $150 travel &amp; set-up fee. The minimum is 10 children.</p></div></details>
             <details class="acc"><summary>Which Squishy DIY options are there?</summary><div class="acc-body"><p>There are three. <b>Duo:</b> each child makes one Jelly and one Crunchy squishy. <b>Jelly:</b> one smooth, clear squishy filled with charms. <b>Crunchy:</b> one squishy packed with crunchy toppings. Every option includes a take-home squishy capsule to decorate with rhinestone stickers, all materials and our hosts. For a birthday girl, we also bring a sparkly Birthday Girl sash and tiara to wear during the party (we take them back afterwards).</p></div></details>
+            <details class="acc"><summary>How are vendors priced?</summary><div class="acc-body"><p>Most add-ons show their price as you plan. Cake prices depend on size and flavour, so we add them to your quotation.</p></div></details>
+            <details class="acc"><summary>Who coordinates the vendors?</summary><div class="acc-body"><p>We do. We confirm each vendor for your date, arrange timings and delivery, and send you one quotation.</p></div></details>
+            <details class="acc"><summary>Can I arrange my own cake or food?</summary><div class="acc-body"><p>Yes. We don’t cater food, so your to-do list reminds you to arrange it. If you’re bringing your own cake, just skip Cakes in the planner.</p></div></details>
             <details class="acc"><summary>What does Wax Cracking cost?</summary><div class="acc-body"><p>$2 per squishy for Jelly or Crunchy. With the Duo, it’s $50 for every 20 squishies (U.P. $60).</p></div></details>
             <details class="acc"><summary>How long is the activity?</summary><div class="acc-body"><p>One hour of our time: 15 minutes to set up, then 45 minutes of guided play. The travel &amp; set-up fee covers our team for up to 2 hours on site.</p></div></details>
             <details class="acc"><summary>What do I need to provide?</summary><div class="acc-body"><p>The venue, tables and chairs, and anything you don’t add from our partners, such as food or cake. Your checklist updates as you plan.</p></div></details>
-            <details class="acc"><summary>When do I pay?</summary><div class="acc-body"><p>Not yet. We confirm availability and send one quotation first. A deposit is arranged only after you approve it.</p></div></details>
+            <details class="acc"><summary>When do I pay?</summary><div class="acc-body"><p>When you send your request, you pay a 10% holding deposit on your Squishy Party by PayNow. We then confirm availability on WhatsApp and send one quotation. The deposit is refunded in full if we’re unable to attend on your date, and deducted from your full amount if you go ahead with your package. It’s non-refundable if you cancel.</p></div></details>
           </div>
         </div>
           <div class="retail retail-photo" style="margin-top:24px"><img class="retail-bg" src="img/store.jpg" alt="" aria-hidden="true" loading="lazy">
@@ -1653,8 +1878,9 @@ html:has(body.planning){scroll-padding-top:150px}
                 <label class="field">Preferred date<input name="date" id="date" type="date"></label>
                 <div class="field"><span id="time-label">Party time</span>
                   <div class="time-range" role="group" aria-labelledby="time-label"><label><span class="vh">Start time</span><input name="time" id="time" type="time" value="14:00" aria-label="Start time"></label><span class="time-to" aria-hidden="true">to</span><label><span class="vh">End time</span><input name="end" id="end" type="time" value="16:00" aria-label="End time"></label></div>
-                  <span class="hint" id="time-hint">2 hours · Singapore time</span></div>
-                <label class="field full">Venue address<input name="venue" id="venue" autocomplete="street-address" maxlength="300" placeholder="e.g. Blk 123 Tampines St 11, function room"></label>
+                  <span class="hint" id="time-hint">2 hours · Singapore time</span><span class="hint early-hint"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Our team arrives 15 minutes before your start time to set up.</span></div>
+                <label class="field full">Venue address<input name="venue" id="venue" autocomplete="street-address" maxlength="300" placeholder="e.g. Blk 123 Tampines St 11"></label>
+                <label class="field full"><span>Exact location <span class="opt-tag">(optional)</span></span><input name="spot" id="spot" maxlength="120" placeholder="e.g. Condo Clubhouse II, function room level 2"><span class="hint">So our team can find you on the day</span></label>
                 <label class="field">Postal code<input name="postal" id="postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 digits"><span class="hint">Helps us plan travel to your venue</span></label>
               </div>
             </div>
@@ -1806,9 +2032,9 @@ html:has(body.planning){scroll-padding-top:150px}
       <!-- STEP 5 -->
       <section class="wstep" id="wstep-5" aria-labelledby="ws5-h" hidden>
         <p class="eyebrow">Step 5</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
-        <p class="wlead">While we confirm our team’s availability, let us know how we can reach you. Once your date is confirmed, we’ll let you know, and a 50% deposit on your Squishy Party secures it.</p>
+        <p class="wlead">Tell us how to reach you and verify your email. After you send your request, a 10% holding deposit by PayNow locks it in while we confirm our team’s availability.</p>
         <div class="deposit-card">
-          <div><p class="eyebrow">To secure your date, after we confirm</p><p class="dep-line"><strong id="dep-amount">$0.00</strong> <span>50% deposit on your Squishy Party</span></p><p class="dep-sub" id="dep-sub">Squishy DIY total $0.00. Nothing is charged now.</p></div>
+          <div><p class="eyebrow">Holding deposit, paid by PayNow after you send</p><p class="dep-line"><strong id="hold-amount">$0.00</strong> <span>10% of your Squishy Party</span></p><p class="dep-sub" id="dep-sub">Refunded in full if we’re unable to attend. Deducted from your full amount if you go ahead.</p></div>
           <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
         </div>
         <details class="acc acc-card">
@@ -1822,13 +2048,19 @@ html:has(body.planning){scroll-padding-top:150px}
               <label class="field">Party date<input name="reqDate" id="req-date" type="date" required></label>
               <div class="field"><span id="req-time-label">Party time</span><div class="time-range" role="group" aria-labelledby="req-time-label"><label><span class="vh">Start time</span><input name="reqTime" id="req-time" type="time" aria-label="Start time" required></label><span class="time-to" aria-hidden="true">to</span><label><span class="vh">End time</span><input name="reqEnd" id="req-end" type="time" aria-label="End time" required></label></div></div>
               <label class="field full">Venue address<input name="address" id="req-address" autocomplete="street-address" maxlength="300" required></label>
+              <label class="field full"><span>Exact location <span class="opt-tag">(optional)</span></span><input name="reqSpot" id="req-spot" maxlength="120" placeholder="e.g. Condo Clubhouse II, function room level 2"></label>
               <label class="field">Singapore postal code<input name="postalCode" id="req-postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required></label>
             </div>
             <div class="group-title"><span class="step-num">2</span><h3>How we can reach you</h3></div>
             <div class="grid2">
               <label class="field full">Parent’s name<input name="parentName" autocomplete="name" maxlength="100" required></label>
               <label class="field">Mobile number (WhatsApp)<input name="phone" type="tel" autocomplete="tel" placeholder="8123 4567" pattern="(\+?65)?[ ]?[689][0-9]{3}[ ]?[0-9]{4}" maxlength="16" required><span class="hint">We’ll WhatsApp you to confirm</span></label>
-              <label class="field">Email address<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+              <div class="field full otp-field" id="otp-field">
+                <label for="req-email">Email address</label>
+                <div class="otp-row"><input name="email" id="req-email" type="email" autocomplete="email" maxlength="254" required aria-describedby="otp-status"><button type="button" class="btn btn-ghost otp-btn" id="otp-send">Send code</button></div>
+                <div class="otp-row" id="otp-code-row" hidden><input id="otp-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit code" aria-label="6-digit code from your email"><button type="button" class="btn btn-primary otp-btn" id="otp-verify">Verify</button></div>
+                <p class="hint otp-status" id="otp-status" aria-live="polite">We’ll email you a 6-digit code to confirm it’s you.</p>
+              </div>
               <label class="field full">Anything else we should know? <span class="hint">Optional: access, parking or setup details. Please share dietary needs with your coordinator directly.</span><textarea name="notes" rows="3" maxlength="1000"></textarea></label>
             </div>
             <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
@@ -1836,14 +2068,31 @@ html:has(body.planning){scroll-padding-top:150px}
             <p class="privacy">We use these details only to arrange your party and reply to your request.</p>
             <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
             <button type="button" class="btn btn-primary" id="booking-submit">Send my request</button>
-            <p class="submit-note">Nothing is charged now. We confirm availability first, then the 50% deposit secures your date.</p>
+            <p class="submit-note">Next, you’ll see a PayNow QR for the <b id="hold-note">10%</b> holding deposit.</p>
+            <p class="fine-print"><b>Fine print:</b> The 10% holding deposit is refunded in full if we’re unable to attend on your date. If you go ahead with your package, it’s deducted from your full amount. It’s non-refundable if you cancel.</p>
           </form>
         </div>
         <div class="sent-card" id="sent-card" tabindex="-1" hidden>
           <span class="sent-icon" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
-          <h3>Request sent!</h3>
-          <p>Your reference is <strong id="sent-ref">SP-0000</strong>. We’re checking our team’s availability for <span id="sent-date"></span> and will WhatsApp you at <strong id="sent-phone"></strong> to confirm.</p>
-          <p class="dep-sub">Once it’s confirmed, the 50% Squishy Party deposit (<span id="sent-dep"></span>) secures your date.</p>
+          <h3>Request received!</h3>
+          <p>Your reference is <strong id="sent-ref">SP-0000</strong>. Your request is being verified by our team, and we’ll reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
+          <p class="dep-sub" id="sent-mail">We’ve emailed a copy to <span id="sent-email"></span>.</p>
+          <div class="pay-card" id="pay-card">
+            <p class="eyebrow">Lock in your request</p>
+            <h4>Pay the <span id="pay-amount">$0.00</span> holding deposit</h4>
+            <div class="pay-body" id="pay-qr-wrap">
+              <div class="pay-qr" id="pay-qr" role="img" aria-label="PayNow QR code"></div>
+              <ol class="pay-steps">
+                <li>Open your banking app and scan this PayNow QR, or long-press to save it.</li>
+                <li>The amount <b id="pay-amount-2"></b> and reference <b id="pay-ref"></b> fill in automatically.</li>
+                <li>Pay to <b id="pay-payee"></b> (<span id="pay-label"></span>), then tap the button below.</li>
+              </ol>
+            </div>
+            <p class="dep-sub" id="pay-none" hidden>We’ll WhatsApp you the PayNow details for this deposit.</p>
+            <p class="pay-policy fine-print"><b>Fine print:</b> The 10% holding deposit is refunded in full if we’re unable to attend on your date. If you go ahead with your package, it’s deducted from your full amount. It’s non-refundable if you cancel.</p>
+            <button type="button" class="btn btn-primary" id="pay-done">I’ve paid the deposit</button>
+            <p class="pay-status" id="pay-status" role="status" hidden></p>
+          </div>
           <button type="button" class="btn btn-ghost" id="sent-todo">See your to-do list</button>
         </div>
       </section>
@@ -2033,6 +2282,57 @@ html:has(body.planning){scroll-padding-top:150px}
         cardEls[p.id] = {card:c, add:add, basis:pb, rec:rec};
       });
     });
+  }
+
+
+  /* ================= HOME: "How it works" 3-step timeline ================= */
+  function buildTimeline(){
+    var tl = $('how-tl'); if (!tl) return;
+    // Step 1: the three Squishy DIY options, reusing the photos from the planner
+    var ex = $('tl-exp');
+    [['both','Duo','Best value'],['jelly','Jelly',''],['crunchy','Crunchy','']].forEach(function(o){
+      var src = document.querySelector('.exp-tile input[value="' + o[0] + '"]'), img = src && src.parentNode.querySelector('img');
+      var c = el('div','tl-exp-card' + (o[0] === 'both' ? ' best' : ''));
+      if (img) { var im = document.createElement('img'); im.src = img.src; im.alt = ''; im.decoding = 'async'; c.appendChild(im); }
+      c.appendChild(el('b', null, o[1])); c.appendChild(el('span', null, short(EXP[o[0]].pax) + ' per child'));
+      if (o[2]) c.appendChild(el('i', null, o[2]));
+      ex.appendChild(c);
+    });
+    // Step 2: one swipeable card per partner
+    var vs = $('tl-vendors');
+    var order = []; ['cake','styling','entertainment'].forEach(function(c){ vendorsFor(c).forEach(function(v){ order.push([v, c]); }); });
+    order.forEach(function(x){
+      var v = x[0], cat = x[1], st = storeOf(v), card = el('div','tl-vcard'); card.setAttribute('role','listitem');
+      var pic = st.hero || (P.filter(function(p){ return p.vendor === v && p.img; })[0] || {}).img;
+      card.appendChild(photoEl(pic, '', 'tl-vpic tone-' + cat, st.icon || CAT_ICON[cat]));
+      var b = el('div','tl-vbody');
+      b.appendChild(el('span','tl-vcat', (CATS.filter(function(c){ return c.id === cat; })[0] || {}).tab));
+      b.appendChild(el('b', null, st.title || v));
+      b.appendChild(el('span','tl-vfrom', fromTxt(v)));
+      card.appendChild(b); vs.appendChild(card);
+    });
+    // Step 3: a sample invitation
+    var inv = $('tl-invite');
+    if (inv) inv.innerHTML = invSVG('splash', { name:'Mia', age:6, ageLine:'6th Birthday', dateLine:'Saturday, 21 November', dayLine:'Saturday', dayDate:'Nov 21', timeLine:'2:00 pm – 4:00 pm', startLine:'at 2:00 pm', venue:'Clubhouse II, 1 Example Road', rsvp:'' }, 'tl');
+    // Scroll: the line fills and each step lights up and fades in as it reaches the middle of the screen.
+    var steps = [].slice.call(tl.querySelectorAll('.tl-step'));
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!('IntersectionObserver' in window)) { steps.forEach(function(x){ x.classList.add('in', 'on'); }); return; }
+    tl.classList.add('tl-anim'); if (reduce) tl.classList.add('tl-still');
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin:'0px 0px -12% 0px', threshold:0.12 });
+    steps.forEach(function(x){ io.observe(x); });
+    var ticking = false;
+    function fill(){
+      ticking = false;
+      if (tl.offsetParent === null) return;
+      var r = tl.getBoundingClientRect(), mid = window.innerHeight * 0.55;
+      var pct = Math.max(0, Math.min(1, (mid - r.top) / Math.max(1, r.height)));
+      tl.style.setProperty('--tl-p', pct.toFixed(3));
+      steps.forEach(function(x){ var d = x.querySelector('.tl-dot').getBoundingClientRect(); x.classList.toggle('on', d.top + d.height / 2 <= mid); });
+    }
+    window.addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(fill); } }, {passive:true});
+    window.addEventListener('resize', fill); fill();
+    tl.__fill = fill;
   }
 
   /* ================= PARTNER STORES: one card per vendor; tapping opens its menu, like a delivery app ================= */
@@ -2247,15 +2547,17 @@ html:has(body.planning){scroll-padding-top:150px}
     var im = new Image(); im.onload = function(){ photoOK[url] = true; cb(); }; im.onerror = function(){ photoOK[url] = false; }; im.src = url;
   }
   // Card positions relative to the active card (k = index - active). Upcoming cards peek up and to the right.
+  // Centred stack: the current card sits in the middle, the next ones fan out behind it (right, top, left).
+  // Swipe left for the next card (the current one slides out to the left); swipe right to bring it back.
   var HW_POS = {
-    '-1': 'translate(-58%, 4%) rotate(-8deg) scale(0.92)',
+    '-1': 'translate(-78%, 6%) rotate(-12deg) scale(0.9)',
     '0':  'none',
-    '1':  'translate(12%, -14%) rotate(3deg) scale(0.92)',
-    '2':  'translate(22%, -26%) rotate(6deg) scale(0.84)',
-    '3':  'translate(31%, -36%) rotate(9deg) scale(0.76)'
+    '1':  'translate(20%, -5%) rotate(5deg) scale(0.88)',
+    '2':  'translate(1%, -19%) rotate(-2deg) scale(0.8)',
+    '3':  'translate(-20%, -7%) rotate(-6deg) scale(0.84)',
+    '4':  'translate(0, -8%) scale(0.72)'
   };
-  HW_POS['4'] = HW_POS['3'];
-  var HW_OPACITY = { '-1': 0, '0': 1, '1': 1, '2': 0.85, '3': 0.7, '4': 0 };
+  var HW_OPACITY = { '-1': 0, '0': 1, '1': 1, '2': 0.92, '3': 0.88, '4': 0 };
   /* One reusable card stack, used for "How it works" (planner) and "The making" (home page). */
   var MAKING_STEPS = [
     {img:'img/making/1.jpg', title:'Pick a colour', caption:'Choose from three base colours of clear or glittery slime.'},
@@ -2718,8 +3020,9 @@ html:has(body.planning){scroll-padding-top:150px}
 
     // request step: deposit + fields prefilled from the plan (kept in sync both ways)
     var squishyTotal = T.found.reduce(function(a, f){ return a + f.cents; }, 0), dep = Math.round(squishyTotal / 2);
-    put('dep-amount', money(dep)); put('dep-sub', 'Squishy DIY total ' + money(squishyTotal) + ', including travel & set-up. Nothing is charged now.');
-    [['req-date', s.date], ['req-time', s.time], ['req-end', s.end], ['req-address', s.venue], ['req-postal', s.postal]].forEach(function(p){ var e = $(p[0]); if (e && document.activeElement !== e && e.value !== (p[1] || '')) e.value = p[1] || ''; if (e) e.classList.toggle('prefilled', !!e.value); });
+    var hold = Math.round(squishyTotal / 10); S.holdCents = hold;
+    put('hold-amount', money(hold)); put('hold-note', money(hold)); put('dep-sub', '10% of your Squishy DIY total of ' + money(squishyTotal) + '. Refunded in full if we’re unable to attend; deducted from your full amount if you go ahead.');
+    [['req-date', s.date], ['req-time', s.time], ['req-end', s.end], ['req-address', s.venue], ['req-spot', s.spot], ['req-postal', s.postal]].forEach(function(p){ var e = $(p[0]); if (e && document.activeElement !== e && e.value !== (p[1] || '')) e.value = p[1] || ''; if (e) e.classList.toggle('prefilled', !!e.value); });
     S.depositCents = dep;
 
     // recap + mobile
@@ -2759,7 +3062,7 @@ html:has(body.planning){scroll-padding-top:150px}
     S.length = ok ? b - a : 120; S.timeOk = ok || a == null || b == null;
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
-    put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
+    put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
     S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax');
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
@@ -2780,6 +3083,7 @@ html:has(body.planning){scroll-padding-top:150px}
   initHow();
   buildCards();
   buildInvite();
+  buildTimeline();
   document.addEventListener('change', function(e){ var id = e.target.dataset && e.target.dataset.todo; if (id) { S.done[id] = e.target.checked; render(false); } });
   document.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('.todo-act'); if (!b) return; go('#plan-' + b.dataset.go); if (b.dataset.tab) { var t = $(b.dataset.tab); if (t) selectTab(t, false); } });
   readForm();
@@ -2790,6 +3094,7 @@ html:has(body.planning){scroll-padding-top:150px}
     var list = tab.closest('[role=tablist]'), tabs = list.querySelectorAll('[role=tab]');
     tabs.forEach(function(t){ var on = t === tab; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; var pnl = $(t.getAttribute('aria-controls')); if (pnl) pnl.hidden = !on; });
     if (focus) tab.focus();
+    if (tab.closest('#explore') && tab.getAttribute('aria-selected') === 'true') track('home_tab_viewed', {tab:tab.textContent.trim()});
   }
   document.addEventListener('click', function(e){ var t = e.target.closest('[role=tab]'); if (t) selectTab(t, false); });
   document.addEventListener('keydown', function(e){
@@ -2825,7 +3130,7 @@ html:has(body.planning){scroll-padding-top:150px}
     $('wiz-back').lastChild.textContent = k === 1 ? 'Home' : 'Back';
     var nx = $('wiz-next'), nm = $('wiz-next-m');
     nx.hidden = k === 5; nx.firstChild.textContent = k < 5 ? 'Next: ' + STEPS[k] + ' ' : '';
-    nm.textContent = k < 5 ? 'Next' : 'Send request';
+    nm.textContent = k < 5 ? 'Next' : 'Send request'; nm.hidden = k === 5 && !!S.requested;
     window.scrollTo(0, 0);
     var h = $('ws' + k + '-h'); if (h && focus) h.focus({preventScroll:true});
   }
@@ -2855,8 +3160,81 @@ html:has(body.planning){scroll-padding-top:150px}
   bf.addEventListener('submit', function(e){ e.preventDefault(); sendRequest(); });
   $('booking-submit').addEventListener('click', function(e){ e.preventDefault(); sendRequest(); });
   // Request fields in step 5 write back to the plan, so the plan stays the single source of truth.
-  [['req-date','date'], ['req-time','time'], ['req-end','end'], ['req-address','venue'], ['req-postal','postal']].forEach(function(p){
-    $(p[0]).addEventListener('input', function(e){ $(p[1]).value = e.target.value; readForm(); render(false); });
+  [['req-date','date'], ['req-time','time'], ['req-end','end'], ['req-address','venue'], ['req-spot','spot'], ['req-postal','postal']].forEach(function(p){
+    $(p[0]).addEventListener('input', function(e){ $(p[1]).value = e.target.value; if (p[1] === 'time') autoEnd(); readForm(); render(false); });
+  });
+  // A new start time always moves the end time to 2 hours later; the end time can then be changed freely.
+  function autoEnd(){
+    var a = mins($('time').value); if (a == null) return;
+    var b = Math.min(a + 120, 23 * 60 + 59), v = String(Math.floor(b / 60)).padStart(2, '0') + ':' + String(b % 60).padStart(2, '0');
+    $('end').value = v; var re = $('req-end'); if (re && document.activeElement !== re) re.value = v;
+  }
+  $('time').addEventListener('input', function(){ autoEnd(); readForm(); render(false); });
+  /* ---------- Email verification (6-digit code by email) ---------- */
+  var OTP = { email:'', token:'', verified:'', cooldown:0, timer:null };
+  function normEmail(v){ return String(v || '').trim().toLowerCase(); }
+  function isWebProto(){ try { return /^https?:$/.test(location.protocol); } catch (e) { return false; } }
+  function otpStatus(msg, kind){ var st = $('otp-status'); st.textContent = msg; st.className = 'hint otp-status' + (kind ? ' ' + kind : ''); }
+  function otpUI(){
+    var em = $('req-email'), ok = !!OTP.verified && OTP.email === normEmail(em.value);
+    $('otp-field').classList.toggle('verified', ok);
+    $('otp-send').hidden = ok; $('otp-code-row').hidden = ok || !OTP.token || OTP.email !== normEmail(em.value);
+    var send = $('otp-send'); send.disabled = OTP.cooldown > 0; send.textContent = OTP.cooldown > 0 ? 'Resend in ' + OTP.cooldown + 's' : OTP.token && OTP.email === normEmail(em.value) ? 'Resend' : 'Send code';
+    if (ok) { otpStatus('Email verified.', 'ok'); em.removeAttribute('aria-invalid'); }
+  }
+  function otpCall(body){
+    return fetch('/api/otp', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {status:r.status, body:j}; }); });
+  }
+  $('req-email').addEventListener('input', function(){ if (OTP.email !== normEmail(this.value)) { OTP.verified = ''; } otpUI(); if (!OTP.verified) otpStatus('We’ll email you a 6-digit code to confirm it’s you.'); });
+  $('otp-send').addEventListener('click', function(){
+    var em = $('req-email'), v = normEmail(em.value);
+    if (!em.checkValidity() || !v) { em.setAttribute('aria-invalid','true'); otpStatus('Please enter a valid email address first.', 'err'); em.focus(); return; }
+    if (!isWebProto()) { otpStatus('This is an offline preview. Email codes are sent from the live website.', 'err'); return; }
+    var btn = this; btn.disabled = true; btn.textContent = 'Sending…';
+    otpCall({ action:'send', email:v }).then(function(res){
+      if (res.status === 200 && res.body.ok) {
+        OTP.email = v; OTP.token = res.body.token; OTP.verified = ''; OTP.cooldown = 30;
+        clearInterval(OTP.timer); OTP.timer = setInterval(function(){ OTP.cooldown--; if (OTP.cooldown <= 0) clearInterval(OTP.timer); otpUI(); }, 1000);
+        otpUI(); otpStatus('We’ve emailed a 6-digit code to ' + v + '. Check your spam folder if it’s not there in a minute.', 'ok'); $('otp-code').value = ''; $('otp-code').focus();
+        track('otp_sent', {});
+      } else { otpUI(); otpStatus(res.body.error || 'We couldn’t send the code just now. Please try again.', 'err'); }
+    }).catch(function(){ otpUI(); otpStatus('We couldn’t reach our server. Please check your connection and try again.', 'err'); });
+  });
+  function verifyCode(){
+    var code = $('otp-code').value.replace(/\D/g, '');
+    if (code.length !== 6) { otpStatus('Enter the 6-digit code from your email.', 'err'); $('otp-code').focus(); return; }
+    var btn = $('otp-verify'); btn.disabled = true; btn.textContent = 'Checking…';
+    otpCall({ action:'verify', email:OTP.email, code:code, token:OTP.token }).then(function(res){
+      btn.disabled = false; btn.textContent = 'Verify';
+      if (res.status === 200 && res.body.ok) { OTP.verified = res.body.verified; otpUI(); track('otp_verified', {}); }
+      else { otpStatus(res.body.error || 'That code didn’t work. Please try again.', 'err'); $('otp-code').value = ''; $('otp-code').focus(); }
+    }).catch(function(){ btn.disabled = false; btn.textContent = 'Verify'; otpStatus('We couldn’t reach our server. Please try again.', 'err'); });
+  }
+  $('otp-verify').addEventListener('click', verifyCode);
+  $('otp-code').addEventListener('input', function(){ var c = this.value.replace(/\D/g, '').slice(0, 6); if (c !== this.value) this.value = c; if (c.length === 6) verifyCode(); });
+  $('otp-code').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
+
+  /* ---------- PayNow holding deposit ---------- */
+  var PAY = null;
+  function showPay(b){
+    var nm = $('wiz-next-m'); if (nm) nm.hidden = true;
+    PAY = { ref:b.ref, cents:b.holdCents, sig:b.paynow ? b.paynow.sig : '' };
+    put('pay-amount', money(b.holdCents)); put('pay-amount-2', money(b.holdCents)); put('pay-ref', b.ref);
+    var has = !!b.paynow; $('pay-qr-wrap').hidden = !has; $('pay-none').hidden = has; $('pay-done').hidden = !has;
+    if (has) { $('pay-qr').innerHTML = b.paynow.svg; put('pay-payee', b.paynow.payee); put('pay-label', b.paynow.label); }
+  }
+  $('pay-done').addEventListener('click', function(){
+    if (!PAY || !PAY.sig) return;
+    var btn = this, st = $('pay-status'); btn.disabled = true; btn.textContent = 'Letting us know…';
+    fetch('/api/paid', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ ref:PAY.ref, cents:PAY.cents, sig:PAY.sig }) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {status:r.status, body:j}; }); })
+      .then(function(res){
+        st.hidden = false;
+        if (res.status === 200 && res.body.ok) { btn.hidden = true; st.className = 'pay-status ok'; st.textContent = 'Thank you! We’ll check the payment and WhatsApp you to confirm.'; track('deposit_marked_paid', {}); }
+        else { btn.disabled = false; btn.textContent = 'I’ve paid the deposit'; st.className = 'pay-status err'; st.textContent = res.body.error || 'We couldn’t send that just now. Please try again in a minute.'; }
+      })
+      .catch(function(){ btn.disabled = false; btn.textContent = 'I’ve paid the deposit'; st.hidden = false; st.className = 'pay-status err'; st.textContent = 'We couldn’t reach our server. Please try again.'; });
   });
   function phoneDigits(v){ var d = String(v || '').replace(/[^0-9]/g, ''); if (d.length === 10 && d.indexOf('65') === 0) d = d.slice(2); return d; }
   function sendRequest(){
@@ -2867,6 +3245,7 @@ html:has(body.planning){scroll-padding-top:150px}
       if (!i.checkValidity()) flag(i, i.validity.valueMissing ? 'Please fill this in.' : i.name === 'postalCode' ? 'Enter a 6-digit Singapore postal code.' : i.name === 'phone' ? 'Enter a Singapore mobile number, e.g. 8123 4567.' : 'Please check this.');
     });
     if (!S.timeOk && bad.indexOf($('req-end')) < 0) flag($('req-end'), 'The end time needs to be after the start time.');
+    var em = $('req-email'); if (isWebProto() && bad.indexOf(em) < 0 && !(OTP.verified && OTP.email === normEmail(em.value))) { bad.push(em); em.setAttribute('aria-invalid','true'); otpStatus('Please verify your email: tap “Send code”, then enter the code we email you.', 'err'); }
     err.hidden = false;
     track(bad.length ? 'request_invalid' : 'request_submitted', bad.length ? {fields:bad.map(function(i){ return i.name; }).join(',')} : {});
     if (bad.length) { err.textContent = 'Please check the highlighted details' + (bf.consent.checked ? '.' : ', and tick the contact consent box.'); bad[0].focus(); return; }
@@ -2876,9 +3255,9 @@ html:has(body.planning){scroll-padding-top:150px}
     var payload = {
       v: 1,
       plan: { children:S.children, adults:S.adults, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, budgetCents:S.budgetCents },
-      contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:'', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
+      contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
-      client: { totalCents:T.total }
+      client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';
     err.hidden = true;
@@ -2892,12 +3271,14 @@ html:has(body.planning){scroll-padding-top:150px}
           track('request_sent', {experience:S.experience, children:S.children, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
           put('sent-ref', res.body.ref); put('sent-phone', '+65 ' + payload.contact.phone.replace(/(\d{4})(\d{4})/, '$1 $2'));
           put('sent-date', new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}));
-          put('sent-dep', money(res.body.depositCents != null ? res.body.depositCents : S.depositCents));
+          put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
+          showPay(res.body);
           $('request-panel').hidden = true; $('sent-card').hidden = false; $('sent-card').focus();
-          render(true, 'Request sent. Reference ' + res.body.ref + '.');
+          render(true, 'Request received. Reference ' + res.body.ref + '. Pay the holding deposit by PayNow to lock it in.');
           return;
         }
-        fail(res.status === 429 ? 'You’ve sent a few requests just now. Please wait a minute and try again.' : res.status === 400 && res.body.error ? res.body.error : 'We couldn’t send your request just now. Please try again in a minute.');
+        if (res.body && res.body.field === 'email') { OTP.verified = ''; otpUI(); }
+        fail(res.status === 429 ? 'You’ve sent a few requests just now. Please wait a minute and try again.' : (res.status === 400 || res.status === 503) && res.body.error ? res.body.error : 'We couldn’t send your request just now. Please try again in a minute.');
       })
       .catch(function(){ clearTimeout(timer); fail('We couldn’t reach our server. Please check your connection and try again.'); });
     function fail(msg){ track('request_failed', {reason:msg.slice(0, 60)}); btn.removeAttribute('aria-busy'); btn.disabled = false; btn.textContent = 'Send my request'; err.hidden = false; err.textContent = msg + ' Your request has not been sent.'; err.focus(); }

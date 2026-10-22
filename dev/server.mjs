@@ -13,13 +13,18 @@ if (fs.existsSync(envFile)) {
     if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
   }
 }
-const { default: handler } = await import('../api/request.js');
+const ROUTES = {
+  '/api/request': (await import('../api/request.js')).default,
+  '/api/otp': (await import('../api/otp.js')).default,
+  '/api/paid': (await import('../api/paid.js')).default,
+};
 const PORT = Number(process.env.PORT || 3000);
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  if (url.pathname === '/api/request') {
+  const handler = ROUTES[url.pathname];
+  if (handler) {
     res.status = (c) => { res.statusCode = c; return res; };
     res.json = (o) => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(o)); return res; };
     try { await handler(req, res); } catch (e) { console.error(e); res.statusCode = 500; res.end('{"ok":false}'); }
