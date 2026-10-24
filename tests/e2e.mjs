@@ -145,8 +145,12 @@ try {
   assert.equal(x.s, 400); assert.equal(x.b.field, 'email'); ok('a request without a verified email is refused (400)');
   x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
   assert.equal(x.s, 400); ok('a verified token for a different email is refused');
+  x = await api({ ...base, bookingFor: 'company', contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
+  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.paynow, null);
+  assert.ok(sent().at(-1).text.includes('Company booking') && mails().at(-1).text.includes('nothing to pay now') && mails().at(-1).attachments.length === 0);
+  ok('company booking: same price, no PayNow QR, invoice requested on Telegram and in the email');
   x = await api({ ...base, website: 'http://spam' }, { 'X-Forwarded-For': '10.0.0.5' });
-  assert.equal(x.s, 200); assert.equal(sent().length, before + 1);
+  assert.equal(x.s, 200); assert.equal(sent().length, before + 2); // the $480 request and the company booking, nothing from the bot
   ok('honeypot (bot) submissions are dropped silently');
   const g = await p2.evaluate(async () => (await fetch('/api/request')).status);
   assert.equal(g, 405); ok('GET is refused (405)');

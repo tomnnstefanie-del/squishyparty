@@ -43,6 +43,7 @@ export default async function handler(req, res) {
 
     if (!checkVerified(data.contact.email, data.emailToken)) throw new HttpError(400, 'Please verify your email address first.', 'email');
     const contact = { ...data.contact, emailVerified: true };
+    const company = data.bookingFor === 'company';
 
     const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
@@ -54,7 +55,7 @@ export default async function handler(req, res) {
     }
     console.log('[request] sent', ref);
 
-    const paynow = await paynowFor(price.holdCents, ref).catch((e) => { console.error('[request] paynow qr failed', ref, e.message); return null; });
+    const paynow = company ? null : await paynowFor(price.holdCents, ref).catch((e) => { console.error('[request] paynow qr failed', ref, e.message); return null; });
 
     // The confirmation email is a courtesy: if it fails, the request has still reached you.
     let emailed = true;
@@ -62,9 +63,9 @@ export default async function handler(req, res) {
     catch (e) { emailed = false; console.error('[request] confirmation email failed', ref, e.message); }
 
     return res.status(200).json({
-      ok: true, ref, emailed,
+      ok: true, ref, emailed, bookingFor: data.bookingFor,
       totalCents: price.totalCents, depositCents: price.depositCents, holdCents: price.holdCents,
-      paynow: paynow ? { svg: paynow.svg, payee: paynow.payee, label: paynow.label, sig: signPayment(ref, price.holdCents) } : null,
+      paynow: !company && paynow ? { svg: paynow.svg, payee: paynow.payee, label: paynow.label, sig: signPayment(ref, price.holdCents) } : null,
     });
   } catch (e) { return fail(res, e, 'request'); }
 }

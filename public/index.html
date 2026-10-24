@@ -1565,6 +1565,22 @@ html:has(body.planning){scroll-padding-top:150px}
 .safe-card ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.9375rem;color:var(--ink-2)}
 .safe-card b{color:var(--ink)}
 @media (max-width:760px){.myths,.safe-grid{grid-template-columns:1fr}.myth h3{font-size:1.125rem}}
+/* v22 company bookings */
+.hero-corp{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.875rem;color:var(--ink-2);font-weight:600}
+.hero-corp .icon{width:16px;height:16px;color:var(--rose);flex:none}
+.booking-for{border:0;margin:0;padding:0;min-width:0}
+.booking-for legend{font-size:.875rem;font-weight:600;margin-bottom:7px;padding:0}
+.bf-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bf-opt{position:relative;display:block;cursor:pointer}
+.bf-opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.bf-opt span{display:flex;flex-direction:column;gap:2px;min-height:64px;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--line-2);background:#fff;transition:border-color 150ms ease,background-color 150ms ease}
+.bf-opt b{font-weight:800;color:var(--ink);font-size:.9375rem}
+.bf-opt small{font-weight:500;color:var(--muted);font-size:.8125rem;line-height:1.35}
+.bf-opt input:checked+span{border-color:var(--cobalt);background:var(--cobalt-50);box-shadow:0 0 0 3px rgba(34,52,184,.12)}
+.bf-opt input:focus-visible+span{outline:3px solid var(--rose);outline-offset:2px}
+.company-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1/-1}
+.company-fields[hidden]{display:none}
+@media (max-width:640px){.bf-opts{gap:8px}.bf-opt span{padding:10px 12px}.company-fields{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1633,6 +1649,7 @@ html:has(body.planning){scroll-padding-top:150px}
           <a class="btn btn-ghost" href="#explore" data-tab-link="tab-how">How it works</a>
         </div>
         <p class="hero-time"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Five short steps, about 3 minutes. Nothing is booked until you approve a quote.</p>
+        <p class="hero-corp"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>Planning a company event? Same prices, and we can invoice your company.</p>
         <div class="hero-facts"><ul>
           <li><svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg>Built around your budget</li>
           <li><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>One itemised quote</li>
@@ -1792,6 +1809,7 @@ html:has(body.planning){scroll-padding-top:150px}
             <details class="acc"><summary>How are vendors priced?</summary><div class="acc-body"><p>Most add-ons show their price as you plan. Cake prices depend on size and flavour, so we add them to your quotation.</p></div></details>
             <details class="acc"><summary>Who coordinates the vendors?</summary><div class="acc-body"><p>We do. We confirm each vendor for your date, arrange timings and delivery, and send you one quotation.</p></div></details>
             <details class="acc"><summary>Can I arrange my own cake or food?</summary><div class="acc-body"><p>Yes. We don’t cater food, so your to-do list reminds you to arrange it. If you’re bringing your own cake, just skip Cakes in the planner.</p></div></details>
+            <details class="acc"><summary>Can companies book?</summary><div class="acc-body"><p>Yes: team bonding workshops, family days and booths at roadshows or client events. Prices are the same as shown, per person. When you send your request, choose “A company” and we’ll send a quotation and invoice once we confirm, instead of a PayNow deposit.</p></div></details>
             <details class="acc"><summary>What does Wax Cracking cost?</summary><div class="acc-body"><p>$2 per squishy for Jelly or Crunchy. With the Duo, it’s $50 for every 20 squishies (U.P. $60).</p></div></details>
             <details class="acc"><summary>How long is the activity?</summary><div class="acc-body"><p>One hour of our time: 15 minutes to set up, then 45 minutes of guided play. The travel &amp; set-up fee covers our team for up to 2 hours on site.</p></div></details>
             <details class="acc"><summary>What do I need to provide?</summary><div class="acc-body"><p>The venue, tables and chairs, and anything you don’t add from our partners, such as food or cake. Your checklist updates as you plan.</p></div></details>
@@ -2032,10 +2050,14 @@ html:has(body.planning){scroll-padding-top:150px}
       <!-- STEP 5 -->
       <section class="wstep" id="wstep-5" aria-labelledby="ws5-h" hidden>
         <p class="eyebrow">Step 5</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
-        <p class="wlead">Tell us how to reach you and verify your email. After you send your request, a 10% holding deposit by PayNow locks it in while we confirm our team’s availability.</p>
-        <div class="deposit-card">
+        <p class="wlead">Tell us how to reach you and verify your email. For family parties, a 10% holding deposit by PayNow locks in your request while we confirm. Booking for a company? We’ll invoice you instead, at the same prices.</p>
+        <div class="deposit-card" id="dep-family">
           <div><p class="eyebrow">Holding deposit, paid by PayNow after you send</p><p class="dep-line"><strong id="hold-amount">$0.00</strong> <span>10% of your Squishy Party</span></p><p class="dep-sub" id="dep-sub">Refunded in full if we’re unable to attend. Deducted from your full amount if you go ahead.</p></div>
           <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
+        </div>
+        <div class="deposit-card" id="dep-company" hidden>
+          <div><p class="eyebrow">Booking for a company</p><p class="dep-line"><strong>Invoice</strong> <span>after we confirm availability</span></p><p class="dep-sub">Same prices as shown. No deposit to pay now.</p></div>
+          <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>
         </div>
         <details class="acc acc-card">
           <summary>Your plan <span class="acc-meta" id="recap-total">$0.00</span></summary>
@@ -2053,7 +2075,19 @@ html:has(body.planning){scroll-padding-top:150px}
             </div>
             <div class="group-title"><span class="step-num">2</span><h3>How we can reach you</h3></div>
             <div class="grid2">
-              <label class="field full">Parent’s name<input name="parentName" autocomplete="name" maxlength="100" required></label>
+              <fieldset class="field full booking-for">
+                <legend>Who is this booking for?</legend>
+                <div class="bf-opts">
+                  <label class="bf-opt"><input type="radio" name="bookingFor" value="family" checked><span><b>Me or my family</b><small>10% holding deposit by PayNow</small></span></label>
+                  <label class="bf-opt"><input type="radio" name="bookingFor" value="company"><span><b>A company</b><small>Same prices, invoiced after we confirm</small></span></label>
+                </div>
+              </fieldset>
+              <div class="company-fields grid2 full" id="company-fields" hidden>
+                <label class="field full">Company name<input name="companyName" id="company-name" autocomplete="organization" maxlength="120" placeholder="For the quotation and invoice"></label>
+                <label class="field"><span>UEN <span class="opt-tag">(optional)</span></span><input name="companyUen" id="company-uen" maxlength="10" placeholder="e.g. 201912345K" autocapitalize="characters"></label>
+                <label class="field"><span>Billing email <span class="opt-tag">(optional)</span></span><input name="billingEmail" id="billing-email" type="email" maxlength="254" placeholder="If different from yours"></label>
+              </div>
+              <label class="field full">Your name<input name="parentName" autocomplete="name" maxlength="100" required></label>
               <label class="field">Mobile number (WhatsApp)<input name="phone" type="tel" autocomplete="tel" placeholder="8123 4567" pattern="(\+?65)?[ ]?[689][0-9]{3}[ ]?[0-9]{4}" maxlength="16" required><span class="hint">We’ll WhatsApp you to confirm</span></label>
               <div class="field full otp-field" id="otp-field">
                 <label for="req-email">Email address</label>
@@ -2064,12 +2098,13 @@ html:has(body.planning){scroll-padding-top:150px}
               <label class="field full">Anything else we should know? <span class="hint">Optional: access, parking or setup details. Please share dietary needs with your coordinator directly.</span><textarea name="notes" rows="3" maxlength="1000"></textarea></label>
             </div>
             <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
-            <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted on WhatsApp and email about this party request.</span></label>
+            <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted on WhatsApp and email about this request.</span></label>
             <p class="privacy">We use these details only to arrange your party and reply to your request.</p>
             <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
             <button type="button" class="btn btn-primary" id="booking-submit">Send my request</button>
-            <p class="submit-note">Next, you’ll see a PayNow QR for the <b id="hold-note">10%</b> holding deposit.</p>
-            <p class="fine-print"><b>Fine print:</b> The 10% holding deposit is refunded in full if we’re unable to attend on your date. If you go ahead with your package, it’s deducted from your full amount. It’s non-refundable if you cancel.</p>
+            <p class="submit-note" id="note-family">Next, you’ll see a PayNow QR for the <b id="hold-note">10%</b> holding deposit.</p>
+            <p class="submit-note" id="note-company" hidden>Nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to your company, at the same prices shown.</p>
+            <p class="fine-print" id="fine-family"><b>Fine print:</b> The 10% holding deposit is refunded in full if we’re unable to attend on your date. If you go ahead with your package, it’s deducted from your full amount. It’s non-refundable if you cancel.</p>
           </form>
         </div>
         <div class="sent-card" id="sent-card" tabindex="-1" hidden>
@@ -2077,6 +2112,7 @@ html:has(body.planning){scroll-padding-top:150px}
           <h3>Request received!</h3>
           <p>Your reference is <strong id="sent-ref">SP-0000</strong>. Your request is being verified by our team, and we’ll reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
           <p class="dep-sub" id="sent-mail">We’ve emailed a copy to <span id="sent-email"></span>.</p>
+          <p class="dep-sub" id="sent-company" hidden>As a company booking, there’s nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to <b id="sent-bill"></b>.</p>
           <div class="pay-card" id="pay-card">
             <p class="eyebrow">Lock in your request</p>
             <h4>Pay the <span id="pay-amount">$0.00</span> holding deposit</h4>
@@ -3215,9 +3251,22 @@ html:has(body.planning){scroll-padding-top:150px}
   $('otp-code').addEventListener('input', function(){ var c = this.value.replace(/\D/g, '').slice(0, 6); if (c !== this.value) this.value = c; if (c.length === 6) verifyCode(); });
   $('otp-code').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
 
+  /* ---------- Who the booking is for (family or company) ---------- */
+  function isCompany(){ var r = bf.querySelector('input[name="bookingFor"]:checked'); return !!r && r.value === 'company'; }
+  function syncBookingFor(){
+    var co = isCompany();
+    $('company-fields').hidden = !co; $('company-name').required = co;
+    $('dep-family').hidden = co; $('dep-company').hidden = !co;
+    $('note-family').hidden = co; $('fine-family').hidden = co; $('note-company').hidden = !co;
+  }
+  bf.querySelectorAll('input[name="bookingFor"]').forEach(function(r){ r.addEventListener('change', function(){ syncBookingFor(); track('booking_for_selected', {booking_for:r.value}); }); });
+  syncBookingFor();
+
   /* ---------- PayNow holding deposit ---------- */
   var PAY = null;
   function showPay(b){
+    var co = b.bookingFor === 'company'; $('sent-company').hidden = !co; $('pay-card').hidden = co;
+    if (co) { put('sent-bill', ($('billing-email').value || $('req-email').value).trim()); var nm0 = $('wiz-next-m'); if (nm0) nm0.hidden = true; return; }
     var nm = $('wiz-next-m'); if (nm) nm.hidden = true;
     PAY = { ref:b.ref, cents:b.holdCents, sig:b.paynow ? b.paynow.sig : '' };
     put('pay-amount', money(b.holdCents)); put('pay-amount-2', money(b.holdCents)); put('pay-ref', b.ref);
@@ -3255,8 +3304,9 @@ html:has(body.planning){scroll-padding-top:150px}
     var payload = {
       v: 1,
       plan: { children:S.children, adults:S.adults, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, budgetCents:S.budgetCents },
-      contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
+      contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
+      bookingFor: isCompany() ? 'company' : 'family',
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';
@@ -3274,7 +3324,7 @@ html:has(body.planning){scroll-padding-top:150px}
           put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
           showPay(res.body);
           $('request-panel').hidden = true; $('sent-card').hidden = false; $('sent-card').focus();
-          render(true, 'Request received. Reference ' + res.body.ref + '. Pay the holding deposit by PayNow to lock it in.');
+          render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. Pay the holding deposit by PayNow to lock it in.'));
           return;
         }
         if (res.body && res.body.field === 'email') { OTP.verified = ''; otpUI(); }

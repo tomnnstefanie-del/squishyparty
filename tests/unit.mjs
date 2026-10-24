@@ -76,6 +76,23 @@ t('confirmation email says it’s being verified and we’ll WhatsApp them', () 
   for (const s of ['SP-TEST-0001', 'currently being verified by our team', 'WhatsApp', '+65 8123 4567', '$48.00', 'refunded in full', '15 minutes before']) assert.ok(e.text.includes(s), s);
   assert.ok(!e.html.includes('<b>B</b>'));
 });
+t('company booking: needs a company name, checks UEN and billing email', () => {
+  const g = dateOK(); g.bookingFor = 'company';
+  assert.throws(() => validateRequest(g), (e) => e.field === 'companyName');
+  g.contact.companyName = 'Acme Pte Ltd'; g.contact.companyUen = 'bad uen!'; assert.throws(() => validateRequest(g), (e) => e.field === 'companyUen');
+  g.contact.companyUen = '201912345k'; g.contact.billingEmail = 'nope'; assert.throws(() => validateRequest(g), (e) => e.field === 'billingEmail');
+  g.contact.billingEmail = 'finance@acme.sg'; const ok = validateRequest(g);
+  assert.equal(ok.bookingFor, 'company'); assert.equal(ok.contact.companyUen, '201912345K');
+});
+t('company booking: Telegram asks for an invoice, no deposit line; email says nothing to pay now', () => {
+  const g = dateOK(); g.bookingFor = 'company'; Object.assign(g.contact, { companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' });
+  const c = validateRequest(g), pr = priceRequest(c.plan);
+  const m = buildMessage({ ref: 'SP-1', plan: c.plan, contact: c.contact, price: pr, clientTotalCents: null });
+  assert.ok(m.includes('Acme Pte Ltd') && m.includes('Invoice to finance@acme.sg') && m.includes('send a quotation and invoice')); assert.ok(!m.includes('holding deposit'));
+  const e = confirmationEmail({ ref: 'SP-1', plan: c.plan, contact: c.contact, price: pr, paynow: null });
+  assert.ok(e.text.includes('nothing to pay now') && e.text.includes('finance@acme.sg') && e.text.includes('same as shown')); assert.ok(!e.text.includes('holding deposit'));
+  assert.equal(validateRequest(dateOK()).bookingFor, 'family');
+});
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));
 
