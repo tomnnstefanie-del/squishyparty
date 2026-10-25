@@ -1,7 +1,9 @@
-node_modules/
 .env
 .env.local
+.preview/
 .vercel/
+dev/.mailbox.json
 dev/.outbox.json
 dev/.outbox.json.fail
-dev/.mailbox.json
+node_modules/
+tools/mobile-studio/site.html

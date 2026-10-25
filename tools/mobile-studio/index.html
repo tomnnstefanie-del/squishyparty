@@ -1,0 +1,239 @@
+<title>Squishy Party Mobile Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: a working bench. The phone sits on the left as the object being tuned; the controls read like a spec sheet on the right. */
+:root{
+  --bg:#f3f3fb; --panel:#ffffff; --ink:#10173a; --muted:#5a6282; --line:#dfe2f0;
+  --accent:#2234b8; --accent-soft:#e8ebff; --lemon:#f6e98c; --frame:#10173a; --ok:#1d6b41;
+  --display:"Fraunces",Georgia,serif; --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d1230;--panel:#161c42;--ink:#eef0ff;--muted:#a8afd6;--line:#2a3266;--accent:#8f9bff;--accent-soft:#232b62;--lemon:#f6e98c;--frame:#05081c;--ok:#7fd6a4;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1230;--panel:#161c42;--ink:#eef0ff;--muted:#a8afd6;--line:#2a3266;--accent:#8f9bff;--accent-soft:#232b62;--lemon:#f6e98c;--frame:#05081c;--ok:#7fd6a4;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+h1,h2{font-family:var(--display);font-weight:500;letter-spacing:-.01em;margin:0;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+.top{max-width:1180px;margin:0 auto 18px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.top h1{font-size:1.9rem}
+.top p{color:var(--muted);max-width:60ch;margin-top:4px}
+.bench{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:28px;align-items:start}
+/* phone */
+.stagebox{display:flex;flex-direction:column;align-items:center;gap:12px;position:sticky;top:max(12px,env(safe-area-inset-top,0px))}
+.devices{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.chip{min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.8125rem;font-weight:700;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.phone-wrap{position:relative}
+.phone{background:var(--frame);border-radius:46px;padding:12px;box-shadow:0 24px 60px rgba(16,23,58,.25);transform-origin:top center}
+.phone iframe{display:block;border:0;border-radius:34px;background:#fff}
+.dims{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.open-link{font-size:.8125rem;font-weight:700;color:var(--accent)}
+/* controls */
+.side{display:grid;gap:16px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card h2{font-size:1.15rem;margin-bottom:4px}
+.card .sub{color:var(--muted);font-size:.875rem;margin-bottom:12px}
+.jumps{display:flex;flex-wrap:wrap;gap:6px}
+.jumps button{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:.8125rem;font-weight:700;cursor:pointer}
+.jumps button:hover{border-color:var(--accent);color:var(--accent)}
+.sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+.sl{display:grid;gap:4px;min-width:0}
+.sl-top{display:flex;justify-content:space-between;gap:8px;font-size:.8125rem;font-weight:700}
+.sl-top output{font-family:var(--mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.sl input[type=range]{width:100%;accent-color:var(--accent)}
+.sl small{font-size:.75rem;color:var(--muted)}
+.sl.changed .sl-top span::after{content:" •";color:var(--accent)}
+textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg);font-family:var(--mono);font-size:.8125rem;line-height:1.5;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{min-height:42px;padding:0 16px;border-radius:999px;border:0;font-weight:800;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--line)}
+.status{font-size:.8125rem;font-weight:700;color:var(--ok);min-height:1.2em;margin-top:8px}
+pre.out{margin:12px 0 0;padding:12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-family:var(--mono);font-size:.75rem;overflow-x:auto;white-space:pre}
+@media (max-width:880px){
+  .bench{grid-template-columns:1fr}
+  .stagebox{position:static}
+  .sliders{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div>
+    <h1>Mobile Studio</h1>
+    <p>The real Squishy Party site in a phone frame. Move the sliders to tune the phone layout and see it change live, then copy your settings back to Claude.</p>
+  </div>
+  <a class="open-link" href="site.html" target="_blank" rel="noopener">Open the site on its own ↗</a>
+</header>
+
+<main class="bench">
+  <section class="stagebox" aria-label="Phone preview">
+    <div class="devices" role="group" aria-label="Phone size">
+      <button class="chip" type="button" data-w="360" data-h="780" aria-pressed="false">Small Android</button>
+      <button class="chip" type="button" data-w="390" data-h="844" aria-pressed="true">iPhone 15</button>
+      <button class="chip" type="button" data-w="430" data-h="932" aria-pressed="false">iPhone Pro Max</button>
+    </div>
+    <div class="phone-wrap" id="phone-wrap">
+      <div class="phone" id="phone"><iframe id="site" src="site.html" title="Squishy Party site on a phone" width="390" height="844"></iframe></div>
+    </div>
+    <p class="dims" id="dims">390 × 844</p>
+  </section>
+
+  <div class="side">
+    <section class="card" aria-labelledby="jump-h">
+      <h2 id="jump-h">Go to</h2>
+      <p class="sub">Jump the phone to any part of the site.</p>
+      <div class="jumps">
+        <button type="button" data-go="home">Home</button>
+        <button type="button" data-go="making">Squishy Activity</button>
+        <button type="button" data-go="faq">FAQ</button>
+        <button type="button" data-go="1">Planner: basics</button>
+        <button type="button" data-go="2">Squishy DIY</button>
+        <button type="button" data-go="3">Add-ons</button>
+        <button type="button" data-go="4">Your plan</button>
+        <button type="button" data-go="5">Request</button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="set-h">
+      <h2 id="set-h">Mobile settings</h2>
+      <p class="sub">These are the same values as the “MOBILE SETTINGS” block in the site. They only affect phones (screens up to 640px wide).</p>
+      <div class="sliders" id="sliders"></div>
+    </section>
+
+    <section class="card" aria-labelledby="css-h">
+      <h2 id="css-h">Your own mobile CSS</h2>
+      <p class="sub">Optional. Anything here is applied on phones, after the settings above. Example: <code>.hero h1 { color: #e2477f; }</code></p>
+      <label for="custom" class="sr" style="position:absolute;left:-9999px">Custom mobile CSS</label>
+      <textarea id="custom" spellcheck="false" placeholder=".hero h1 { letter-spacing: -0.04em; }"></textarea>
+    </section>
+
+    <section class="card" aria-labelledby="out-h">
+      <h2 id="out-h">Keep your changes</h2>
+      <p class="sub">Copy this and paste it to Claude in the chat, and it will be built into the site. Your settings are also remembered in this browser.</p>
+      <pre class="out" id="out"></pre>
+      <div class="row">
+        <button class="btn btn-primary" type="button" id="copy">Copy settings</button>
+        <button class="btn btn-ghost" type="button" id="reset">Reset to defaults</button>
+      </div>
+      <p class="status" id="status" role="status"></p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var VARS = [
+    {k:'--m-root', label:'Overall text size', unit:'px', min:12, max:17, step:0.5, def:14, hint:'Scales almost every size on the page'},
+    {k:'--m-gutter', label:'Side padding', unit:'px', min:12, max:28, step:1, def:16, hint:'Space at the left and right edges'},
+    {k:'--m-body', label:'Body text', unit:'px', min:13, max:18, step:0.5, def:14, hint:'Size of normal text'},
+    {k:'--m-h1', label:'Home headline', unit:'rem', min:2, max:4, step:0.1, def:2.6, hint:'“Make it their party.”'},
+    {k:'--m-h2', label:'Headings', unit:'rem', min:1.3, max:2.6, step:0.05, def:1.6, hint:'Section and planner step titles'},
+    {k:'--m-tile', label:'Jelly / Crunchy circles', unit:'px', min:76, max:130, step:2, def:92, hint:'Photo size in Squishy DIY'},
+    {k:'--m-tile-duo', label:'Duo circle', unit:'px', min:84, max:150, step:2, def:104, hint:'The Best value option'},
+    {k:'--m-card', label:'Carousel card width', unit:'%', min:64, max:92, step:1, def:78, hint:'Front card in How it works / The making'},
+    {k:'--m-radius', label:'Corner roundness', unit:'px', min:8, max:28, step:1, def:16, hint:'Cards and panels'},
+    {k:'--m-cta', label:'Big button height', unit:'px', min:44, max:64, step:1, def:48, hint:'“I want a party” and Next'},
+    {k:'--m-section', label:'Section spacing', unit:'px', min:16, max:72, step:2, def:28, hint:'Gaps between home sections'},
+    {k:'--m-gap', label:'Inner spacing', unit:'px', min:6, max:24, step:1, def:12, hint:'Space inside cards and between blocks'}
+  ];
+  var KEY = 'squishy-mobile-studio-v2';
+  var state = { vals:{}, css:'', w:390, h:844 };
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) state = Object.assign(state, saved); } catch (e) {}
+  VARS.forEach(function(v){ if (typeof state.vals[v.k] !== 'number') state.vals[v.k] = v.def; });
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var frame = $('site'), phone = $('phone'), wrap = $('phone-wrap');
+
+  // sliders
+  var box = $('sliders');
+  VARS.forEach(function(v){
+    var id = 's' + v.k.replace(/[^a-z0-9]/gi, '');
+    var d = document.createElement('div'); d.className = 'sl';
+    d.innerHTML = '<div class="sl-top"><label for="' + id + '"><span></span></label><output for="' + id + '"></output></div><input type="range" id="' + id + '"><small></small>';
+    d.querySelector('span').textContent = v.label; d.querySelector('small').textContent = v.hint;
+    var r = d.querySelector('input'); r.min = v.min; r.max = v.max; r.step = v.step; r.value = state.vals[v.k];
+    var o = d.querySelector('output');
+    function sync(){ o.textContent = r.value + v.unit; d.classList.toggle('changed', Number(r.value) !== v.def); }
+    r.addEventListener('input', function(){ state.vals[v.k] = Number(r.value); sync(); apply(); save(); });
+    sync(); box.appendChild(d); v.el = r; v.sync = sync;
+  });
+  $('custom').value = state.css;
+  $('custom').addEventListener('input', function(e){ state.css = e.target.value; apply(); save(); });
+
+  function settingsCSS(){
+    var lines = VARS.map(function(v){ return '    ' + v.k + ': ' + state.vals[v.k] + v.unit + ';' + (state.vals[v.k] !== v.def ? '   /* default ' + v.def + v.unit + ' */' : ''); });
+    var out = '@media (max-width:640px){\n  :root{\n' + lines.join('\n') + '\n  }\n}';
+    if (state.css.trim()) out += '\n\n/* custom mobile CSS */\n@media (max-width:640px){\n' + state.css.trim().split('\n').map(function(l){ return '  ' + l; }).join('\n') + '\n}';
+    return out;
+  }
+  function apply(){
+    $('out').textContent = settingsCSS();
+    var doc; try { doc = frame.contentDocument; } catch (e) { return; }
+    if (!doc || !doc.head) return;
+    var st = doc.getElementById('mobile-studio-overrides');
+    if (!st) { st = doc.createElement('style'); st.id = 'mobile-studio-overrides'; doc.head.appendChild(st); }
+    st.textContent = settingsCSS();
+    // Preview only: hide desktop scrollbars inside the phone so the screen is the full device width, like a real phone.
+    var ch = doc.getElementById('mobile-studio-phone');
+    if (!ch) { ch = doc.createElement('style'); ch.id = 'mobile-studio-phone'; ch.textContent = 'html,body,*{scrollbar-width:none}::-webkit-scrollbar{width:0;height:0;display:none}'; doc.head.appendChild(ch); }
+  }
+  frame.addEventListener('load', apply);
+
+  // device sizes + fit the phone to the available height
+  function fit(){
+    var avail = Math.max(420, window.innerHeight - 140), full = state.h + 24, s = Math.min(1, avail / full);
+    if (window.innerWidth <= 880) s = Math.min(1, (window.innerWidth - 40) / (state.w + 24));
+    phone.style.transform = 'scale(' + s.toFixed(3) + ')';
+    wrap.style.width = Math.round((state.w + 24) * s) + 'px'; wrap.style.height = Math.round(full * s) + 'px';
+  }
+  function setDevice(w, h){
+    state.w = w; state.h = h; frame.width = w; frame.height = h; $('dims').textContent = w + ' × ' + h;
+    document.querySelectorAll('.devices .chip').forEach(function(c){ c.setAttribute('aria-pressed', String(+c.dataset.w === w)); });
+    fit(); save();
+  }
+  document.querySelectorAll('.devices .chip').forEach(function(c){ c.addEventListener('click', function(){ setDevice(+c.dataset.w, +c.dataset.h); }); });
+  window.addEventListener('resize', fit);
+  setDevice(state.w, state.h);
+
+  // jump the site to a section by pressing its own buttons
+  function jump(where){
+    var doc; try { doc = frame.contentDocument; } catch (e) { return; }
+    if (!doc) return;
+    var q = function(s){ return doc.querySelector(s); };
+    var planOpen = q('#view-plan') && !q('#view-plan').hidden;
+    if (where === 'home' || where === 'making' || where === 'faq') {
+      if (planOpen) { var h = q('.wiz-exit'); if (h) h.click(); }
+      if (where === 'home') { frame.contentWindow.scrollTo(0, 0); return; }
+      var tab = q(where === 'making' ? '#tab-making' : '#tab-faq'); if (tab) { tab.click(); q('#explore').scrollIntoView({block:'start'}); }
+      return;
+    }
+    var k = Number(where);
+    if (!planOpen) { var cta = q('.mobile-cta a') || q('.hero-actions a.btn-primary'); if (cta) cta.click(); }
+    var link = q('#stepper li:nth-child(' + k + ') a');
+    for (var i = 0; i < 6 && link && q('#wstep-' + k).hidden; i++) {
+      var nx = q('#wiz-next-m'); if (link.parentNode.className.indexOf('locked') < 0) link.click(); else if (nx) nx.click(); else break;
+    }
+    frame.contentWindow.scrollTo(0, 0);
+  }
+  document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ jump(b.dataset.go); }); });
+
+  // copy + reset
+  $('copy').addEventListener('click', function(){
+    var t = settingsCSS(), s = $('status');
+    try { navigator.clipboard.writeText(t).then(function(){ s.textContent = 'Copied. Paste it to Claude in the chat.'; }, fallback); } catch (e) { fallback(); }
+    function fallback(){ var r = document.createRange(); r.selectNodeContents($('out')); var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); s.textContent = 'Selected. Press Ctrl+C or Cmd+C to copy.'; }
+  });
+  $('reset').addEventListener('click', function(){
+    VARS.forEach(function(v){ state.vals[v.k] = v.def; v.el.value = v.def; v.sync(); });
+    state.css = ''; $('custom').value = ''; apply(); save(); $('status').textContent = 'Back to the defaults.';
+  });
+  apply();
+})();
+</script>

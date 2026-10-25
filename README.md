@@ -11,7 +11,9 @@ How a request works:
 Fine print shown on the page, in the FAQ and in the email: the 10% holding deposit is refunded in full if you're unable to attend on their date, deducted from the full amount if they go ahead with the package, and non-refundable if they cancel.
 
 ```
-public/index.html      the whole website (one file)
+src/                   EDIT HERE: markup.html, styles.css, app.js, base*.html, img/
+dev/build.mjs          npm run build -> public/index.html (never edit that file by hand)
+public/index.html      the whole website (one file, generated)
 api/request.js         sends the request (Vercel serverless function)
 api/otp.js             emails and checks the 6-digit code
 api/paid.js            "I've paid" -> Telegram note
@@ -25,6 +27,14 @@ lib/paynow.js          PayNow QR with amount + reference (SGQR format)
 dev/                   local server, mock Telegram, chat-ID helper
 tests/                 npm test (unit + full browser end-to-end)
 ```
+
+## Making changes
+
+1. Edit files in `src/` (and `public/img/` for photos).
+2. Run `npm run check`: build, price catalogue, unit + end-to-end tests, browser click-through.
+3. Push to a branch, check Vercel's preview link, then merge to `main` to go live.
+
+See `CLAUDE.md` for the full rules.
 
 ## Environment variables (Vercel → Project → Settings → Environment Variables)
 

@@ -1,0 +1,898 @@
+<style>
+/* ===================== v2 additions ===================== */
+.journey{list-style:none;padding:0;margin:0 0 clamp(28px,4vw,44px);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;counter-reset:j}
+.journey li{counter-increment:j;background:var(--paper);border-radius:var(--r-md);padding:14px 14px 16px;box-shadow:inset 0 0 0 1px var(--line);font-size:.875rem;font-weight:600;line-height:1.35}
+.journey li::before{content:counter(j,decimal-leading-zero);display:block;font-family:var(--display);font-size:1.4rem;font-weight:500;color:var(--cobalt);margin-bottom:6px}
+.journey li span{display:block;font-weight:500;color:var(--muted);font-size:.8125rem;margin-top:3px}
+.step .grid2{margin-top:4px}
+.step .field input,.step .field select{min-height:50px}
+.field select{width:100%;min-height:50px;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff;font-size:1rem;font-weight:400}
+.field select:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(34,52,184,.14)}
+.counter{display:flex;align-items:center;gap:8px}
+.counter input{text-align:center;font-variant-numeric:tabular-nums}
+.counter button{flex:none;width:50px;height:50px;border-radius:var(--r-sm);border:1.5px solid var(--line-2);background:#fff;cursor:pointer;display:grid;place-items:center;transition:border-color .2s,color .2s}
+.counter button:hover{border-color:var(--cobalt);color:var(--cobalt)}
+.counter .icon{width:18px;height:18px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.chipopt{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--line-2);background:#fff;font-size:.875rem;font-weight:700;cursor:pointer;transition:box-shadow .2s,background .2s,color .2s}
+.chipopt input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.chipopt:has(input:checked){background:var(--cobalt);color:#fff;box-shadow:none}
+.chipopt:has(input:focus-visible){outline:3px solid var(--rose);outline-offset:3px}
+.swatch{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 2px #fff}
+.budget-box{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end;padding:18px;border-radius:var(--r-md);background:var(--cobalt-50)}
+.budget-out{text-align:right;font-size:.8125rem;color:var(--muted);font-weight:600}
+.budget-out strong{display:block;font-family:var(--display);font-size:1.6rem;font-weight:500;color:var(--cobalt);font-variant-numeric:tabular-nums;line-height:1.1}
+.money-in{position:relative}
+.money-in::before{content:"$";position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:600;color:var(--muted)}
+.money-in input{padding-left:28px!important}
+.budget-box .fine{grid-column:1/-1;margin-top:0}
+.warn{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-sm);background:#fff1f4;color:#8b2940;font-size:.875rem;font-weight:600;box-shadow:inset 0 0 0 1px #f2c3cf;margin-top:12px}
+.warn .icon{width:18px;height:18px;margin-top:2px}
+.rec{border-radius:var(--r-md);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.rec-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);font-size:.9375rem}
+.rec-row:first-child{border-top:0}
+.rec-row .ri{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--cobalt-50);color:var(--cobalt)}
+.rec-row .ri .icon{width:18px;height:18px}
+.rec-row b{display:block;font-weight:700}
+.rec-row small{display:block;color:var(--muted);font-size:.8125rem}
+.rec-row .amt{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.rec-row.req .ri{background:var(--ink);color:var(--lemon)}
+.rec-row.miss{background:var(--paper);color:var(--muted)}
+.rec-row.miss .ri{background:#fff;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
+.tagmini{display:inline-block;font-size:.625rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:var(--lemon-50);color:#6b5b00;vertical-align:2px;margin-left:6px;box-shadow:inset 0 0 0 1px #eadb7a}
+.rec-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.rec-actions .btn{min-height:46px;font-size:.9375rem}
+.rec-state{font-size:.875rem;color:var(--muted);font-weight:600}
+.offer .offer-price small{font-family:var(--sans);font-size:.8125rem;color:var(--muted);font-weight:600;letter-spacing:0;margin-left:6px}
+.offer.duo:has(input:checked){background:linear-gradient(180deg,var(--lemon-50),#fff 70%)}
+.offer.single:has(input:checked){background:linear-gradient(180deg,var(--blush-50),#fff 70%)}
+
+/* summary additions */
+.meter-wrap{margin-top:18px}
+.meter-top{display:flex;justify-content:space-between;font-size:.8125rem;color:#dfe3ff;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.meter{height:8px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:inherit;background:var(--lemon);transition:width .5s var(--ease)}
+.meter.over i{background:#ff9cc0}
+.meter-note{font-size:.8125rem;margin-top:8px;color:#dfe3ff}
+.meter.over + .meter-note{color:#ffd0e1;font-weight:700}
+.breakdown .sub dt{padding-left:12px;color:#c9d0ff}
+.breakdown dd.pend{color:var(--lemon);font-weight:700;font-size:.8125rem}
+.breakdown .grp{font-size:.6875rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aeb7ff;margin-top:6px}
+.pending-note{margin-top:14px;padding:12px 14px;border-radius:var(--r-sm);background:rgba(246,233,140,.12);box-shadow:inset 0 0 0 1px rgba(246,233,140,.35);font-size:.8125rem;color:#f4efc8;line-height:1.5}
+
+/* partners */
+.partners{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:-12px 0 36px;font-size:.8125rem;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:8px}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:.6875rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;white-space:nowrap}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-demo{background:var(--lemon-50);color:#6b5b00;box-shadow:inset 0 0 0 1px #eadb7a}
+.st-prospective{background:var(--blush-50);color:#9b2a5c;box-shadow:inset 0 0 0 1px #f6bfd5}
+.st-approved{background:#e9f7ef;color:#1d6b41;box-shadow:inset 0 0 0 1px #bfe3cd}
+.st-confirmed{background:var(--cobalt-50);color:var(--cobalt);box-shadow:inset 0 0 0 1px var(--cobalt-100)}
+.cat{margin-top:40px}
+.cat:first-of-type{margin-top:0}
+.cat-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:16px}
+.cat-head h3{font-size:1.6rem;display:flex;align-items:center;gap:12px}
+.cat-head h3 .ci{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--cobalt-50);color:var(--cobalt)}
+.cat-head h3 .ci .icon{width:20px;height:20px}
+.cat-head p{color:var(--muted);font-size:.875rem;margin-top:4px}
+.viewall{flex:none;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--line-2);font-weight:700;font-size:.875rem;cursor:pointer}
+.viewall:hover{box-shadow:inset 0 0 0 1.5px var(--cobalt);color:var(--cobalt)}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(280px,312px);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 18px;margin:0 -4px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.rail > *{scroll-snap-align:start}
+.rail.all{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));overflow:visible}
+.vcard{position:relative;display:flex;flex-direction:column;background:#fff;border-radius:var(--r-lg);box-shadow:inset 0 0 0 1.5px var(--line);overflow:hidden;transition:box-shadow .2s,transform .2s var(--ease)}
+.vcard:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1.5px var(--line-2),var(--shadow-md)}
+.vcard.on{box-shadow:inset 0 0 0 2px var(--cobalt),0 12px 28px rgba(34,52,184,.12)}
+.vtop{position:relative;height:100px;display:flex;align-items:flex-end;justify-content:space-between;padding:14px 16px;background:var(--cobalt-50)}
+.vtop .vi{width:46px;height:46px;border-radius:14px;background:#fff;display:grid;place-items:center;color:var(--cobalt);box-shadow:var(--shadow-sm)}
+.vtop .vi .icon{width:22px;height:22px}
+.vtop.styling{background:linear-gradient(135deg,var(--blush),#ffe9f2)}
+.vtop.cake{background:linear-gradient(135deg,var(--lemon),#fff7c9)}
+.vtop.food{background:linear-gradient(135deg,#dfe9ff,var(--cobalt-50))}
+.vtop.entertainment{background:linear-gradient(135deg,#e9defe,#f4eeff)}
+.vrec{position:absolute;right:16px;top:12px;font-size:.625rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--ink);color:var(--lemon);padding:5px 9px;border-radius:999px}
+.vbody{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.vname{font-family:var(--display);font-size:1.3rem;font-weight:500;letter-spacing:-.015em;line-height:1.2}
+.vvendor{font-size:.8125rem;color:var(--muted);font-weight:600;margin-top:2px}
+.vprice{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px dashed var(--line-2);border-bottom:1px dashed var(--line-2)}
+.vprice strong{font-family:var(--display);font-size:1.45rem;font-weight:500;color:var(--cobalt);font-variant-numeric:tabular-nums}
+.vprice strong.pend{font-family:var(--sans);font-size:.9375rem;font-weight:700;color:#9b2a5c}
+.vprice span{font-size:.8125rem;color:var(--muted);text-align:right}
+.vline{font-size:.8125rem;color:var(--ink-2);display:flex;gap:8px;align-items:flex-start}
+.vline .icon{width:15px;height:15px;color:var(--cobalt);margin-top:3px}
+.vcard details{font-size:.8125rem;color:var(--ink-2)}
+.vcard summary{cursor:pointer;font-weight:700;color:var(--cobalt);list-style:none;min-height:32px;display:flex;align-items:center}
+.vcard summary::-webkit-details-marker{display:none}
+.vcard summary::after{content:"+";margin-left:6px}
+.vcard details[open] summary::after{content:"–"}
+.vcard dl{margin:6px 0 0;display:grid;gap:8px}
+.vcard dt{font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.vcard dd{margin:2px 0 0}
+.vcard dd ul{margin:0;padding-left:18px}
+.vadd{margin-top:auto;width:100%;min-height:46px;font-size:.9375rem}
+.vcard.on .vadd{background:var(--ink);color:#fff;box-shadow:none}
+.vcard.disabled .vadd{opacity:.55;cursor:not-allowed}
+
+/* plan */
+.plan-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;position:relative}
+.timeline.dyn{grid-template-columns:repeat(var(--n,5),minmax(0,1fr))}
+@media (max-width:1080px){.timeline.dyn{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.timeline.dyn{grid-template-columns:1fr}}
+.timeline li.food{box-shadow:inset 0 0 0 1px rgba(246,233,140,.45)}
+.timeline li.free{background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 0 0 0 transparent;border:1px dashed rgba(255,255,255,.2)}
+.alongside{position:relative;margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.875rem;color:#c3c8e3}
+.alongside span.tag{background:rgba(255,255,255,.08);color:#fff;font-weight:600;border-radius:999px;padding:6px 12px}
+.prog-warn{position:relative;margin-top:18px;padding:12px 16px;border-radius:var(--r-sm);background:rgba(255,156,192,.14);color:#ffd0e1;font-size:.9375rem;font-weight:600;box-shadow:inset 0 0 0 1px rgba(255,156,192,.4)}
+.checks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+.checkcol{background:#fff;border-radius:var(--r-md);padding:22px}
+.checkcol h3{font-family:var(--sans);font-size:1rem;font-weight:700;letter-spacing:0;display:flex;align-items:center;gap:10px}
+.checkcol h3 .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--lemon)}
+.checkcol h3 .ic .icon{width:18px;height:18px;color:var(--cobalt)}
+.checkcol.you h3 .ic{background:var(--blush)}
+.checkcol.you h3 .ic .icon{color:var(--rose)}
+.checkcol.wait h3 .ic{background:var(--cobalt-50)}
+.checkcol ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+.checkcol li{display:grid;grid-template-columns:20px 1fr;gap:10px;font-size:.9rem;color:var(--ink-2);line-height:1.5}
+.checkcol li::before{content:"";width:18px;height:18px;margin-top:2px;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.checkcol.team li::before{background:var(--cobalt) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/12px no-repeat;box-shadow:none}
+.checkcol.wait li::before{border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--cobalt);background:radial-gradient(circle,var(--cobalt) 0 3px,transparent 3.5px)}
+.checkcol li small{display:block;color:var(--muted);font-size:.8125rem}
+.invite-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(24px,4vw,48px);align-items:center}
+.invite-inputs{display:grid;grid-template-columns:1fr 120px;gap:12px;margin-top:22px}
+.invite-inputs .field input{background:rgba(255,255,255,.85);border-color:rgba(16,23,58,.18)}
+.invite{position:relative;border-radius:var(--r-lg);padding:34px 30px 30px;text-align:center;overflow:hidden;box-shadow:var(--shadow-lg);background:var(--cobalt);color:#fff;isolation:isolate}
+.invite::before,.invite::after{content:"";position:absolute;border-radius:50%;z-index:-1}
+.invite::before{width:220px;height:220px;right:-70px;top:-80px;background:rgba(255,255,255,.12)}
+.invite::after{width:160px;height:160px;left:-60px;bottom:-60px;background:rgba(246,233,140,.22)}
+.invite .inv-eyebrow{font-size:.6875rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+.invite .inv-name{font-family:var(--display);font-size:clamp(2.2rem,1.6rem + 2vw,3rem);font-style:italic;font-weight:400;line-height:1.05;margin:12px 0 6px;overflow-wrap:anywhere}
+.invite .inv-age{font-family:var(--display);font-size:1.25rem}
+.invite .inv-line{margin:16px auto 0;max-width:24rem;font-size:.9375rem;line-height:1.6;opacity:.92}
+.invite .inv-facts{display:grid;gap:8px;margin:22px auto 0;max-width:22rem;padding:16px;border-radius:var(--r-md);background:rgba(255,255,255,.12);font-size:.9375rem;font-weight:600;text-align:left}
+.invite .inv-facts div{display:flex;gap:10px;align-items:center}
+.invite .inv-facts .icon{width:17px;height:17px;flex:none}
+.invite .inv-star{width:34px;height:34px;margin:0 auto;color:var(--lemon)}
+.invite.pink{background:#e2477f}
+.invite.pink .inv-star{color:#fff}
+.invite.lemon{background:var(--lemon);color:var(--ink)}
+.invite.lemon .inv-star{color:var(--cobalt)}
+.invite.lemon .inv-facts{background:rgba(255,255,255,.6)}
+.invite.lemon::before{background:rgba(34,52,184,.1)}
+.invite.lemon::after{background:rgba(255,214,230,.8)}
+.inv-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.inv-actions .btn{min-height:46px;font-size:.9375rem}
+.copy-status{font-size:.875rem;font-weight:600;color:#55512c;min-height:1.4em;margin-top:8px}
+.recap{margin-top:24px;padding:20px;border-radius:var(--r-md);background:#fff;box-shadow:var(--shadow-sm)}
+.recap dl{margin:12px 0 0;display:grid;gap:8px;font-size:.875rem}
+.recap dl div{display:flex;justify-content:space-between;gap:12px}
+.recap dt{color:var(--muted)}
+.recap dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.recap .rt{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.recap .rt strong{font-family:var(--display);font-size:1.8rem;font-weight:500;color:var(--cobalt);font-variant-numeric:tabular-nums}
+.recap .rt span{font-size:.875rem;font-weight:700}
+.found-badge{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:.8125rem;font-weight:700;color:var(--ink);background:var(--lemon);padding:8px 14px;border-radius:999px}
+.found-badge .icon{width:16px;height:16px;color:var(--cobalt)}
+.included-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sel-label{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin:4px 0 14px}
+.sel-label b{letter-spacing:.02em;text-transform:none;font-size:.875rem;color:var(--cobalt);margin-left:4px}
+.exp-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.exp-tile{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;padding:8px 4px 6px;border-radius:var(--r-md)}
+.exp-tile input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}
+.exp-tile:has(input:focus-visible){outline:3px solid var(--rose);outline-offset:2px}
+.exp-img{width:min(128px,100%);aspect-ratio:1;border-radius:50%;background:var(--photo,var(--cobalt)) var(--pos)/310% auto no-repeat,var(--cobalt);box-shadow:0 0 0 3px #fff,0 0 0 4.5px var(--line-2);transition:box-shadow .25s,transform .3s var(--ease),filter .25s;filter:saturate(.8)}
+.exp-tile:hover .exp-img{transform:scale(1.04)}
+.exp-tile:has(input:checked) .exp-img{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--cobalt),0 14px 30px rgba(34,52,184,.25);filter:none}
+.exp-badge{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:1;background:var(--ink);color:var(--lemon);font-size:.625rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 0 0 3px #fff}
+.exp-name{font-weight:700;font-size:1rem;margin-top:14px}
+.exp-sub{font-size:.8125rem;color:var(--muted)}
+.exp-pp{font-size:.875rem;font-weight:700;color:var(--cobalt);margin-top:2px}
+.exp-tile:has(input:checked) .exp-name{color:var(--cobalt)}
+.exp-panel{margin-top:22px;padding:24px;border-radius:var(--r-lg);background:linear-gradient(180deg,var(--cobalt-50),#fff 72%);box-shadow:inset 0 0 0 1.5px var(--cobalt-100)}
+.exp-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.exp-panel h3{font-size:1.75rem;margin-top:6px}
+.exp-price{text-align:right;flex:none}
+.exp-price strong{display:block;font-family:var(--display);font-size:2.2rem;font-weight:500;color:var(--cobalt);line-height:1;font-variant-numeric:tabular-nums}
+.exp-price span{font-size:.8125rem;color:var(--muted);font-weight:600}
+.exp-copy{color:var(--ink-2);margin-top:10px;max-width:36rem}
+.ticks{list-style:none;padding:0;margin:16px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+.ticks li{display:flex;align-items:center;gap:8px;font-size:.8125rem;font-weight:700;color:var(--ink);background:#fff;padding:9px 14px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line-2)}
+.ticks .icon{width:15px;height:15px;color:var(--cobalt);stroke-width:2.6}
+.addon-label{margin-top:24px}
+.addon{position:relative;display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:var(--r-md);background:#fff;box-shadow:inset 0 0 0 1.5px var(--line-2);cursor:pointer;transition:box-shadow .2s,background .2s}
+.addon:hover{box-shadow:inset 0 0 0 1.5px var(--cobalt)}
+.addon input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.addon:has(input:focus-visible){outline:3px solid var(--rose);outline-offset:3px}
+.addon:has(input:checked){box-shadow:inset 0 0 0 2px var(--cobalt);background:#fbfbff}
+.addon-icon{width:48px;height:48px;border-radius:14px;background:var(--blush);display:grid;place-items:center;flex:none}
+.addon-icon .icon{color:var(--rose);width:22px;height:22px}
+.addon-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.addon-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-weight:700}
+.addon-copy{font-size:.875rem;color:var(--muted)}
+.addon-qty{font-size:.8125rem;font-weight:700;color:var(--cobalt)}
+.addon-ctl{display:flex;align-items:center;gap:12px;font-weight:700;font-variant-numeric:tabular-nums;flex:none}
+.tickbox{width:28px;height:28px;border-radius:9px;box-shadow:inset 0 0 0 1.5px var(--line-2);background:#fff;display:grid;place-items:center;color:#fff;transition:background .2s,box-shadow .2s}
+.tickbox .icon{width:16px;height:16px;stroke-width:3;opacity:0;transform:scale(.6);transition:opacity .2s,transform .25s var(--ease)}
+.addon:has(input:checked) .tickbox{background:var(--cobalt);box-shadow:none}
+.addon:has(input:checked) .tickbox .icon{opacity:1;transform:none}
+.exp-total{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:.9375rem}
+.exp-total strong{font-family:var(--display);font-size:1.6rem;font-weight:500;font-variant-numeric:tabular-nums}
+.exp-panel .fine{margin-top:8px}
+@media (max-width:640px){.exp-panel{padding:18px}.exp-panel h3{font-size:1.45rem}.exp-price strong{font-size:1.8rem}.addon{flex-wrap:wrap;padding:14px}.addon-ctl{width:100%;justify-content:space-between;padding-left:64px}.exp-name{font-size:.9375rem}}
+.bs-logo{display:inline-flex;align-items:center;justify-content:center;background:#fff;border-radius:12px;padding:6px 10px;box-shadow:var(--shadow-sm);height:46px;min-width:46px}
+.bs-logo img{height:30px;width:auto;max-width:120px;object-fit:contain}
+.bs-word{font-family:var(--display);font-style:italic;font-weight:500;font-size:1rem;color:#5b3a1e;white-space:nowrap}
+.cat-head h3 .bs-logo{height:40px;padding:4px 10px;box-shadow:inset 0 0 0 1px var(--line)}
+.cat-head h3 .bs-logo img{height:28px}
+.bs-banner{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:-8px 0 18px;padding:14px 18px;border-radius:var(--r-md);background:var(--lemon-50);box-shadow:inset 0 0 0 1px #eadb7a;font-size:.875rem;color:var(--ink-2)}
+.bs-banner a{font-weight:700;color:var(--cobalt)}
+.vprice strong.quote{font-family:var(--sans);font-size:.9375rem;font-weight:700;color:#5b3a1e}
+.price-unit{font-family:var(--sans);font-size:.875rem;font-weight:700;color:var(--muted);letter-spacing:0}
+.hero-float .bs-logo{height:46px;padding:4px 8px}
+@media (max-width:1080px){.journey{grid-template-columns:repeat(3,minmax(0,1fr))}.included-grid.four{grid-template-columns:1fr 1fr}.checks{grid-template-columns:1fr}}
+@media (max-width:900px){.invite-grid{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .journey{grid-template-columns:1fr 1fr}
+  .budget-box{grid-template-columns:1fr}
+  .budget-out{text-align:left}
+  .included-grid.four{grid-template-columns:1fr}
+  .cat-head{flex-direction:column;align-items:flex-start}
+  .rail{grid-auto-columns:minmax(266px,82%);margin-right:calc(-1 * var(--gut));padding-right:var(--gut)}
+  .rail.all{grid-template-columns:1fr;margin-right:-4px;padding-right:4px}
+  .rec-row{padding:12px 14px;grid-template-columns:36px minmax(0,1fr) auto}
+  .invite-inputs{grid-template-columns:1fr}
+}
+@media print{.partners,.invite-wrap,.included-sec,.makers-sec,#request{display:none!important}}
+</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></symbol>
+  <symbol id="i-balloon" viewBox="0 0 24 24"><path d="M12 16c3.3 0 6-3.1 6-7s-2.7-7-6-7-6 3.1-6 7 2.7 7 6 7z"/><path d="m11 16-1 2h4l-1-2M12 18c0 2-2 2-2 4"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M3 7h16a2 2 0 0 1 2 2v3h-5a2 2 0 0 0 0 4h5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M7 2v4a5 5 0 0 0 10 0V2M7 22v-4a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+</svg>
+
+<p class="notice">Offline preview. Butter Studio cakes are priced in your quotation; other partner prices marked “Demo price” are placeholders. No requests are sent.</p>
+
+<header class="site-header" id="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="#top" aria-label="Squishy Party home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f6e98c"><use href="#i-star"/></svg></span>
+      <span class="brand-text"><span class="brand-name">Squishy Party</span><span class="brand-by">by Tom &amp; Stefanie</span></span>
+    </a>
+    <nav class="nav" aria-label="Page sections">
+      <a href="#builder">Plan a party</a><a href="#partners">Partner services</a><a href="#plan">Your plan</a><a href="#included">What’s included</a>
+    </nav>
+    <a class="btn btn-primary header-cta" href="#request">Request availability</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="reveal">
+        <p class="eyebrow">Fully styled birthday celebrations</p>
+        <h1>Make it <em>their</em> party.</h1>
+        <p class="lead">Every celebration starts with our signature Squishy DIY experience. Personalise the rest around your child and your budget, and we coordinate every partner for you.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#builder">Plan their celebration <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-ghost" href="#partners">Browse partner services</a>
+        </div>
+        <div class="hero-facts"><ul>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg>A plan built around your budget</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>One itemised quotation</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-cake"/></svg>Cakes by Butter Studio</li>
+        </ul></div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="hero-photo"><img src="__IMG__" alt="Colourful clear jelly and crunchy squishies, with a cracked wax shell, on a blue background" width="1536" height="1024" fetchpriority="high"></div>
+        <div class="stamp" aria-hidden="true">
+          <svg class="ring" viewBox="0 0 120 120"><defs><path id="circ" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0"/></defs><text><textPath href="#circ">CREATE · CELEBRATE · KEEP · </textPath></text></svg>
+          <svg class="star" viewBox="0 0 24 24" fill="currentColor"><use href="#i-star"/></svg>
+        </div>
+        <div class="hero-float">
+          <span class="hero-float-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
+          <div><small>Squishy DIY from</small><strong>$16 per child</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INCLUDED (foundation) ===================== -->
+  <section class="section included-sec" id="included" aria-labelledby="included-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal"><div><p class="eyebrow">The foundation of every celebration</p><h2 id="included-h">Squishy DIY, fully handled.</h2></div><p class="lead">The making activity, a take-home squishy capsule, our team and the logistics are in every plan. Cake, food, styling and entertainment are yours to add.</p></div>
+      <div class="included-grid four">
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span><h3 id="child-squishy-title">Two take-home squishies</h3><p id="child-squishy-copy">One Jelly and one Crunchy creation each, in a decorated container with a name label and care card.</p></article>
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-jar"/></svg></span><h3>A take-home squishy capsule</h3><p>Every child decorates their own capsule with our rhinestone stickers, DIY. $2 per child.</p></article>
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span><h3>Hosts &amp; logistics</h3><p>A one-hour session: 15 minutes to set up, then 45 minutes of squishy play. One $150 logistics fee covers our team for up to 2 hours.</p></article>
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></span><h3>One coordinator</h3><p>We confirm each partner you add and send one consolidated quotation, so you never chase separate suppliers.</p></article>
+      </div>
+      <div class="spotlight reveal">
+        <span class="spotlight-icon"><svg class="icon" aria-hidden="true"><use href="#i-cake"/></svg></span>
+        <div><p class="eyebrow">For the birthday child</p><h3>A little extra spotlight.</h3><p>First choice, a personalised birthday label, a special charm and a card signed by friends, then a birthday spotlight, group photo and birthday song to finish.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BUILDER ===================== -->
+  <section class="section configurator" id="builder" aria-labelledby="builder-h">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">Your celebration, put together</p><h2 id="builder-h">Start with the essentials.</h2></div>
+        <p class="lead">Tell us about the party and your budget. We’ll recommend a complete plan, which you can adjust before asking us to check availability.</p>
+      </div>
+      <ol class="journey reveal" aria-label="How it works">
+        <li>Set the celebration<span>Guests, budget, date</span></li>
+        <li>Choose Squishy DIY<span>Jelly, Crunchy or Duo</span></li>
+        <li>Get a recommended plan<span>Essentials included</span></li>
+        <li>Adjust partner services<span>Food, cake, fun</span></li>
+        <li>Review one plan<span>Total, schedule, checklist</span></li>
+        <li>Request availability<span>We confirm and quote</span></li>
+      </ol>
+      <div class="planner">
+        <form id="party-form" aria-label="Plan your celebration" novalidate>
+          <fieldset class="step">
+            <legend class="step-title"><span class="step-num">1</span>Set the celebration</legend>
+            <p class="step-desc">Guests and budget together, so the plan reflects the whole party.</p>
+            <div class="grid2">
+              <div class="field"><label for="children">Number of children</label>
+                <div class="counter"><button type="button" data-step="children" data-d="-1" aria-label="One fewer child"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button><input id="children" name="children" type="number" inputmode="numeric" min="1" max="60" value="15" aria-describedby="children-help"><button type="button" data-step="children" data-d="1" aria-label="One more child"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                <span class="hint" id="children-help">Including the birthday child. Minimum charge is 10.</span></div>
+              <div class="field"><label for="adults">Approximate number of adults</label>
+                <div class="counter"><button type="button" data-step="adults" data-d="-1" aria-label="One fewer adult"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button><input id="adults" name="adults" type="number" inputmode="numeric" min="0" max="80" value="10" aria-describedby="adults-help"><button type="button" data-step="adults" data-d="1" aria-label="One more adult"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                <span class="hint" id="adults-help">Used for food served per guest.</span></div>
+              <div class="budget-box">
+                <div class="field"><span id="budget-label">Total budget for the services we arrange</span>
+                  <div class="seg" role="radiogroup" aria-label="Enter budget as" style="margin:2px 0 6px"><label class="chipopt"><input type="radio" name="budgetMode" value="total" checked>Total</label><label class="chipopt"><input type="radio" name="budgetMode" value="child">Per child</label></div>
+                  <div class="money-in"><input id="budget" name="budget" type="number" inputmode="decimal" min="0" step="10" value="1200" aria-labelledby="budget-label" aria-describedby="budget-help"></div></div>
+                <p class="budget-out" aria-live="polite"><span id="budget-alt-label">Approximately</span><strong id="budget-alt">$120.00</strong><span id="budget-alt-sub">per child</span></p>
+                <p class="fine" id="budget-help">Covers Squishy DIY, styling and any partner services you add. Your venue isn’t included. Food and cake count only when you add them here.</p>
+              </div>
+              <label class="field">Preferred date<input name="date" id="date" type="date"></label>
+              <label class="field">Start time<input name="time" id="time" type="time" value="14:00"><span class="hint">Singapore time, subject to availability</span></label>
+              <div class="field"><span id="length-label">Party length</span><div class="seg" role="radiogroup" aria-labelledby="length-label"><label class="chipopt"><input type="radio" name="length" value="90">1½ hours</label><label class="chipopt"><input type="radio" name="length" value="120" checked>2 hours</label><label class="chipopt"><input type="radio" name="length" value="150">2½ hours</label><label class="chipopt"><input type="radio" name="length" value="180">3 hours</label></div></div>
+              <div class="field"><span id="theme-label">Colour theme</span><div class="seg" role="radiogroup" aria-labelledby="theme-label"><label class="chipopt"><input type="radio" name="theme" value="cobalt" checked><span class="swatch" style="background:#2234b8" aria-hidden="true"></span>Cobalt</label><label class="chipopt"><input type="radio" name="theme" value="pink"><span class="swatch" style="background:#e2477f" aria-hidden="true"></span>Pink</label><label class="chipopt"><input type="radio" name="theme" value="lemon"><span class="swatch" style="background:#f6e98c" aria-hidden="true"></span>Lemon</label></div></div>
+              <label class="field full">Venue<input name="venue" id="venue" maxlength="120" placeholder="e.g. condo function room, Tampines"><span class="hint">A name or area is enough for now. The full address goes with your request.</span></label>
+            </div>
+            <div class="warn" id="children-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-hourglass"/></svg><span>For more than 60 children, plan for 60 here and tell us the full number in your request.</span></div>
+          </fieldset>
+
+          <fieldset class="step">
+            <legend class="step-title"><span class="step-num">2</span>Choose their Squishy DIY</legend>
+            <p class="step-desc">Required for every celebration. Priced per child, plus a $2 squishy capsule each and one $150 logistics fee.</p>
+            <p class="sel-label" id="exp-label">Select experience: <b id="exp-chosen">Duo: Jelly + Crunchy</b></p>
+            <div class="exp-picker" role="radiogroup" aria-labelledby="exp-label">
+              <label class="exp-tile"><input type="radio" name="experience" value="both" checked><span class="exp-badge">Best value</span><span class="exp-img" style="--pos:62% 78%" aria-hidden="true"></span><span class="exp-name">Duo</span><span class="exp-sub">Jelly + Crunchy</span><span class="exp-pp"><span id="price-both">$26</span>/child</span></label>
+              <label class="exp-tile"><input type="radio" name="experience" value="jelly"><span class="exp-img" style="--pos:4% 52%" aria-hidden="true"></span><span class="exp-name">Jelly</span><span class="exp-sub">Smooth &amp; clear</span><span class="exp-pp"><span id="price-jelly">$16</span>/child</span></label>
+              <label class="exp-tile"><input type="radio" name="experience" value="crunchy"><span class="exp-img" style="--pos:52% 18%" aria-hidden="true"></span><span class="exp-name">Crunchy</span><span class="exp-sub">Extra texture</span><span class="exp-pp"><span id="price-crunchy">$18</span>/child</span></label>
+            </div>
+            <div class="exp-panel" id="exp-panel">
+              <div class="exp-panel-head">
+                <div><p class="eyebrow" id="exp-eyebrow">Two textures · two squishies each</p><h3 id="exp-title">Duo: Jelly + Crunchy</h3></div>
+                <div class="exp-price"><strong id="exp-pp">$26</strong><span>per child</span></div>
+              </div>
+              <p class="exp-copy" id="exp-copy"></p>
+              <ul class="ticks" id="exp-feats"></ul>
+              <p class="sel-label addon-label">Add-on</p>
+              <label class="addon" for="wax">
+                <span class="addon-icon" aria-hidden="true"><svg class="icon"><use href="#i-crack"/></svg></span>
+                <span class="addon-body"><span class="addon-title">Wax Cracking <span class="pill">+$2 per squishy</span></span><span class="addon-copy">A colourful wax shell to crack and reveal their squishy, done within the 45-minute session.</span><span class="addon-qty" id="wax-quantity">30 squishies to crack</span></span>
+                <span class="addon-ctl"><span id="wax-price">+$60</span><input type="checkbox" id="wax" name="wax"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
+              </label>
+              <p class="exp-total"><span>Squishy DIY for <b id="exp-n">15</b> children</span><strong id="exp-total">$420.00</strong></p>
+            <p class="fine" id="tier-note">Minimum 10 children.</p>
+            </div>
+          </fieldset>
+
+          <div class="step" role="group" aria-labelledby="rec-h">
+            <h3 class="step-title" id="rec-h"><span class="step-num">3</span>Your recommended celebration</h3>
+            <p class="step-desc" id="rec-desc">Essentials first, then the partner services that fit your remaining budget.</p>
+            <div class="rec" id="rec-list"></div>
+            <div class="warn" id="budget-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg><span id="budget-warn-text"></span></div>
+            <div class="rec-actions"><button type="button" class="btn btn-primary" id="use-rec">Use recommended plan</button><a class="btn btn-ghost" href="#partners">Adjust or explore alternatives</a><span class="rec-state" id="rec-state" aria-live="polite"></span></div>
+          </div>
+        </form>
+
+        <aside class="summary" aria-labelledby="summary-h">
+          <div class="summary-photo"><img id="summary-img" alt="" width="1536" height="1024" loading="lazy"><span class="summary-chip">One celebration, one quote</span></div>
+          <div class="summary-body">
+            <p class="eyebrow">Your celebration · SGD</p>
+            <h2 id="summary-h">Squishy <span id="summary-exp">Duo</span> celebration</h2>
+            <p class="summary-meta"><span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><b id="summary-children">15</b>&nbsp;children · <b id="summary-adults">10</b>&nbsp;adults</span><span><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span id="summary-length">2 hours</span></span></p>
+            <div class="counts"><div><strong id="squishy-count">30</strong><span>take-home squishies</span></div><div><strong id="partner-count">0</strong><span>partner services</span></div></div>
+            <dl class="breakdown" id="breakdown"></dl>
+            <div class="pending-note" id="pending-note" hidden></div>
+            <div class="total"><div><small>Estimated celebration total</small><strong id="total-price">$0.00</strong></div><div class="per-child"><strong id="per-child">$0.00</strong><small>per child</small></div></div>
+            <div class="meter-wrap"><div class="meter-top"><span>Budget used</span><span id="meter-label">$0 of $0</span></div><div class="meter" id="meter" role="img" aria-labelledby="meter-note"><i id="meter-fill"></i></div><p class="meter-note" id="meter-note"></p></div>
+            <a class="btn btn-lemon" href="#request">Request availability</a>
+            <div class="summary-links"><a href="#plan">See schedule &amp; checklist</a></div>
+            <p class="summary-fine">An estimate, not a booking. Our team confirms each partner and sends one final quotation, including tax treatment and any venue charges.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PARTNERS ===================== -->
+  <section class="section partners" id="partners" aria-labelledby="partners-h" style="border-top:0">
+    <div class="wrap">
+      <div class="section-head reveal"><div><p class="eyebrow">Curated partner services</p><h2 id="partners-h">Complete it your way.</h2></div><p class="lead">Swipe through each row or view all. Anything you add updates your total, schedule and checklist straight away.</p></div>
+      <div class="legend reveal" aria-label="Partner status key">
+        <span><span class="st st-demo">Sample listing</span>Placeholder partner, demo price</span>
+        <span><span class="st st-approved">Cake partner</span>Butter Studio, priced in your quotation</span>
+        <span><span class="st st-confirmed">Confirmed</span>Accepted for your date</span>
+      </div>
+      <div id="categories"></div>
+    </div>
+  </section>
+
+  <!-- ===================== PLAN: SCHEDULE ===================== -->
+  <section class="section" id="plan" aria-labelledby="programme-h">
+    <div class="wrap">
+      <div class="programme reveal">
+        <div class="plan-head"><div><p class="eyebrow">Your plan, as one schedule</p><h2 id="programme-h">From hello to happy birthday.</h2></div><button type="button" class="btn btn-lemon print-btn" onclick="window.print()" style="margin:0">Print or save as PDF</button></div>
+        <p class="lead" id="programme-description"></p>
+        <ol class="timeline dyn" id="timeline"></ol>
+        <div class="alongside" id="alongside" hidden></div>
+        <p class="prog-warn" id="prog-warn" hidden></p>
+        <p class="fine">An indicative schedule, adapted to the group on the day. Setup and cleanup happen outside party time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PLAN: CHECKLIST ===================== -->
+  <section class="section" aria-labelledby="prep-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="prep reveal" style="grid-template-columns:1fr">
+        <div><p class="eyebrow">Shared checklist</p><h2 id="prep-h">Who’s handling what.</h2><p class="lead">Updates with every choice, so it’s clear what our team has covered and what still needs you.</p></div>
+      </div>
+      <div class="checks">
+        <div class="checkcol team"><h3><span class="ic"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>Handled by our team</h3><ul id="list-team"></ul></div>
+        <div class="checkcol you"><h3><span class="ic"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span>For you</h3><ul id="list-you"></ul></div>
+        <div class="checkcol wait"><h3><span class="ic"><svg class="icon" aria-hidden="true"><use href="#i-hourglass"/></svg></span>Waiting on confirmation</h3><ul id="list-wait"></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INVITATION ===================== -->
+  <section class="section invite-wrap" aria-labelledby="invite-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="parent reveal invite-grid">
+        <div>
+          <p class="eyebrow">Theme-matched invitation</p>
+          <h2 id="invite-h">Their invitation, already written.</h2>
+          <p class="sub">Built from the date, time, venue and theme you’ve chosen. Add their first name to finish it.</p>
+          <div class="invite-inputs">
+            <label class="field">Birthday child’s first name<input id="child-name" maxlength="40" autocomplete="off"></label>
+            <label class="field">Turning<input id="child-age" type="number" inputmode="numeric" min="1" max="18"></label>
+          </div>
+          <div class="inv-actions"><button type="button" class="btn btn-primary" id="copy-invite"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy invitation text</button></div>
+          <p class="copy-status" id="copy-status" role="status"></p>
+        </div>
+        <div class="invite" id="invite" aria-label="Invitation preview">
+          <svg class="inv-star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-star"/></svg>
+          <p class="inv-eyebrow">You’re invited to a squishy party</p>
+          <p class="inv-name" id="inv-name">Your child’s</p>
+          <p class="inv-age" id="inv-age">birthday celebration</p>
+          <p class="inv-line" id="inv-line">Come make your very own squishies, decorate a squishy capsule to take home and celebrate together.</p>
+          <div class="inv-facts">
+            <div><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg><span id="inv-date">Date to be confirmed</span></div>
+            <div><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span id="inv-time">2:00 pm – 4:30 pm</span></div>
+            <div><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span id="inv-venue">Venue to be confirmed</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MAKERS ===================== -->
+  <section class="section makers-sec" aria-labelledby="makers-h" style="padding-top:0">
+    <div class="wrap makers-grid">
+      <div class="reveal">
+        <p class="eyebrow">From little ideas to big squishes</p>
+        <h2 id="makers-h" style="font-size:clamp(2.1rem,1.4rem + 2.4vw,3.2rem);margin-top:12px">They’re the makers.</h2>
+        <p class="lead" style="margin-top:14px">Our 20-topping menu includes charms, sprinkles and crunchy mix-ins. Jelly uses a portioned charm-and-sprinkle selection; Crunchy uses a measured crunch-topping box. Our hosts guide children to the options for each texture.</p>
+        <div class="toppings"><strong>20</strong><span>toppings to explore</span></div>
+      </div>
+      <ol class="process reveal">
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-palette"/></svg></span><div><h3>Pick a colour</h3><p>Start with blue, pink or purple.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span><div><h3>Choose toppings</h3><p>Favourites from the texture-specific menu, using the supplied portion boxes.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg></span><div><h3>Choose a skin</h3><p>Paw, ball and more: a shape to make theirs.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-wand"/></svg></span><div><h3>Make &amp; customise</h3><p>Our team guides the mixing and making.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg></span><div><h3>Film &amp; take home</h3><p>Capture the squish, then decorate their squishy capsule with rhinestone stickers.</p></div></li>
+      </ol>
+    </div>
+    <div class="wrap">
+      <div class="retail reveal">
+        <div><p class="eyebrow">Try the experience in store</p><p>Currently available exclusively at <strong>Tom &amp; Stefanie</strong> retail outlets.</p><small>The celebration brings this make-your-own experience to your chosen venue.</small></div>
+        <svg class="icon" style="width:44px;height:44px;color:var(--lemon)" aria-hidden="true"><use href="#i-store"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REQUEST ===================== -->
+  <section class="section" id="request" aria-labelledby="booking-h" style="padding-top:0">
+    <div class="wrap booking">
+      <div class="booking-intro reveal">
+        <p class="eyebrow">Last step</p>
+        <h2 id="booking-h">Request availability.</h2>
+        <p class="lead">We check our team and each partner for your date, then send one consolidated quotation for you to approve.</p>
+        <div class="recap"><span class="eyebrow">Your plan</span><dl id="recap-list"></dl><div class="rt"><span>Estimated total</span><strong id="recap-total">$0.00</strong></div></div>
+        <p class="pending"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>Your request doesn’t reserve a date. No payment is due until you approve the final quotation.</p>
+      </div>
+      <div class="form-panel reveal">
+        <form id="booking-form" novalidate>
+          <div class="group-title"><span class="step-num">1</span><h3>Where it’s happening</h3></div>
+          <div class="grid2">
+            <label class="field full">Venue address<input name="address" autocomplete="street-address" maxlength="300" required></label>
+            <label class="field">Singapore postal code<input name="postalCode" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required></label>
+          </div>
+          <div class="group-title"><span class="step-num">2</span><h3>How we can reach you</h3></div>
+          <div class="grid2">
+            <label class="field full">Parent’s name<input name="parentName" autocomplete="name" maxlength="100" required></label>
+            <label class="field">Email address<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+            <label class="field">Mobile number (+65)<input name="phone" type="tel" autocomplete="tel" placeholder="8123 4567" pattern="[0-9 +]{8,15}" maxlength="25" required></label>
+            <label class="field full">Anything else we should know? <span class="hint">Optional: access, setup or theme ideas. Please share dietary needs with your coordinator directly.</span><textarea name="notes" rows="3" maxlength="1500"></textarea></label>
+          </div>
+          <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted about this celebration request.</span></label>
+          <p class="privacy">We use these details only to arrange your celebration and respond to your request.</p>
+          <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
+          <button type="submit" class="btn btn-primary" id="booking-submit">Request availability</button>
+          <p class="submit-note">Availability first. One quotation. Deposit only after you approve it.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+  <p class="vh" id="live" role="status" aria-live="polite" aria-atomic="true"></p>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f6e98c"><use href="#i-star"/></svg></span><span class="brand-name">Squishy Party</span></a>
+    <span>Birthday celebrations by Tom &amp; Stefanie.</span>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<div class="mobile-bar" aria-label="Celebration total"><div><small id="mobile-caption">15 children · Duo</small><strong id="mobile-price">$0.00</strong></div><a class="btn btn-lemon" href="#plan">Review plan</a></div>
+
+<noscript><p style="padding:24px;text-align:center;background:#fdf8d7">Please enable JavaScript to plan your celebration. Squishy DIY is $16 (Jelly), $18 (Crunchy) or $26 (Duo) per child, minimum 10, plus $2 per squishy capsuleainer and a $150 logistics fee.</p></noscript>
+
+<script>
+(function(){
+  'use strict';
+  document.documentElement.classList.add('js');
+  var hi = document.querySelector('.hero-photo img'), si = document.getElementById('summary-img'); if (hi && si) si.src = hi.src; if (hi) document.documentElement.style.setProperty('--photo', 'url("' + hi.src + '")');
+
+  /* ================= CONFIG =================
+     Squishy DIY: the original offer, integer cents.
+     Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
+     'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
+  var BS_LOGO = 'https://thebutterstudio.com/wp-content/uploads/2024/11/Butterstudio-Logo.png';
+  var EXP = { jelly:{name:'Jelly',short:'Jelly',pax:1600,per:1}, crunchy:{name:'Crunchy',short:'Crunchy',pax:1800,per:1}, both:{name:'Duo: Jelly + Crunchy',short:'Duo',pax:2600,per:2} };
+  var CATS = [
+    {id:'styling', title:'Styling', icon:'i-balloon', blurb:'Go beyond the essentials included in every plan.'},
+    {id:'cake', title:'Cakes by', logo:true, icon:'i-cake', blurb:'Our cake partner. Delivered to your venue in time for the finale.'},
+    {id:'food', title:'Food & drinks', icon:'i-utensils', blurb:'Priced per child or per guest, including adults.'},
+    {id:'entertainment', title:'Entertainment & photography', icon:'i-smile', blurb:'Runs alongside the making, or as its own moment.'}
+  ];
+  var P = [
+    {id:'bs-celebration', cat:'cake', name:'Celebration cake', vendor:'Butter Studio', status:'partner', basis:'cake', price:null, rec:1, cap:'Sizes up to 12″ online; larger by enquiry', inc:['Flavour from Butter Studio’s celebration cake range','Cake toppers available','Delivered to your venue'], cond:['Standard cakes: order 1–2 weeks ahead','Delivery $16 per location, 10am–6pm slots']},
+    {id:'bs-2d', cat:'cake', name:'2D thematic cake', vendor:'Butter Studio', status:'partner', basis:'cake', price:null, rec:0, cap:'Custom design around your party theme', inc:['Designed around your colour theme','Delivered to your venue'], cond:['Pre-designed: at least 5 days ahead; fully customised: 14 working days','Tiered or fragile cakes: $20–$30 delivery']},
+    {id:'bs-themed', cat:'cake', name:'Themed cupcakes', vendor:'Butter Studio', status:'partner', basis:'box', price:null, rec:0, cap:'Boxes of 6 or 12: unicorn, mermaid, dinosaur and more', inc:['Themed designs from Butter Studio’s range'], cond:['Pre-orders need at least 3 days','Delivery $16 per location']},
+    {id:'bs-platter', cat:'cake', name:'Cupcake party platter', vendor:'Butter Studio', status:'partner', basis:'booking', price:null, rec:0, cap:'One platter, assorted cupcakes', inc:['Assorted cupcakes on a party platter'], cond:['Order at least 1–2 weeks ahead','Delivery $16 per location']},
+    {id:'bs-cakelets', cat:'cake', name:'Petit cakelets', vendor:'Butter Studio', status:'partner', basis:'box', price:null, rec:0, cap:'Individual cakelets', inc:['Mini cakes, one per guest'], cond:['Order at least 1–2 weeks ahead','Delivery $16 per location']},
+    {id:'f-bento', cat:'food', name:'Kids’ party bento', vendor:'Catering partner, to be selected', status:'demo', basis:'child', price:1400, min:15, rec:2, slot:{min:25,title:'Party food',copy:'Bentos served at the tables.'}, cap:'One box per child, minimum 15', inc:['Mini sandwiches and nuggets','Fruit cup','Juice box'], cond:['Minimum 15 boxes','Order at least 5 days ahead']},
+    {id:'f-buffet', cat:'food', name:'Mini buffet for children & adults', vendor:'Catering partner, to be selected', status:'demo', basis:'pax', price:2200, min:20, rec:0, slot:{min:25,title:'Party food',copy:'Buffet for children and adults.'}, cap:'Per guest, minimum 20', inc:['Six dishes, kid-friendly and adult options','Drinks and disposable ware','Setup and collection'], cond:['Minimum 20 guests','Order at least 7 days ahead']},
+    {id:'f-dessert', cat:'food', name:'Dessert cups', vendor:'Catering partner, to be selected', status:'demo', basis:'child', price:450, rec:0, cap:'One per child', inc:['Jelly and pudding cups in theme colours'], cond:['Order at least 5 days ahead']},
+    {id:'e-face', cat:'entertainment', name:'Face painting, 2 hours', vendor:'Entertainment partner, to be selected', status:'demo', basis:'booking', price:32000, rec:3, along:'Face painting', cap:'One artist, about 20 children in 2 hours, once verified', inc:['Skin-safe paints','Theme-matched designs'], cond:['Book at least 14 days ahead','Space for a small table and two chairs']},
+    {id:'e-photo', cat:'entertainment', name:'Party photographer, 2 hours', vendor:'Photography partner, to be selected', status:'demo', basis:'booking', price:45000, rec:4, along:'Photographer', cap:'One photographer', inc:['Candid and group photos','Edited gallery within 7 days'], cond:['Book at least 14 days ahead']},
+    {id:'e-balloon', cat:'entertainment', name:'Balloon sculpting, 90 minutes', vendor:'Entertainment partner, to be selected', status:'demo', basis:'booking', price:28000, rec:0, along:'Balloon sculpting', cap:'One sculptor', inc:['One balloon creation per child'], cond:['Book at least 14 days ahead']},
+    {id:'e-magic', cat:'entertainment', name:'Magic show, 30 minutes', vendor:'Entertainment partner, to be selected', status:'demo', basis:'booking', price:35000, rec:0, slot:{min:30,title:'Magic show',copy:'A 30-minute show with the birthday child as assistant.'}, cap:'For up to 40 guests', inc:['Interactive show','Birthday-child volunteer moment'], cond:['Book at least 14 days ahead','Needs a 2 m clear performance space']},
+    {id:'s-backdrop', cat:'styling', name:'Balloon garland & name backdrop', vendor:'Styling partner, to be selected', status:'demo', basis:'booking', price:28000, rec:5, cap:'One 2 m backdrop', inc:['Balloon garland in your theme colours','Child’s name sign','Setup and removal'], cond:['Book at least 7 days ahead','Indoor venues, helium-free']},
+    {id:'s-dessert', cat:'styling', name:'Dessert table styling', vendor:'Styling partner, to be selected', status:'demo', basis:'booking', price:22000, rec:0, cap:'One table', inc:['Themed tablecloth and stands','Cake toppers and signage'], cond:['Needs a 1.8 m table at the venue']},
+    {id:'s-favours', cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']}
+  ];
+  var BYID = {}; P.forEach(function(p){ BYID[p.id] = p; });
+  var STATUS = { demo:['st-demo','Sample listing'], prospective:['st-prospective','Prospective'], approved:['st-approved','Approved'], partner:['st-approved','Cake partner'], confirmed:['st-confirmed','Confirmed'] };
+
+  /* ================= HELPERS ================= */
+  var fmt = new Intl.NumberFormat('en-SG',{style:'currency',currency:'SGD',currencyDisplay:'narrowSymbol'});
+  function money(c){ return fmt.format(c/100); }
+  function short(c){ return money(c).replace('.00',''); }
+  var $ = function(id){ return document.getElementById(id); };
+  function put(id, t){ var el = $(id); if (el && el.textContent !== String(t)) { el.textContent = t; return true; } return false; }
+  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function icon(name){ var ns='http://www.w3.org/2000/svg', s=document.createElementNS(ns,'svg'), u=document.createElementNS(ns,'use'); s.setAttribute('class','icon'); s.setAttribute('aria-hidden','true'); u.setAttribute('href','#'+name); s.appendChild(u); return s; }
+  function billable(n){ return Math.max(n, MIN_PAX); }
+  function clamp(n, lo, hi){ n = Math.round(Number(n)); return isNaN(n) ? lo : Math.min(hi, Math.max(lo, n)); }
+  function squishyCents(exp, n){ return EXP[exp].pax * billable(n); }
+  function logoEl(){ var w = el('span','bs-logo'), im = document.createElement('img'), done = false; function fallback(){ if (done) return; done = true; if (im.parentNode) im.replaceWith(el('span','bs-word','Butter Studio')); } im.alt = 'Butter Studio'; im.decoding = 'async'; im.addEventListener('error', fallback); im.addEventListener('load', function(){ if (im.naturalWidth) done = true; else fallback(); }); im.src = BS_LOGO; setTimeout(function(){ if (!im.complete || !im.naturalWidth) fallback(); }, 6000); w.appendChild(im); return w; }
+  function basisLabel(p){ return {booking:'per order', cake:'per cake', box:'per box', child:'per child', pax:'per guest'}[p.basis]; }
+  function qtyFor(p, s){ if (p.basis === 'child') return Math.max(s.children, p.min || 0); if (p.basis === 'pax') return Math.max(s.children + s.adults, p.min || 0); return 1; }
+  function costFor(p, s){ return p.price == null ? null : p.price * qtyFor(p, s); }
+  function clock(start, mins){ if (!start) return null; var hm = start.split(':'), t = (+hm[0]) * 60 + (+hm[1]) + mins, h = Math.floor(t / 60) % 24, m = t % 60; return (h % 12 || 12) + ':' + String(m).padStart(2,'0') + (h < 12 ? ' am' : ' pm'); }
+  function range(start, a, b){ var x = clock(start, a), y = clock(start, b); if (!x) return null; var sx = x.slice(-2), sy = y.slice(-2); return (sx === sy ? x.slice(0, -3) : x) + '–' + y; }
+  function lengthLabel(m){ return {90:'1½ hours',120:'2 hours',150:'2½ hours',180:'3 hours'}[m]; }
+
+  /* ================= STATE ================= */
+  var S = { children:15, adults:10, budgetMode:'total', budgetCents:120000, date:'', time:'14:00', length:120, venue:'', theme:'cobalt', experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
+
+  function foundation(s){
+    var n = billable(s.children), e = EXP[s.experience], items = [];
+    items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
+    items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
+    if (s.wax) items.push({label:'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:WAX * n * e.per, ic:'i-crack'});
+    items.push({label:'Logistics & team, up to ' + TEAM_HOURS + ' hours', cents:LOGISTICS, ic:'i-users'});
+    return items;
+  }
+  function recommend(s){
+    var base = foundation(s).reduce(function(a, i){ return a + i.cents; }, 0), left = s.budgetCents - base, picks = [], missed = [];
+    P.filter(function(p){ return p.rec > 0 && p.price != null; }).sort(function(a, b){ return a.rec - b.rec; }).forEach(function(p){
+      var c = costFor(p, s); if (c <= left) { picks.push(p.id); left -= c; } else missed.push({p:p, short:c - left});
+    });
+    P.filter(function(p){ return p.rec > 0 && p.price == null; }).forEach(function(p){ picks.unshift(p.id); });
+    return {base:base, picks:picks, missed:missed, left:left};
+  }
+  function totals(s){
+    var f = foundation(s), sum = f.reduce(function(a, i){ return a + i.cents; }, 0), pending = [], partners = [];
+    s.selected.forEach(function(id){ var p = BYID[id], c = costFor(p, s); partners.push({p:p, cents:c, qty:qtyFor(p, s)}); if (c == null) pending.push(p); else sum += c; });
+    return {found:f, partners:partners, pending:pending, total:sum};
+  }
+
+  /* ================= PARTNER CARDS (built once) ================= */
+  var cardEls = {};
+  function buildCards(){
+    var host = $('categories');
+    CATS.forEach(function(cat){
+      var wrap = el('div','cat reveal'), head = el('div','cat-head'), hl = el('div'), h = el('h3'), ci = el('span','ci');
+      ci.appendChild(icon(cat.icon)); h.appendChild(ci); h.appendChild(document.createTextNode(cat.title)); if (cat.logo) h.appendChild(logoEl()); h.id = 'cat-' + cat.id;
+      hl.appendChild(h); hl.appendChild(el('p', null, cat.blurb)); head.appendChild(hl); if (cat.logo) h.setAttribute('aria-label', 'Cakes by Butter Studio');
+      var rail = el('div','rail'); rail.id = 'rail-' + cat.id; rail.setAttribute('role','list'); rail.setAttribute('aria-labelledby', h.id); rail.tabIndex = 0;
+      var va = el('button','viewall','View all'); va.type = 'button'; va.setAttribute('aria-controls', rail.id); va.setAttribute('aria-expanded','false');
+      va.addEventListener('click', function(){ var all = rail.classList.toggle('all'); va.textContent = all ? 'Show as a row' : 'View all'; va.setAttribute('aria-expanded', String(all)); });
+      head.appendChild(va); wrap.appendChild(head);
+      P.filter(function(p){ return p.cat === cat.id; }).forEach(function(p){
+        var c = el('article','vcard'); c.setAttribute('role','listitem');
+        var top = el('div','vtop ' + cat.id), vi = el('span','vi'); vi.appendChild(icon(cat.icon)); top.appendChild(p.vendor === 'Butter Studio' ? logoEl() : vi);
+        var st = el('span','st ' + STATUS[p.status][0], STATUS[p.status][1]); top.appendChild(st);
+        var rec = el('span','vrec','Recommended'); rec.hidden = true; top.appendChild(rec); c.appendChild(top);
+        var b = el('div','vbody'), nm = el('div'); nm.appendChild(el('p','vname', p.name)); nm.appendChild(el('p','vvendor', p.vendor)); b.appendChild(nm);
+        var pr = el('div','vprice'), ps = el('strong', p.price == null ? 'quote' : null, p.price == null ? 'Priced in your quote' : short(p.price)), pb = el('span', null, '');
+        pr.appendChild(ps); pr.appendChild(pb); b.appendChild(pr);
+        var l1 = el('p','vline'); l1.appendChild(icon('i-users')); l1.appendChild(el('span', null, p.cap)); b.appendChild(l1);
+        var l2 = el('p','vline'); l2.appendChild(icon('i-calendar')); l2.appendChild(el('span', null, p.cond[0])); b.appendChild(l2);
+        var d = el('details'), sm = el('summary', null, 'View details'), dl = el('dl');
+        [['Price basis', null], ['Inclusions', p.inc], ['Conditions', p.cond], ['Vendor status', null]].forEach(function(r){
+          var w = el('div'); w.appendChild(el('dt', null, r[0])); var dd = el('dd');
+          if (r[1]) { var ul = el('ul'); r[1].forEach(function(t){ ul.appendChild(el('li', null, t)); }); dd.appendChild(ul); }
+          else if (r[0] === 'Price basis') dd.textContent = p.price == null ? 'Butter Studio’s price for your size and flavour is added to your quotation. It isn’t counted in the estimate here.' : short(p.price) + ' ' + basisLabel(p) + (p.min ? ', minimum ' + p.min : '') + (p.status === 'demo' ? '. Demo price.' : '.');
+          else dd.textContent = p.status === 'demo' ? 'Sample listing. Partner and rate to be agreed before launch.' : p.status === 'partner' ? 'Our cake partner. We order and coordinate delivery for you.' : 'Approved partner with agreed rates.';
+          w.appendChild(dd); dl.appendChild(w);
+        });
+        d.appendChild(sm); d.appendChild(dl); b.appendChild(d);
+        var add = el('button','btn btn-ghost vadd'); add.type = 'button'; add.setAttribute('aria-pressed','false');
+        add.addEventListener('click', function(){ toggle(p.id); });
+        b.appendChild(add); c.appendChild(b); rail.appendChild(c);
+        cardEls[p.id] = {card:c, add:add, basis:pb, rec:rec};
+      });
+      wrap.appendChild(rail); host.appendChild(wrap);
+    });
+  }
+  function toggle(id){
+    var i = S.selected.indexOf(id);
+    if (i >= 0) S.selected.splice(i, 1); else S.selected.push(id);
+    S.customised = true;
+    render(true, (i >= 0 ? 'Removed ' : 'Added ') + BYID[id].name + '.');
+  }
+
+  /* ================= RENDER ================= */
+  function render(announce, msg){
+    var s = S, n = billable(s.children), R = recommend(s);
+    if (!s.customised) s.selected = R.picks.slice();
+    var T = totals(s), exp = EXP[s.experience];
+
+    var exp0 = EXP[s.experience];
+    // step 1
+    var perChild = Math.round(s.budgetCents / s.children);
+    if (s.budgetMode === 'total') { put('budget-alt-label','Approximately'); put('budget-alt', money(perChild)); put('budget-alt-sub','per child'); put('budget-label','Total budget for the services we arrange'); }
+    else { put('budget-alt-label','Total budget'); put('budget-alt', money(s.budgetCents)); put('budget-alt-sub','for ' + s.children + ' children'); put('budget-label','Budget per child for the services we arrange'); }
+    // step 2
+    ['both','jelly','crunchy'].forEach(function(e){ put('price-' + e, short(EXP[e].pax)); });
+    var dup = s.experience === 'both', COPY = { both:'Make both textures: a smooth Jelly and a satisfying Crunchy. Both go home in a squishy capsule they decorate with our rhinestone stickers.', jelly:'Smooth, clear and endlessly squishable. It goes home in a squishy capsule they decorate with our rhinestone stickers.', crunchy:'Extra texture and that satisfying crunch. It goes home in a squishy capsule they decorate with our rhinestone stickers.' };
+    put('exp-chosen', exp0.name); put('exp-title', exp0.name); put('exp-pp', short(exp0.pax));
+    put('exp-eyebrow', dup ? 'Best value · two squishies each' : 'One squishy each');
+    put('exp-copy', COPY[s.experience]); put('exp-n', s.children);
+    var fl = $('exp-feats'); fl.textContent = '';
+    [dup ? 'Two squishies each' : 'One ' + exp0.name + ' squishy each', 'Take-home squishy capsule', 'DIY rhinestone stickers', '45 minutes of guided play'].forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); fl.appendChild(li); });
+    var expSum = exp0.pax * n + CONTAINER * n + (s.wax ? WAX * n * exp0.per : 0);
+    if (put('exp-total', money(expSum))) { var et = $('exp-total'); et.classList.remove('bump'); void et.offsetWidth; et.classList.add('bump'); }
+    put('wax-quantity', (n * exp0.per) + ' squishies to crack' + (s.experience === 'both' ? ', two per child' : ', one per child'));
+    put('wax-price', '+' + short(WAX * n * exp0.per));
+    put('tier-note', (s.children < MIN_PAX ? 'Minimum 10 children: for ' + s.children + ' we charge for 10, and spare materials are yours to keep. ' : 'Minimum 10 children. ') + 'Includes the $2 squishy capsule per child. The $150 logistics fee is added once, in your summary.');
+
+    // step 3: recommendation
+    var rl = $('rec-list'); rl.textContent = '';
+    function recRow(ic, title, sub, amt, cls, demo){ var r = el('div','rec-row' + (cls ? ' ' + cls : '')), i = el('span','ri'); i.appendChild(icon(ic)); r.appendChild(i); var t = el('div'), b = el('b', null, title); if (demo) b.appendChild(el('span','tagmini','Demo price')); t.appendChild(b); if (sub) t.appendChild(el('small', null, sub)); r.appendChild(t); r.appendChild(el('span','amt', amt)); rl.appendChild(r); }
+    T.found.forEach(function(f){ recRow(f.ic, f.label, 'Required', money(f.cents), 'req', false); });
+    R.picks.forEach(function(id){ var p = BYID[id], c = CATS.filter(function(x){ return x.id === p.cat; })[0], cc = costFor(p, s); recRow(c.icon, p.name + (p.vendor === 'Butter Studio' ? ' by Butter Studio' : ''), cc == null ? 'Recommended · ' + (R.left > 0 ? money(R.left) + ' of your budget left for it' : 'priced in your quotation') : p.vendor + ' · recommended', cc == null ? 'On quote' : money(cc), '', p.status === 'demo'); });
+    R.missed.slice(0, 2).forEach(function(m){ var c = CATS.filter(function(x){ return x.id === m.p.cat; })[0]; recRow(c.icon, m.p.name, 'Add ' + money(m.short) + ' to your budget to include this', 'Not in budget', 'miss'); });
+    var over = s.budgetCents < R.base;
+    $('budget-warn').hidden = !over;
+    if (over) put('budget-warn-text', 'Your budget is ' + money(R.base - s.budgetCents) + ' below the required Squishy DIY foundation of ' + money(R.base) + '. Try Jelly, skip Wax Cracking or raise the budget.');
+    var same = s.selected.length === R.picks.length && R.picks.every(function(id){ return s.selected.indexOf(id) >= 0; });
+    put('rec-state', s.customised ? (same ? 'Your plan matches the recommendation.' : 'You’ve adjusted the plan.') : 'Showing the recommended plan.');
+    $('use-rec').hidden = !s.customised || same;
+
+    // cards
+    P.forEach(function(p){
+      var c = cardEls[p.id], on = s.selected.indexOf(p.id) >= 0, cost = costFor(p, s), q = qtyFor(p, s);
+      c.card.classList.toggle('on', on);
+      c.add.setAttribute('aria-pressed', String(on));
+      c.add.textContent = on ? 'Added to celebration ✓' : 'Add to celebration';
+      c.add.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + p.name + (on ? ' from' : ' to') + ' celebration');
+      c.basis.textContent = p.price == null ? basisLabel(p) + ' · not in the estimate' : (p.basis === 'child' || p.basis === 'pax' ? basisLabel(p) + ' · ' + money(cost) + ' for ' + q : basisLabel(p)) + (p.status === 'demo' ? ' · Demo price' : '');
+      c.rec.hidden = R.picks.indexOf(p.id) < 0;
+    });
+
+    // summary
+    put('summary-exp', exp.short); put('summary-children', s.children); put('summary-adults', s.adults); put('summary-length', lengthLabel(s.length));
+    put('squishy-count', s.children * exp.per); put('partner-count', s.selected.length);
+    var bd = $('breakdown'); bd.textContent = '';
+    function row(dt, dd, cls, ddcls){ var d = el('div', cls); d.appendChild(el('dt', null, dt)); d.appendChild(el('dd', ddcls, dd)); bd.appendChild(d); }
+    bd.appendChild(el('div','grp','Foundation'));
+    T.found.forEach(function(f){ row(f.label, money(f.cents)); });
+    row('Coordination & one quotation', 'Included', 'sub');
+    if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.vendor === 'Butter Studio' ? 'Butter Studio ' + x.p.name.charAt(0).toLowerCase() + x.p.name.slice(1) : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
+    $('pending-note').hidden = !T.pending.length;
+    if (T.pending.length) put('pending-note', 'Not yet in your total: Butter Studio ' + T.pending.map(function(p){ return p.name.toLowerCase(); }).join(', ') + '. Its price depends on size and flavour, so we add it to your quotation' + (s.budgetCents > T.total ? ', with ' + money(s.budgetCents - T.total) + ' of your budget still free for it.' : '.'));
+    put('total-price', money(T.total) + (T.pending.length ? '+' : ''));
+    put('per-child', money(Math.round(T.total / s.children)));
+    var pct = s.budgetCents > 0 ? Math.min(100, T.total / s.budgetCents * 100) : 100, isOver = T.total > s.budgetCents;
+    $('meter-fill').style.width = pct + '%'; $('meter').classList.toggle('over', isOver);
+    put('meter-label', short(T.total) + ' of ' + short(s.budgetCents));
+    put('meter-note', isOver ? money(T.total - s.budgetCents) + ' over your budget' : money(s.budgetCents - T.total) + ' of your budget left');
+
+    // included
+    put('child-squishy-title', s.experience === 'both' ? 'Two take-home squishies' : 'A take-home ' + exp.name + ' squishy');
+    put('child-squishy-copy', s.experience === 'both' ? 'One Jelly and one Crunchy creation each, made in a 45-minute guided session.' : 'One ' + exp.name + ' creation each, made in a 45-minute guided session.');
+
+    // schedule
+    var blocks = [
+      {m:10, t:'Welcome & arrivals', c:'Guests arrive while our squishy station is ready to go.'},
+      {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.wax ? ', finished with Wax Cracking.' : '.'), cls:'sq'}
+    ];
+    var slotted = {}; s.selected.forEach(function(id){ var p = BYID[id]; if (p.slot && !slotted[p.slot.title]) { slotted[p.slot.title] = 1; blocks.push({m:p.slot.min, t:p.slot.title, c:p.slot.copy, cls:'food'}); } else if (p.slot && slotted[p.slot.title]) { blocks.filter(function(b){ return b.t === p.slot.title; })[0].c += ' Plus ' + p.name.toLowerCase() + '.'; } });
+    var hasCake = s.selected.some(function(id){ return BYID[id].cat === 'cake'; });
+    var finale = {m:20, t:'Birthday finale', c:hasCake ? 'Butter Studio cake, candles, birthday song and group photo.' : 'Birthday spotlight, song and group photo.'};
+    var used = blocks.reduce(function(a, b){ return a + b.m; }, 0) + finale.m, free = s.length - used;
+    if (free >= 10) blocks.push({m:free, t:'Free play & photos', c:'Time to squish, mingle and take photos.', cls:'free'});
+    blocks.push(finale);
+    var tl = $('timeline'); tl.textContent = ''; tl.style.setProperty('--n', blocks.length + 1 <= 6 ? blocks.length + 1 : 4); var at = 0;
+    var pre = el('li','free'), ps0 = clock(s.time, -SETUP_MIN); pre.appendChild(el('span','time', ps0 ? range(s.time, -SETUP_MIN, 0) : 'Before guests')); pre.appendChild(el('h3', null, 'Our team sets up')); pre.appendChild(el('p', null, '15 minutes to set up the squishy station before guests arrive.')); tl.appendChild(pre);
+    blocks.forEach(function(b){ var li = el('li', b.cls), a = clock(s.time, at), z = clock(s.time, at + b.m); li.appendChild(el('span','time', a ? range(s.time, at, at + b.m) : at + '–' + (at + b.m) + ' min')); li.appendChild(el('h3', null, b.t)); li.appendChild(el('p', null, b.c)); tl.appendChild(li); at += b.m; });
+    put('programme-description', 'A ' + lengthLabel(s.length).replace(' hours','-hour') + ' party at ' + (s.venue || 'your venue') + ', with ' + exp.name + (s.wax ? ', Wax Cracking' : '') + (s.selected.length ? ' and ' + s.selected.length + ' partner service' + (s.selected.length > 1 ? 's' : '') : '') + '. Our team is on site for up to 2 hours: 15 minutes of setup, 45 minutes of squishy play, then pack-down.');
+    var al = $('alongside'); al.textContent = ''; var alongs = s.selected.map(function(id){ return BYID[id]; }).filter(function(p){ return p.along; });
+    al.hidden = !alongs.length;
+    if (alongs.length) { al.appendChild(el('span', null, 'Running alongside:')); alongs.forEach(function(p){ al.appendChild(el('span','tag', p.along)); }); }
+    $('prog-warn').hidden = used <= s.length;
+    if (used > s.length) put('prog-warn', 'Your choices need about ' + used + ' minutes. Choose a longer party, or remove a timed item such as food or the magic show.');
+    if (s.length > 120 && used <= s.length) { $('prog-warn').hidden = false; put('prog-warn', 'The $150 logistics fee covers our team for up to 2 hours. For a longer party, our team leaves after pack-down and your other partners carry on.'); }
+
+    // checklist
+    function fill(id, items){ var ul = $(id); ul.textContent = ''; items.forEach(function(x){ var li = el('li'), d = el('span', null, x[0]); if (x[1]) d.appendChild(el('small', null, x[1])); li.appendChild(d); ul.appendChild(li); }); }
+    var team = [['Squishy DIY hosts and all materials', exp.name + ' for ' + s.children + ' children'], ['A squishy capsule and rhinestone stickers for every child'], ['15-minute setup and pack-down', 'Our team is on site for up to 2 hours']];
+    if (s.selected.length) team.push(['Coordinating ' + s.selected.length + ' partner service' + (s.selected.length > 1 ? 's' : ''), s.selected.map(function(id){ return BYID[id].name; }).join(', ')]);
+    team.push(['One consolidated quotation'], ['A coordinator on the day']);
+    var you = [['Book the venue', s.venue ? s.venue : 'Add it in step 1'], ['Tables and chairs at the venue', 'We’ll confirm how many with you']];
+    if (!hasCake) you.push(['Arrange a cake', 'Or add one from Butter Studio']);
+    if (!s.selected.some(function(id){ return BYID[id].cat === 'food'; })) you.push(['Arrange food and drinks', 'Or add catering from our partners']);
+    you.push(['Confirm the adult headcount', 'About ' + s.adults + ' for now'], ['Share dietary needs with your coordinator']);
+    var wait = [['Our team’s availability', s.date ? new Date(s.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'short', day:'numeric', month:'short'}) : 'Add a preferred date']];
+    s.selected.forEach(function(id){ var p = BYID[id]; wait.push([p.vendor + ' availability', p.name]); });
+    T.pending.forEach(function(p){ wait.push(['Butter Studio ' + p.name.toLowerCase() + ' price', 'Size and flavour confirmed in your quotation']); });
+    if (s.selected.some(function(id){ return BYID[id].status === 'demo'; })) wait.push(['Final rates for demo-priced items', 'Confirmed in your quotation']);
+    fill('list-team', team); fill('list-you', you); fill('list-wait', wait);
+
+    // invitation
+    var inv = $('invite'); inv.className = 'invite ' + s.theme;
+    put('inv-name', s.childName ? s.childName + '’s' : 'Your child’s');
+    if (!s.childAge) put('inv-age', 'birthday celebration');
+    else { var n = +s.childAge, sfx = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({1:'st',2:'nd',3:'rd'}[n % 10] || 'th'); put('inv-age', n + sfx + ' birthday'); }
+    put('inv-line', 'Come make ' + (s.experience === 'both' ? 'two squishies of your very own' : 'your very own ' + exp.name.toLowerCase() + ' squishy') + ', decorate a squishy capsule to take home' + (hasCake ? ' and stay for cake' : '') + '.');
+    put('inv-date', s.date ? new Date(s.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : 'Date to be confirmed');
+    put('inv-time', s.time ? clock(s.time, 0) + ' – ' + clock(s.time, s.length) : 'Time to be confirmed');
+    put('inv-venue', s.venue || 'Venue to be confirmed');
+
+    // recap + mobile
+    var rc = $('recap-list'); rc.textContent = '';
+    [['Children · adults', s.children + ' · ' + s.adults], ['Date', s.date ? new Date(s.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}) : 'Not set'], ['Time', s.time ? clock(s.time, 0) + ', ' + lengthLabel(s.length) : 'Not set'], ['Squishy DIY', exp.name + (s.wax ? ' + Wax' : '')], ['Partner services', s.selected.length ? String(s.selected.length) : 'None'], ['Budget', money(s.budgetCents)]].forEach(function(r){ var d = el('div'); d.appendChild(el('dt', null, r[0])); d.appendChild(el('dd', null, r[1])); rc.appendChild(d); });
+    put('recap-total', money(T.total) + (T.pending.length ? '+' : ''));
+    put('mobile-caption', s.children + ' children · ' + exp.short + ' · ' + s.selected.length + ' extras');
+    put('mobile-price', money(T.total) + (T.pending.length ? '+' : ''));
+    if (announce) put('live', (msg ? msg + ' ' : '') + 'Estimated total ' + money(T.total) + (T.pending.length ? ' plus items pending price' : '') + '.');
+  }
+
+  /* ================= EVENTS ================= */
+  var form = $('party-form');
+  function readForm(){
+    var d = new FormData(form);
+    S.children = clamp(d.get('children'), 1, 60);
+    $('children-warn').hidden = !(Number(d.get('children')) > 60);
+    S.adults = clamp(d.get('adults'), 0, 80);
+    var mode = d.get('budgetMode'), v = Math.max(0, Number(d.get('budget')) || 0);
+    if (mode !== S.budgetMode) { S.budgetMode = mode; $('budget').value = mode === 'child' ? Math.round(S.budgetCents / S.children / 100) : Math.round(S.budgetCents / 100); }
+    else S.budgetCents = Math.round(mode === 'child' ? v * 100 * S.children : v * 100);
+    if (mode === 'child') S.budgetCents = Math.round((Number($('budget').value) || 0) * 100 * S.children);
+    S.date = d.get('date') || ''; S.time = d.get('time') || ''; S.length = Number(d.get('length')); S.venue = (d.get('venue') || '').trim();
+    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax');
+  }
+  form.addEventListener('input', function(){ readForm(); render(false); });
+  form.addEventListener('change', function(e){
+    if (e.target.name === 'children') e.target.value = S.children;
+    if (e.target.name === 'adults') e.target.value = S.adults;
+    readForm(); render(true);
+  });
+  form.querySelectorAll('[data-step]').forEach(function(b){ b.addEventListener('click', function(){ var i = $(b.dataset.step); i.value = clamp(Number(i.value) + Number(b.dataset.d), Number(i.min), Number(i.max)); readForm(); render(true); }); });
+  $('use-rec').addEventListener('click', function(){ S.customised = false; render(true, 'Recommended plan applied.'); });
+  $('child-name').addEventListener('input', function(e){ S.childName = e.target.value.trim(); render(false); });
+  $('child-age').addEventListener('input', function(e){ var n = parseInt(e.target.value, 10); S.childAge = n >= 1 && n <= 18 ? String(n) : ''; render(false); });
+  $('copy-invite').addEventListener('click', function(){
+    var t = ['You’re invited to a squishy party!', $('inv-name').textContent + ' ' + $('inv-age').textContent, $('inv-line').textContent, $('inv-date').textContent, $('inv-time').textContent, $('inv-venue').textContent].join('\n');
+    var done = function(ok){ put('copy-status', ok ? 'Invitation text copied.' : 'Couldn’t copy here. Select the invitation text to copy it.'); };
+    try { navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){ done(false); }); } catch (e) { done(false); }
+  });
+
+  buildCards();
+  readForm();
+  render(false);
+
+  /* ================= REQUEST: validated, never sent offline ================= */
+  var bf = $('booking-form'), err = $('booking-error');
+  bf.addEventListener('input', function(e){ if (e.target.getAttribute('aria-invalid') === 'true' && e.target.checkValidity()) { e.target.removeAttribute('aria-invalid'); var m = e.target.parentElement.querySelector('.err-msg'); if (m) m.remove(); } });
+  bf.addEventListener('submit', function(e){
+    e.preventDefault();
+    bf.querySelectorAll('.err-msg').forEach(function(m){ m.remove(); });
+    var bad = [];
+    bf.querySelectorAll('input[required]').forEach(function(i){
+      if (!i.checkValidity()) {
+        bad.push(i);
+        if (i.type !== 'checkbox') {
+          i.setAttribute('aria-invalid','true');
+          var m = el('span','err-msg', i.validity.valueMissing ? 'Please fill this in.' : (i.name === 'postalCode' ? 'Enter a 6-digit Singapore postal code.' : 'Please check this.')); m.id = i.name + '-err';
+          i.setAttribute('aria-describedby', m.id); i.insertAdjacentElement('afterend', m);
+        }
+      }
+    });
+    err.hidden = false;
+    if (bad.length) { err.textContent = 'Please check the highlighted details' + (bf.consent.checked ? '.' : ', and tick the contact consent box.'); bad[0].focus(); return; }
+    if (!S.date) { err.textContent = 'Add a preferred date in step 1 of your plan so we can check availability.'; err.focus(); return; }
+    err.textContent = 'This is an offline HTML preview, so no request has been sent. Requesting availability needs the live website.';
+    err.focus();
+  });
+
+  /* ================= HEADER + REVEAL ================= */
+  var header = $('site-header');
+  var onScroll = function(){ header.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  window.addEventListener('load', function(){ document.body.classList.add('loaded'); });
+  var els = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){ entries.forEach(function(en){ if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }); }, {rootMargin:'0px 0px -8% 0px', threshold:.06});
+    els.forEach(function(x){ io.observe(x); });
+  } else { els.forEach(function(x){ x.classList.add('in'); }); }
+})();
+</script>
+</body>
+</html>
