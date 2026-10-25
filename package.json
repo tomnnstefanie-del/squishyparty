@@ -18,7 +18,7 @@
     "chat-id": "node dev/get-chat-id.mjs"
   },
   "dependencies": {
-    "nodemailer": "10.0.16",
+    "nodemailer": "10.2.1",
     "qrcode": "1.5.4"
   },
   "devDependencies": {
