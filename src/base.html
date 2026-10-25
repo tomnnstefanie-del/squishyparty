@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en-SG">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2234b8">
+<meta name="description" content="A hosted squishy-making birthday party at your venue. Choose Squishy Party or Signature with both textures, decorated take-home containers and a birthday finale. By Tom & Stefanie.">
+<meta name="robots" content="noindex, nofollow">
+<title>Squishy Party · Tom &amp; Stefanie</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%232234b8'/%3E%3Cpath d='M16 5l3 8 8 3-8 3-3 8-3-8-8-3 8-3z' fill='%23f6e98c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== Tokens ===================== */
+:root{
+  --cobalt:#2234b8; --cobalt-600:#1a2a9c; --cobalt-700:#141f78; --cobalt-50:#eef0ff; --cobalt-100:#dfe3ff;
+  --ink:#10173a; --ink-2:#2b3358; --muted:#5a6282; --line:#e3e6f2; --line-2:#cfd5ea;
+  --paper:#fbfaff; --card:#ffffff;
+  --lemon:#f6e98c; --lemon-50:#fdf8d7; --blush:#ffd6e6; --blush-50:#fff0f6; --rose:#d93d7f;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --r-sm:12px; --r-md:18px; --r-lg:26px; --r-xl:34px;
+  --shadow-sm:0 1px 2px rgba(16,23,58,.05),0 2px 8px rgba(16,23,58,.04);
+  --shadow-md:0 2px 6px rgba(16,23,58,.05),0 14px 34px rgba(16,23,58,.08);
+  --shadow-lg:0 4px 10px rgba(16,23,58,.06),0 30px 70px rgba(34,52,184,.18);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --wrap:1240px; --gut:clamp(20px,4vw,48px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+p,h1,h2,h3{margin:0}
+h1,h2,h3{font-family:var(--display);font-weight:500;letter-spacing:-.02em;line-height:1.08;font-variation-settings:"opsz" 96}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{padding:0}
+input,button,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--rose);outline-offset:3px;border-radius:8px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut)}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt)}
+.lead{font-size:1.125rem;line-height:1.65;color:var(--muted)}
+.icon{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===================== Buttons ===================== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:999px;border:0;font-weight:700;font-size:1rem;text-decoration:none;cursor:pointer;transition:transform .18s var(--ease),background-color .2s,box-shadow .2s,color .2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--cobalt);color:#fff;box-shadow:0 8px 22px rgba(34,52,184,.28)}
+.btn-primary:hover{background:var(--cobalt-600)}
+.btn-ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--cobalt);color:var(--cobalt)}
+.btn-lemon{background:var(--lemon);color:var(--ink)}
+.btn-lemon:hover{background:#fff}
+.btn .icon{width:18px;height:18px}
+
+/* ===================== Notice + header ===================== */
+.notice{background:var(--lemon-50);color:var(--ink-2);font-size:.8125rem;text-align:center;padding:9px 16px;border-bottom:1px solid #f0e6a8}
+.site-header{position:sticky;top:0;z-index:40;background:rgba(251,250,255,.86);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s,background .2s}
+.site-header.scrolled{border-bottom-color:var(--line)}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:76px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand-mark{width:40px;height:40px;border-radius:13px;background:var(--cobalt);display:grid;place-items:center;box-shadow:0 6px 16px rgba(34,52,184,.3)}
+.brand-mark svg{width:22px;height:22px}
+.brand-text{display:flex;flex-direction:column;line-height:1}
+.brand-name{font-family:var(--display);font-size:1.35rem;font-weight:600;letter-spacing:-.02em}
+.brand-by{font-size:.75rem;color:var(--muted);margin-top:4px;font-weight:500}
+.nav{display:flex;align-items:center;gap:30px;font-size:.9375rem;font-weight:600}
+.nav a{text-decoration:none;color:var(--ink-2);transition:color .2s}
+.nav a:hover{color:var(--cobalt)}
+.header-cta{min-height:44px;padding:0 20px;font-size:.9375rem}
+
+/* ===================== Hero ===================== */
+.hero{padding:clamp(40px,6vw,84px) 0 clamp(48px,6vw,88px)}
+.hero-grid{display:grid;grid-template-columns:1.02fr 1fr;gap:clamp(32px,5vw,72px);align-items:center}
+.hero h1{font-size:clamp(3rem,1.6rem + 5vw,5.6rem);line-height:.98;letter-spacing:-.035em;margin:18px 0 22px}
+.hero h1 em{font-style:italic;color:var(--cobalt);font-weight:400}
+.hero .lead{max-width:34rem}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.hero-facts{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:36px;padding-top:26px;border-top:1px solid var(--line);font-size:.9375rem;font-weight:600;color:var(--ink-2)}
+.hero-facts li{display:flex;align-items:center;gap:9px;list-style:none}
+.hero-facts ul{display:contents}
+.hero-facts .icon{color:var(--cobalt)}
+.hero-visual{position:relative}
+.hero-photo{border-radius:var(--r-xl);overflow:hidden;aspect-ratio:4/3.3;box-shadow:var(--shadow-lg);background:var(--cobalt)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 1.6s var(--ease)}
+.loaded .hero-photo img{transform:none}
+.hero-float{position:absolute;left:-28px;bottom:28px;background:#fff;border-radius:var(--r-md);padding:16px 18px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:14px;max-width:290px}
+.hero-float-icon{width:46px;height:46px;border-radius:14px;background:var(--lemon);display:grid;place-items:center;flex:none}
+.hero-float-icon .icon{color:var(--cobalt)}
+.hero-float small{display:block;font-size:.75rem;color:var(--muted);font-weight:600}
+.hero-float strong{font-family:var(--display);font-weight:500;font-size:1.25rem;letter-spacing:-.01em}
+.stamp{position:absolute;right:-18px;top:-22px;width:118px;height:118px;border-radius:50%;background:var(--blush);display:grid;place-items:center;box-shadow:var(--shadow-sm)}
+.stamp svg.ring{position:absolute;inset:0;width:100%;height:100%;animation:spin 22s linear infinite}
+.stamp text{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.24em;fill:var(--cobalt)}
+.stamp .star{width:30px;height:30px;color:var(--cobalt)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===================== Section heads ===================== */
+.section{padding:clamp(56px,7vw,104px) 0}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:clamp(28px,4vw,44px)}
+.section-head h2{font-size:clamp(2.1rem,1.4rem + 2.4vw,3.2rem);margin-top:12px;max-width:16ch}
+.section-head p.lead{max-width:30rem}
+
+/* ===================== Configurator ===================== */
+.configurator{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.planner{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:start}
+.step{padding:0 0 36px;margin-bottom:36px;border-bottom:1px solid var(--line)}
+.step:last-of-type{border-bottom:0;margin-bottom:0}
+.step-title{display:flex;align-items:center;gap:14px;font-family:var(--display);font-size:1.6rem;font-weight:500;letter-spacing:-.02em;line-height:1.2}
+.step-num{width:34px;height:34px;border-radius:50%;background:var(--cobalt-50);color:var(--cobalt);display:grid;place-items:center;font-family:var(--sans);font-size:.8125rem;font-weight:700;letter-spacing:0;flex:none}
+.step-desc{color:var(--muted);font-size:.9375rem;margin:10px 0 20px 48px}
+.fine{font-size:.8125rem;color:var(--muted);line-height:1.6;margin-top:14px}
+
+.opt{position:relative;display:block;cursor:pointer;background:var(--card);border-radius:var(--r-md);box-shadow:inset 0 0 0 1.5px var(--line);transition:box-shadow .2s,background-color .25s,transform .2s var(--ease)}
+.opt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.opt:hover{box-shadow:inset 0 0 0 1.5px var(--line-2),var(--shadow-sm);transform:translateY(-2px)}
+.opt:has(input:checked){box-shadow:inset 0 0 0 2px var(--cobalt),0 10px 26px rgba(34,52,184,.12)}
+.opt:has(input:focus-visible){outline:3px solid var(--rose);outline-offset:3px}
+.tick{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:50%;background:var(--cobalt);color:#fff;display:grid;place-items:center;opacity:0;transform:scale(.6);transition:opacity .2s,transform .25s var(--ease)}
+.tick .icon{width:14px;height:14px;stroke-width:3}
+.opt:has(input:checked) .tick{opacity:1;transform:none}
+
+.sizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.size{padding:20px 18px 18px}
+.size-num,.size-unit,.size-meta,.offer-head,.offer-copy,.offer-price,.offer-foot{display:block}
+.size-num{font-family:var(--display);font-size:2.75rem;line-height:1;letter-spacing:-.03em;font-variation-settings:"opsz" 144}
+.size-unit{font-size:.875rem;font-weight:600;color:var(--muted);margin-top:4px}
+.size .size-meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line-2);font-size:.875rem}
+.size-meta span{color:var(--muted)}
+.size-meta strong{font-weight:700}
+.size:has(input:checked){background:var(--cobalt-50)}
+
+.offers{display:grid;gap:14px}
+.offer{padding:24px 24px 22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px}
+.offer .offer-head{display:flex;grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.offer-head strong{font-family:var(--display);font-weight:500;font-size:1.75rem;letter-spacing:-.02em;line-height:1.15}
+.pill{font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:999px;background:var(--cobalt-50);color:var(--cobalt)}
+.pill-gold{background:var(--ink);color:var(--lemon)}
+.offer-copy{grid-column:1/-1;color:var(--ink-2);margin:6px 0 10px;max-width:38rem}
+.offer-feats{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:0;list-style:none}
+.offer-feats li{display:flex;align-items:center;gap:7px;font-size:.8125rem;font-weight:600;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px var(--line);padding:7px 11px;border-radius:999px}
+.offer-feats .icon{width:15px;height:15px;color:var(--cobalt)}
+.offer-price{font-family:var(--display);font-size:2.2rem;letter-spacing:-.02em;color:var(--cobalt);line-height:1;align-self:end;font-variant-numeric:tabular-nums}
+.offer .offer-foot{display:flex;align-self:end;justify-self:end;display:flex;align-items:center;gap:12px;font-size:.875rem;font-weight:600;color:var(--muted)}
+.radio{width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line-2);background:#fff;transition:box-shadow .2s}
+.opt:has(input:checked) .radio{box-shadow:inset 0 0 0 7px var(--cobalt)}
+.offer.signature:has(input:checked){background:linear-gradient(180deg,var(--lemon-50),#fff 70%)}
+.offer.classic:has(input:checked){background:linear-gradient(180deg,var(--blush-50),#fff 70%)}
+
+.textures{margin-top:16px;padding:20px;border-radius:var(--r-md);background:var(--paper);box-shadow:inset 0 0 0 1px var(--line)}
+.textures legend{font-weight:700;font-size:.9375rem;margin-bottom:12px}
+.texture-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.texture{padding:14px 16px 14px 48px}
+.texture::before{content:"";position:absolute;left:16px;top:16px;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line-2);background:#fff;transition:box-shadow .2s}
+.texture:has(input:checked)::before{box-shadow:inset 0 0 0 6px var(--cobalt)}
+.texture strong{display:block}
+.texture span{font-size:.8125rem;color:var(--muted)}
+
+.wax{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 24px}
+.wax-icon{width:52px;height:52px;border-radius:16px;background:var(--blush);display:grid;place-items:center;flex:none}
+.wax-icon .icon{color:var(--rose);width:24px;height:24px}
+.wax-body{flex:1;min-width:0}
+.wax-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-weight:700;font-size:1.0625rem}
+.wax-copy{font-size:.9375rem;color:var(--muted);margin-top:4px}
+.wax-qty{font-size:.8125rem;font-weight:700;color:var(--cobalt);margin-top:6px}
+.wax-ctl{display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-variant-numeric:tabular-nums}
+.switch{width:52px;height:30px;border-radius:999px;background:var(--line-2);padding:3px;transition:background .25s}
+.switch i{display:block;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(16,23,58,.25);transition:transform .28s var(--ease)}
+.wax:has(input:checked){background:var(--cobalt-50)}
+.wax:has(input:checked) .switch{background:var(--cobalt)}
+.wax:has(input:checked) .switch i{transform:translateX(22px)}
+
+/* ===================== Summary card ===================== */
+.summary{position:sticky;top:100px;border-radius:var(--r-lg);background:var(--cobalt);color:#fff;overflow:hidden;box-shadow:var(--shadow-lg)}
+.summary-photo{height:150px;position:relative;overflow:hidden}
+.summary-photo img{width:100%;height:100%;object-fit:cover;object-position:center 55%}
+.summary-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(34,52,184,0) 30%,rgba(34,52,184,.95))}
+.summary-chip{position:absolute;left:20px;top:16px;z-index:1;background:var(--lemon);color:var(--ink);font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:7px 12px}
+.summary-body{padding:4px 26px 26px}
+.summary .eyebrow{color:#c9d0ff}
+.summary h2{font-size:2rem;margin:8px 0 6px}
+.summary-meta{font-size:.875rem;color:#dfe3ff;display:flex;flex-wrap:wrap;gap:6px 14px}
+.summary-meta span{display:flex;align-items:center;gap:6px}
+.summary-meta .icon{width:15px;height:15px}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.counts div{background:rgba(255,255,255,.1);border-radius:var(--r-sm);padding:14px}
+.counts strong{display:block;font-family:var(--display);font-size:1.9rem;font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
+.counts span{display:block;font-size:.8125rem;color:#dfe3ff;margin-top:6px}
+.summary-note{font-size:.8125rem;color:#dfe3ff;margin-top:12px;display:flex;gap:8px;align-items:center}
+.summary-note .icon{width:15px;height:15px;color:var(--lemon)}
+.breakdown{margin:20px 0 0;padding:16px 0;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18);display:grid;gap:10px}
+.breakdown div{display:flex;justify-content:space-between;gap:16px;font-size:.875rem}
+.breakdown dt{color:#dfe3ff}
+.breakdown dd{margin:0;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bundle{margin-top:16px;padding:14px 16px;border-radius:var(--r-sm);background:rgba(246,233,140,.12);box-shadow:inset 0 0 0 1px rgba(246,233,140,.35)}
+.bundle .eyebrow{color:var(--lemon);font-size:.6875rem}
+.bundle p:last-child{font-size:.8125rem;color:#e7eaff;margin-top:5px;line-height:1.55}
+.total{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:20px}
+.total small{display:block;font-size:.8125rem;color:#dfe3ff}
+.total strong{display:block;font-family:var(--display);font-size:2.7rem;font-weight:500;letter-spacing:-.02em;line-height:1.05;font-variant-numeric:tabular-nums}
+.per-child{text-align:right}
+.per-child strong{font-family:var(--sans);font-size:1.0625rem;font-weight:700;letter-spacing:0}
+.summary .btn{width:100%;margin-top:20px}
+.summary-links{display:flex;justify-content:center;margin-top:12px}
+.summary-links a{font-size:.875rem;color:#dfe3ff;text-underline-offset:4px}
+.summary-fine{font-size:.75rem;color:#c9d0ff;margin-top:12px;line-height:1.55;text-align:center}
+.bump{animation:bump .45s var(--ease)}
+@keyframes bump{0%{transform:translateY(5px);opacity:.4}100%{transform:none;opacity:1}}
+
+/* ===================== Included ===================== */
+.included-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.inc{background:#fff;border-radius:var(--r-lg);padding:26px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:12px}
+.inc-icon{width:50px;height:50px;border-radius:15px;background:var(--cobalt-50);display:grid;place-items:center}
+.inc-icon .icon{color:var(--cobalt);width:24px;height:24px}
+.inc h3{font-size:1.4rem}
+.inc p{color:var(--muted);font-size:.9375rem}
+.inc.wax-inc .inc-icon{background:var(--blush)}
+.inc.wax-inc .inc-icon .icon{color:var(--rose)}
+.spotlight{margin-top:16px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;padding:28px 32px;border-radius:var(--r-lg);background:var(--blush)}
+.spotlight-icon{width:64px;height:64px;border-radius:20px;background:#fff;display:grid;place-items:center}
+.spotlight-icon .icon{width:30px;height:30px;color:var(--rose)}
+.spotlight .eyebrow{color:#8e2d58}
+.spotlight h3{font-size:1.75rem;margin:6px 0}
+.spotlight p{color:#4a2a3a;max-width:44rem}
+.hosting{display:flex;gap:10px;align-items:flex-start;margin-top:20px;font-size:.9375rem;color:var(--muted)}
+.hosting .icon{color:var(--cobalt);margin-top:3px}
+
+/* ===================== Programme ===================== */
+.programme{background:var(--ink);color:#fff;border-radius:var(--r-xl);padding:clamp(32px,5vw,64px);position:relative;overflow:hidden}
+.programme::before{content:"";position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(34,52,184,.75),rgba(34,52,184,0) 70%)}
+.programme .eyebrow{color:var(--lemon)}
+.programme h2{font-size:clamp(2.1rem,1.4rem + 2.4vw,3.2rem);margin-top:12px;position:relative}
+.programme .lead{color:#c3c8e3;margin-top:14px;max-width:40rem;position:relative}
+.timeline{list-style:none;padding:0;margin:40px 0 0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;position:relative}
+.timeline li{background:rgba(255,255,255,.06);border-radius:var(--r-md);padding:20px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.timeline .time{display:inline-block;font-size:.75rem;font-weight:700;color:var(--ink);background:var(--lemon);border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums}
+.timeline h3{font-family:var(--sans);font-size:1rem;font-weight:700;letter-spacing:0;line-height:1.35;margin:14px 0 6px}
+.timeline p{font-size:.875rem;color:#c3c8e3}
+.programme .fine{color:#9ea5c8;margin-top:24px;position:relative}
+
+/* ===================== Makers ===================== */
+.makers-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(28px,4vw,56px);align-items:start}
+.toppings{display:inline-flex;align-items:center;gap:14px;margin-top:24px;background:var(--blush);border-radius:var(--r-md);padding:14px 20px}
+.toppings strong{font-family:var(--display);font-size:3rem;font-weight:500;color:var(--cobalt);line-height:1}
+.toppings span{font-weight:700;font-size:.9375rem;max-width:8rem;line-height:1.35}
+.process{list-style:none;padding:0;margin:0;display:grid;gap:10px;counter-reset:p}
+.process li{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:start;background:#fff;border-radius:var(--r-md);padding:18px 20px;box-shadow:var(--shadow-sm)}
+.process-n{width:44px;height:44px;border-radius:14px;background:var(--cobalt-50);color:var(--cobalt);display:grid;place-items:center;font-weight:700;font-size:.875rem}
+.process h3{font-family:var(--sans);font-size:1rem;font-weight:700;letter-spacing:0}
+.process p{color:var(--muted);font-size:.9375rem;margin-top:2px}
+.retail{margin-top:28px;border-radius:var(--r-lg);background:var(--cobalt);color:#fff;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.retail .eyebrow{color:var(--lemon)}
+.retail p{font-size:1.125rem;margin-top:6px}
+.retail small{display:block;color:#dfe3ff;font-size:.875rem;margin-top:4px}
+
+/* ===================== Prep ===================== */
+.prep{display:grid;grid-template-columns:1fr 1.4fr;gap:clamp(28px,4vw,56px);padding:clamp(28px,4vw,48px);border-radius:var(--r-xl);background:var(--cobalt-50)}
+.prep h2{font-size:clamp(2rem,1.4rem + 2vw,2.8rem);margin-top:12px}
+.prep > div > p.lead{margin-top:14px}
+.prep-list{display:grid;gap:12px}
+.prep-item{display:grid;grid-template-columns:44px 1fr;gap:14px;background:#fff;border-radius:var(--r-md);padding:18px}
+.prep-item .ic{width:44px;height:44px;border-radius:13px;background:var(--lemon);display:grid;place-items:center}
+.prep-item .ic .icon{color:var(--cobalt)}
+.prep-item h3{font-family:var(--sans);font-size:1rem;font-weight:700;letter-spacing:0}
+.prep-item p{color:var(--muted);font-size:.9375rem;margin-top:2px}
+
+/* ===================== Parent summary ===================== */
+.parent{display:grid;grid-template-columns:1fr 1.45fr;gap:clamp(28px,4vw,56px);padding:clamp(28px,4vw,52px);border-radius:var(--r-xl);background:var(--lemon);scroll-margin-top:100px}
+.parent h2{font-size:clamp(2rem,1.4rem + 2vw,2.8rem);margin-top:12px}
+.parent .sub{margin-top:12px;color:#55512c}
+.parent-copy{font-size:1rem;line-height:1.8;color:var(--ink-2)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.tags span{font-size:.8125rem;font-weight:700;padding:8px 12px;background:rgba(255,255,255,.7);border-radius:999px}
+.parent-total{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(16,23,58,.15)}
+.parent-total strong{font-family:var(--display);font-size:2rem;font-weight:500;font-variant-numeric:tabular-nums}
+.print-btn{margin-top:18px}
+
+/* ===================== Booking ===================== */
+.booking{display:grid;grid-template-columns:1fr 1.4fr;gap:clamp(28px,4vw,56px);align-items:start}
+.booking-intro{position:sticky;top:110px}
+.booking-intro h2{font-size:clamp(2.2rem,1.4rem + 2.6vw,3.4rem);margin-top:12px}
+.booking-intro .lead{margin-top:14px}
+.booking-pkg{margin-top:24px;padding:20px;border-radius:var(--r-md);background:#fff;box-shadow:var(--shadow-sm);display:grid;gap:4px}
+.booking-pkg span:first-child{font-weight:700;font-size:.875rem}
+.booking-pkg strong{font-family:var(--display);font-size:2rem;font-weight:500;color:var(--cobalt);font-variant-numeric:tabular-nums}
+.booking-pkg span:last-child{font-size:.875rem;color:var(--muted)}
+.pending{font-size:.875rem;color:var(--muted);margin-top:16px;display:flex;gap:10px;align-items:flex-start}
+.pending .icon{color:var(--cobalt);margin-top:2px}
+.form-panel{background:#fff;border-radius:var(--r-lg);padding:clamp(22px,3vw,36px);box-shadow:var(--shadow-md)}
+.group-title{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.group-title .step-num{width:30px;height:30px}
+.group-title h3{font-family:var(--sans);font-size:1.0625rem;font-weight:700;letter-spacing:0}
+.group-title:not(:first-of-type){margin-top:30px;padding-top:26px;border-top:1px solid var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px}
+.field{display:flex;flex-direction:column;gap:7px;font-size:.875rem;font-weight:600;min-width:0}
+.field.full{grid-column:1/-1}
+.field input,.field textarea{width:100%;min-height:50px;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff;font-size:1rem;font-weight:400;transition:border-color .2s,box-shadow .2s}
+.field textarea{min-height:110px;resize:vertical}
+.field input:hover,.field textarea:hover{border-color:#b6bedb}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(34,52,184,.14)}
+.field input[aria-invalid=true]{border-color:#c2384f;background:#fff6f8}
+.hint{font-size:.75rem;font-weight:500;color:var(--muted)}
+.err-msg{font-size:.8125rem;font-weight:600;color:#a6283f}
+.consent{display:flex;gap:12px;align-items:flex-start;margin-top:24px;font-size:.9375rem;cursor:pointer}
+.consent input{width:22px;height:22px;margin:1px 0 0;flex:none;accent-color:var(--cobalt)}
+.privacy{font-size:.8125rem;color:var(--muted);margin-top:8px}
+.form-error{margin-top:18px;padding:14px 16px;border-radius:var(--r-sm);background:#fff1f4;color:#8b2940;font-size:.9375rem;box-shadow:inset 0 0 0 1px #f2c3cf}
+.form-error:focus{outline:3px solid var(--rose);outline-offset:3px}
+.form-panel .btn{width:100%;margin-top:22px}
+.submit-note{text-align:center;font-size:.8125rem;color:var(--muted);margin-top:10px}
+.bot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+
+/* ===================== Footer ===================== */
+footer{margin-top:clamp(56px,7vw,96px);background:var(--ink);color:#c3c8e3}
+.footer-row{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding:36px 0}
+.footer-row .brand-name{color:#fff}
+.footer-row a{color:#c3c8e3;font-size:.875rem}
+
+.mobile-bar{display:none}
+
+/* ===================== Reveal ===================== */
+@media (prefers-reduced-motion:no-preference){
+  .js .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .8s var(--ease)}
+  .js .reveal.in{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+/* ===================== Responsive ===================== */
+@media (max-width:1080px){
+  .nav{display:none}
+  .timeline{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .included-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  .hero-grid,.planner,.makers-grid,.prep,.parent,.booking{grid-template-columns:1fr}
+  .hero-visual{max-width:620px}
+  .hero-float{left:16px}
+  .stamp{right:10px}
+  .summary,.booking-intro{position:static}
+  .section-head{flex-direction:column;align-items:flex-start}
+}
+@media (max-width:640px){
+  body{font-size:15.5px}
+  .header-row{min-height:64px}
+  .header-cta{display:none}
+  .hero h1{font-size:3.1rem}
+  .stamp{width:92px;height:92px;top:-16px}
+  .stamp text{font-size:9px}
+  .hero-float{position:relative;left:auto;bottom:auto;margin:-36px 16px 0;max-width:none}
+  .step-desc{margin-left:0}
+  .sizes{gap:8px}
+  .size{padding:16px 12px 14px}
+  .size-num{font-size:2.2rem}
+  .size-meta{flex-direction:column;gap:2px}
+  .offer{grid-template-columns:1fr;padding:20px}
+  .offer-foot{justify-self:start}
+  .texture-grid,.grid2,.included-grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  .wax{flex-wrap:wrap;padding:18px}
+  .timeline{grid-template-columns:1fr}
+  .spotlight{grid-template-columns:1fr;padding:24px}
+  .retail{padding:22px}
+  .mobile-bar{display:flex;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:50;align-items:center;justify-content:space-between;gap:12px;background:var(--ink);color:#fff;border-radius:20px;padding:10px 10px 10px 18px;box-shadow:0 18px 40px rgba(16,23,58,.35)}
+  .mobile-bar small{display:block;font-size:.75rem;color:#c3c8e3}
+  .mobile-bar strong{font-family:var(--display);font-size:1.35rem;font-weight:500;font-variant-numeric:tabular-nums}
+  .mobile-bar .btn{min-height:46px;padding:0 18px;font-size:.9375rem}
+  footer{padding-bottom:96px}
+}
+@media print{
+  .notice,.site-header,.hero,.configurator,.section:not(.print-keep),footer,.mobile-bar,.print-btn{display:none!important}
+  body{background:#fff}
+  .parent{background:#fff;box-shadow:inset 0 0 0 1px #ccc}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.4 6.6 6.6 2.4-6.6 2.4L12 20.5l-2.4-6.6L3 11.5l6.6-2.4z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.9 3.5 11 7l3.5 1.1L11 9.2 9.9 12.7 8.8 9.2 5.3 8.1 8.8 7z"/><path d="M17.5 12.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8zM5 15.5l.6 1.6 1.6.6-1.6.6L5 19.9l-.6-1.6-1.6-.6 1.6-.6z"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></symbol>
+  <symbol id="i-jar" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="3" rx="1"/><path d="M8 5.5h8v1.5a3 3 0 0 0 2 2.8V19a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 6 19V9.8A3 3 0 0 0 8 7z"/><path d="M9 14c1.5 1 4.5 1 6 0"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-crack" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="m12 2-1.5 5 3 2.5-2 3.5 3 2.5L13 22"/></symbol>
+  <symbol id="i-cake" viewBox="0 0 24 24"><path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/><path d="M2 21h20M7 8v3M12 8v3M17 8v3"/><path d="M7 4h.01M12 4h.01M17 4h.01"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-wand" viewBox="0 0 24 24"><path d="m15 4-11 11 5 5L20 9z"/><path d="M14 9l1 1M18 2v3M21 5h-3"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9 4.5 4h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2a10 10 0 0 0 0 20c1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a6 6 0 0 0 6-6c0-4.4-4.5-8.2-10-8.2z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/></symbol>
+</svg>
+
+<p class="notice">Original website export, redesigned. Historical pricing. Offline preview: booking requests are not sent.</p>
+
+<header class="site-header" id="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="#top" aria-label="Squishy Party home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f6e98c"><use href="#i-star"/></svg></span>
+      <span class="brand-text"><span class="brand-name">Squishy Party</span><span class="brand-by">by Tom &amp; Stefanie</span></span>
+    </a>
+    <nav class="nav" aria-label="Page sections">
+      <a href="#package">Packages</a><a href="#included">What’s included</a><a href="#programme">Programme</a><a href="#parent-summary">For parents</a>
+    </nav>
+    <a class="btn btn-primary header-cta" href="#booking">Request to book</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="reveal">
+        <p class="eyebrow">The birthday edit</p>
+        <h1>Make it <em>their</em> party.</h1>
+        <p class="lead">Guided squishy making, personalised party favours and a birthday moment to remember. We bring the activity to your venue and handle the setup and cleanup.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#package">Build your package <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-ghost" href="#programme">See the programme</a>
+        </div>
+        <div class="hero-facts"><ul>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>At your chosen venue</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>15, 20 or 30 children</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Setup &amp; cleanup included</li>
+        </ul></div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="hero-photo"><img src="__IMG__" alt="Colourful clear jelly and crunchy squishies, with a cracked wax shell, on a blue background" width="1536" height="1024" fetchpriority="high"></div>
+        <div class="stamp" aria-hidden="true">
+          <svg class="ring" viewBox="0 0 120 120"><defs><path id="circ" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0"/></defs><text><textPath href="#circ">CREATE · FILM · TAKE HOME · </textPath></text></svg>
+          <svg class="star" viewBox="0 0 24 24" fill="currentColor"><use href="#i-star"/></svg>
+        </div>
+        <div class="hero-float">
+          <span class="hero-float-icon"><svg class="icon" aria-hidden="true"><use href="#i-gift"/></svg></span>
+          <div><small>Squishy Party from</small><strong>$698 · 15 children</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONFIGURATOR ===================== -->
+  <section class="section configurator" id="package" aria-labelledby="package-h">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">Your party, put together</p><h2 id="package-h">Build their squishy party.</h2></div>
+        <p class="lead">Three choices. A live price as you go. Nothing is booked until we confirm your date.</p>
+      </div>
+      <div class="planner">
+        <form id="party-form" aria-label="Configure your Squishy Party">
+          <fieldset class="step">
+            <legend class="step-title"><span class="step-num">1</span>How big is the party?</legend>
+            <p class="step-desc" id="size-help">Children, including the birthday child. Prices follow your chosen experience, before Wax Cracking.</p>
+            <div class="sizes" aria-describedby="size-help">
+              <label class="opt size"><input type="radio" name="size" value="15" checked><span class="size-num">15</span><span class="size-unit">children</span><span class="size-meta"><span id="size-duration-15">2 hours</span><strong id="size-price-15">$998</strong></span><span class="tick" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></label>
+              <label class="opt size"><input type="radio" name="size" value="20"><span class="size-num">20</span><span class="size-unit">children</span><span class="size-meta"><span id="size-duration-20">2 hours</span><strong id="size-price-20">$1,248</strong></span><span class="tick" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></label>
+              <label class="opt size"><input type="radio" name="size" value="30"><span class="size-num">30</span><span class="size-unit">children</span><span class="size-meta"><span id="size-duration-30">2 hours</span><strong id="size-price-30">$1,748</strong></span><span class="tick" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></label>
+            </div>
+            <p class="fine">Package sizes include the birthday child. For a smaller group the package price stays the same, and spare materials are yours to keep.</p>
+          </fieldset>
+
+          <fieldset class="step">
+            <legend class="step-title"><span class="step-num">2</span>Choose their party</legend>
+            <p class="step-desc">Both packages include a hosted programme, container decorating, shared filming and a birthday finale.</p>
+            <div class="offers">
+              <label class="opt offer signature"><input type="radio" name="offer" value="signature" checked>
+                <span class="offer-head"><strong>Signature Squishy Party</strong><span class="pill pill-gold">Best value</span></span>
+                <span class="offer-copy">Make both textures. Decorate two containers. Take home two creations they made themselves.</span>
+                <ul class="offer-feats"><li><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg>One Jelly + one Crunchy each</li><li><svg class="icon" aria-hidden="true"><use href="#i-jar"/></svg>Two decorated containers each</li><li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>2 hours with a birthday finale</li></ul>
+                <span class="offer-price" id="offer-price-signature">$998</span>
+                <span class="offer-foot">The full two-texture experience<span class="radio" aria-hidden="true"></span></span>
+              </label>
+              <label class="opt offer classic"><input type="radio" name="offer" value="classic">
+                <span class="offer-head"><strong>Squishy Party</strong><span class="pill">One creation</span></span>
+                <span class="offer-copy">Choose one texture and make it theirs, with a decorated container to take their squishy home.</span>
+                <ul class="offer-feats"><li><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg>One squishy + one container each</li><li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>90 minutes with a birthday finale</li><li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span id="classic-texture-label">Jelly included, Crunchy upgrade available</span></li></ul>
+                <span class="offer-price" id="offer-price-classic">$698</span>
+                <span class="offer-foot">A little making. A lot of squishing.<span class="radio" aria-hidden="true"></span></span>
+              </label>
+            </div>
+            <fieldset class="textures" id="single-texture-options" hidden>
+              <legend>Choose one texture for the group</legend>
+              <div class="texture-grid">
+                <label class="opt texture"><input type="radio" name="experience" value="jelly" checked><strong>Jelly</strong><span>Smooth and clear, included</span></label>
+                <label class="opt texture"><input type="radio" name="experience" value="crunchy"><strong>Crunchy</strong><span>Extra texture, +$5 per child</span></label>
+              </div>
+              <p class="fine" id="crunchy-upgrade-price">+$75 for 15 children</p>
+            </fieldset>
+          </fieldset>
+
+          <fieldset class="step">
+            <legend class="step-title"><span class="step-num">3</span>Finish with a little crackle</legend>
+            <p class="step-desc">Optional, and loved by the satisfying-video crowd.</p>
+            <label class="opt wax" for="wax">
+              <span class="wax-icon" aria-hidden="true"><svg class="icon"><use href="#i-crack"/></svg></span>
+              <span class="wax-body"><span class="wax-title">Wax Cracking <span class="pill">+$5 per child</span></span><span class="wax-copy" style="display:block">A colourful wax shell to crack and reveal their squishy.</span><span class="wax-qty" id="wax-quantity" style="display:block">15 wax finishes, one for every child</span></span>
+              <span class="wax-ctl"><span id="wax-price">+$75</span><input type="checkbox" id="wax" name="wax" aria-describedby="wax-help"><span class="switch" aria-hidden="true"><i></i></span></span>
+            </label>
+            <p class="fine" id="wax-help">$5 per child covers one of their two squishies. Each child chooses which creation gets the wax finish.</p>
+          </fieldset>
+        </form>
+
+        <aside class="summary" aria-labelledby="summary-h">
+          <div class="summary-photo"><img id="summary-img" alt="" width="1536" height="1024" loading="lazy"><span class="summary-chip">A party they can keep</span></div>
+          <div class="summary-body">
+            <p class="eyebrow">Your package · SGD</p>
+            <h2 id="summary-h"><span id="summary-package-name">Signature Squishy Party</span></h2>
+            <p class="summary-meta"><span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>Up to <b id="summary-size">15</b>&nbsp;children</span><span><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span id="summary-duration">2 hours</span></span><span><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span id="summary-experience">Jelly + Crunchy</span></span></p>
+            <div class="counts"><div><strong id="squishy-count">30</strong><span>take-home squishies</span></div><div><strong id="container-count">30</strong><span>personalised containers</span></div></div>
+            <p class="summary-note"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg><span id="summary-wax">Shared ASMR filming setup included</span></p>
+            <dl class="breakdown">
+              <div><dt id="base-label">Squishy Party base, 15 children</dt><dd id="base-price">$698.00</dd></div>
+              <div id="upgrade-breakdown-row"><dt id="upgrade-label">Signature: second creation &amp; 30 extra minutes</dt><dd id="upgrade-price">$300.00</dd></div>
+              <div><dt>Decorated containers &amp; filming</dt><dd>Included</dd></div>
+              <div><dt>Birthday finale &amp; birthday-child extras</dt><dd>Included</dd></div>
+              <div id="wax-breakdown-row" hidden><dt id="wax-breakdown-label">Wax Cracking, 15 finishes</dt><dd id="wax-breakdown-price">$75.00</dd></div>
+            </dl>
+            <div class="bundle" id="bundle-value"><p class="eyebrow">The two-texture advantage</p><p id="bundle-value-copy">Two textures to make. Two containers to decorate. A full two-hour programme with a birthday finale.</p></div>
+            <div class="total"><div><small>Estimated package price</small><strong id="total-price">$998.00</strong></div><div class="per-child"><strong id="per-child">$66.53</strong><small>per child</small></div></div>
+            <a class="btn btn-lemon" href="#booking">Request to book</a>
+            <div class="summary-links"><a href="#parent-summary">View parent summary</a></div>
+            <p class="summary-fine">All prices in SGD. The final booking quote confirms tax treatment and any venue-specific charges.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INCLUDED ===================== -->
+  <section class="section" id="included" aria-labelledby="included-h">
+    <div class="wrap">
+      <div class="section-head reveal"><div><p class="eyebrow">The good stuff, included</p><h2 id="included-h">Every child makes it their own.</h2></div><p class="lead">What each guest takes home, and the extra spotlight for the birthday child.</p></div>
+      <div class="included-grid">
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span><h3 id="child-squishy-title">Two take-home squishies</h3><p id="child-squishy-copy">One Jelly and one Crunchy creation each, with a skin from the party menu: paw, ball and more.</p></article>
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-jar"/></svg></span><h3 id="child-container-title">Two decorated containers</h3><p id="child-container-copy">Decorate two containers with the supplied decoration pack, one for each squishy. A name label and care card are included.</p></article>
+        <article class="inc reveal"><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg></span><h3>A moment behind the camera</h3><p>Use our shared ASMR filming setup to capture the making process and those satisfying squishes.</p></article>
+        <article class="inc wax-inc" id="wax-inclusion" hidden><span class="inc-icon"><svg class="icon" aria-hidden="true"><use href="#i-crack"/></svg></span><h3>A Wax Cracking finale</h3><p>One wax finish for their squishy, ready for a satisfying crack-and-reveal moment.</p></article>
+      </div>
+      <div class="spotlight reveal">
+        <span class="spotlight-icon"><svg class="icon" aria-hidden="true"><use href="#i-cake"/></svg></span>
+        <div><p class="eyebrow">For the birthday child</p><h3>A little extra spotlight.</h3><p>First choice, a personalised birthday label, a special charm and a card signed by friends. We bring everyone together for their birthday spotlight, group photo and birthday song.</p></div>
+      </div>
+      <p class="hosting"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Our team handles the activity setup and cleanup. You provide the venue, suitable tables and chairs, food and cake.</p>
+    </div>
+  </section>
+
+  <!-- ===================== PROGRAMME ===================== -->
+  <section class="section" id="programme" aria-labelledby="programme-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="programme reveal">
+        <p class="eyebrow">A party with a plan</p>
+        <h2 id="programme-h">From hello to happy birthday.</h2>
+        <p class="lead" id="programme-description">A two-hour programme with both textures, container decorating, shared filming and a birthday finale.</p>
+        <ol class="timeline">
+          <li><span class="time">0–10 min</span><h3>Welcome &amp; name labels</h3><p>A little personalisation while everyone arrives.</p></li>
+          <li><span class="time">10–20 min</span><h3>Meet the textures</h3><p>A short demonstration and an icebreaker to bring the group together.</p></li>
+          <li><span class="time" id="programme-time-3">20–80 min</span><h3 id="programme-making-title">Make both textures</h3><p id="programme-making-copy">Guided Jelly making, followed by Crunchy making.</p></li>
+          <li><span class="time" id="programme-time-4">80–100 min</span><h3>Decorate &amp; film</h3><p>Personalise their containers and capture their creations.</p></li>
+          <li><span class="time" id="programme-time-5">100–120 min</span><h3>The birthday finale</h3><p>A birthday spotlight, group photo and guided birthday song.</p></li>
+        </ol>
+        <p class="fine">An indicative programme, adapted to the group. Wax Cracking joins the decorating and filming segment when selected. Setup and cleanup take place outside the activity time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MAKERS ===================== -->
+  <section class="section" aria-labelledby="makers-h" style="padding-top:0">
+    <div class="wrap makers-grid">
+      <div class="reveal">
+        <p class="eyebrow">From little ideas to big squishes</p>
+        <h2 id="makers-h" style="font-size:clamp(2.1rem,1.4rem + 2.4vw,3.2rem);margin-top:12px">They’re the makers.</h2>
+        <p class="lead" style="margin-top:14px">Our 20-topping menu includes charms, sprinkles and crunchy mix-ins. Jelly uses a portioned charm-and-sprinkle selection; Crunchy uses a measured crunch-topping box. Our host guides children to the options for each texture.</p>
+        <div class="toppings"><strong>20</strong><span>toppings to explore</span></div>
+      </div>
+      <ol class="process reveal">
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-palette"/></svg></span><div><h3>Pick a colour</h3><p>Start with blue, pink or purple.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span><div><h3>Choose toppings</h3><p>Favourites from the texture-specific menu, using the supplied portion boxes.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg></span><div><h3>Choose a skin</h3><p>Paw, ball and more: a shape to make theirs.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-wand"/></svg></span><div><h3>Make &amp; customise</h3><p>Our team guides the mixing and making.</p></div></li>
+        <li><span class="process-n"><svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg></span><div><h3>Film &amp; take home</h3><p>Capture the squish, then decorate their container.</p></div></li>
+      </ol>
+    </div>
+    <div class="wrap">
+      <div class="retail reveal">
+        <div><p class="eyebrow">Try the experience in store</p><p>Currently available exclusively at <strong>Tom &amp; Stefanie</strong> retail outlets.</p><small>The party package brings this make-your-own experience to your chosen venue.</small></div>
+        <svg class="icon" style="width:44px;height:44px;color:var(--lemon)" aria-hidden="true"><use href="#i-store"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PREP ===================== -->
+  <section class="section" aria-labelledby="prep-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="prep reveal">
+        <div><p class="eyebrow">We’ll help you get ready</p><h2 id="prep-h">A little planning. An easier party.</h2><p class="lead">A personalised digital invitation and the preparation checklist come with your confirmed booking.</p></div>
+        <div class="prep-list">
+          <div class="prep-item"><span class="ic"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span><div><h3>Before we arrive</h3><p>Arrange the venue, suitable tables and chairs, food and cake. We’ll confirm the working space and access details with you.</p></div></div>
+          <div class="prep-item"><span class="ic"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span><div><h3>While they create</h3><p>Our team guides the activities and birthday finale, then clears the activity area.</p></div></div>
+          <div class="prep-item"><span class="ic"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span><div><h3>Creation care included</h3><p>If a squishy fails during the guided session, we repair or remake it so the child leaves with their finished creation.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PARENT SUMMARY ===================== -->
+  <section class="section print-keep" aria-labelledby="parent-h" style="padding-top:0">
+    <div class="wrap">
+      <div class="parent reveal" id="parent-summary">
+        <div><p class="eyebrow">For the parents</p><h2 id="parent-h">Their party. Your easy afternoon.</h2><p class="sub">The finished package, at a glance.</p><button type="button" class="btn btn-ghost print-btn" onclick="window.print()">Print or save as PDF</button></div>
+        <div>
+          <p class="parent-copy" id="parent-copy"></p>
+          <div class="tags"><span id="parent-guests">Up to 15 children</span><span id="parent-time">2 hours</span><span id="parent-texture">Signature Squishy Party</span><span id="parent-wax" hidden>Wax Cracking</span></div>
+          <div class="parent-total"><span>Estimated package price</span><strong id="parent-total">$998.00</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BOOKING ===================== -->
+  <section class="section" id="booking" aria-labelledby="booking-h" style="padding-top:0">
+    <div class="wrap booking">
+      <div class="booking-intro reveal">
+        <p class="eyebrow">Let’s plan their party</p>
+        <h2 id="booking-h">A date for all that squishing.</h2>
+        <p class="lead">Tell us what you have in mind. We’ll check our team’s availability and contact you to confirm the details.</p>
+        <div class="booking-pkg"><span id="booking-package-label">Signature Squishy Party, 15 children</span><strong id="booking-package-price">$998.00</strong><span id="booking-package-extras">30 squishies and 30 containers, 2 hours</span></div>
+        <p class="pending"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>Your request doesn’t reserve a date. No payment is due until we confirm availability and the final quote.</p>
+      </div>
+      <div class="form-panel reveal">
+        <form id="booking-form" novalidate>
+          <div class="group-title"><span class="step-num">1</span><h3>The birthday plans</h3></div>
+          <div class="grid2">
+            <label class="field">Birthday child’s first name<input name="childName" autocomplete="off" maxlength="80" required></label>
+            <label class="field">Age at the party<input name="childAge" type="number" inputmode="numeric" min="1" max="18" required></label>
+            <label class="field">Preferred date<input name="preferredDate" type="date" required></label>
+            <label class="field">Preferred start time<input name="preferredTime" type="time" required><span class="hint">Singapore time, subject to availability</span></label>
+            <label class="field full">Venue name or type<input name="venue" placeholder="e.g. home, condo function room, party venue" maxlength="150" required></label>
+            <label class="field full">Venue address<input name="address" autocomplete="street-address" maxlength="300" required></label>
+            <label class="field">Singapore postal code<input name="postalCode" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required></label>
+          </div>
+          <div class="group-title"><span class="step-num">2</span><h3>How we can reach you</h3></div>
+          <div class="grid2">
+            <label class="field full">Parent’s name<input name="parentName" autocomplete="name" maxlength="100" required></label>
+            <label class="field">Email address<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+            <label class="field">Mobile number (+65)<input name="phone" type="tel" autocomplete="tel" placeholder="8123 4567" pattern="[0-9 +]{8,15}" maxlength="25" required></label>
+            <label class="field full">Anything else we should know? <span class="hint">Optional: theme ideas, access or setup details</span><textarea name="notes" rows="3" maxlength="1500"></textarea></label>
+          </div>
+          <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+          <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted about this party request.</span></label>
+          <p class="privacy">We use these details to arrange your party and respond to your request.</p>
+          <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
+          <button type="submit" class="btn btn-primary" id="booking-submit">Send booking request</button>
+          <p class="submit-note">Availability first. Deposit arrangements after confirmation.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+  <p class="vh" id="live" role="status" aria-live="polite" aria-atomic="true"></p>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#f6e98c"><use href="#i-star"/></svg></span><span class="brand-name">Squishy Party</span></a>
+    <span>A birthday experience by Tom &amp; Stefanie.</span>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<div class="mobile-bar" aria-label="Package total"><div><small id="mobile-caption">15 children, Signature</small><strong id="mobile-price">$998.00</strong></div><a class="btn btn-lemon" href="#booking">Request to book</a></div>
+
+<noscript><p style="padding:24px;text-align:center;background:#fdf8d7">Please enable JavaScript to choose your package. Squishy Party starts at $698 for 15 children; Signature starts at $998. Crunchy upgrades and Wax Cracking each add $5 per child.</p></noscript>
+
+<script>
+(function(){
+  'use strict';
+  document.documentElement.classList.add('js');
+  var hi=document.querySelector('.hero-photo img'), si=document.getElementById('summary-img'); if(hi&&si) si.src=hi.src;
+
+  /* ---------- Pricing (unchanged from the original offer, integer cents) ---------- */
+  var PACKAGES = {
+    15:{guests:15,baseCents:69800,signatureCents:99800,duration:'90 minutes',bothDuration:'2 hours'},
+    20:{guests:20,baseCents:87300,signatureCents:124800,duration:'90 minutes',bothDuration:'2 hours'},
+    30:{guests:30,baseCents:122300,signatureCents:174800,duration:'90 minutes',bothDuration:'2 hours'}
+  };
+  var EXPERIENCES = {
+    jelly:{name:'Jelly',perChildUpgradeCents:0,creationsPerChild:1},
+    crunchy:{name:'Crunchy',perChildUpgradeCents:500,creationsPerChild:1},
+    both:{name:'Jelly + Crunchy',creationsPerChild:2}
+  };
+  var WAX_PER_CHILD_CENTS = 500;
+
+  function calculatePackage(input){
+    var selected = PACKAGES[input.guests], texture = EXPERIENCES[input.experience];
+    if (!selected || !texture) throw new RangeError('Choose a valid party package.');
+    var signature = input.experience === 'both';
+    var packageCents = signature ? selected.signatureCents : selected.baseCents + texture.perChildUpgradeCents * input.guests;
+    var waxCents = input.wax ? WAX_PER_CHILD_CENTS * input.guests : 0;
+    return {
+      offer: signature ? 'signature' : 'classic',
+      packageName: signature ? 'Signature Squishy Party' : 'Squishy Party',
+      guests: input.guests, experience: input.experience, experienceName: texture.name, wax: input.wax,
+      duration: signature ? selected.bothDuration : selected.duration,
+      squishies: input.guests * texture.creationsPerChild, containers: input.guests * texture.creationsPerChild,
+      waxFinishes: input.wax ? input.guests : 0,
+      baseCents: selected.baseCents, experienceUpgradeCents: packageCents - selected.baseCents,
+      packageCents: packageCents, waxCents: waxCents, totalCents: packageCents + waxCents,
+      perChildCents: Math.round((packageCents + waxCents) / input.guests)
+    };
+  }
+  var fmt = new Intl.NumberFormat('en-SG',{style:'currency',currency:'SGD',currencyDisplay:'narrowSymbol'});
+  function money(c){ return fmt.format(c/100); }
+  function short(c){ return money(c).replace('.00',''); }
+  function parentSummary(p){
+    var creations = p.experience === 'both' ? 'one Jelly and one Crunchy squishy, and decorates two take-home containers' : 'one ' + p.experienceName + ' squishy and decorates a take-home container';
+    return p.packageName + ' for up to ' + p.guests + ' children, including the birthday child: ' + p.duration + ' of guided activities and a birthday finale at your venue. Every child makes ' + creations + ', with a name label and care card. They choose colours and skins from our party menu, and explore the 20-topping menu through portioned selections suited to each texture. A shared ASMR filming setup helps them capture their creations.' + (p.wax ? ' Wax Cracking adds ' + p.waxFinishes + ' finishes, one existing squishy per child' + (p.experience === 'both' ? ', chosen from their two creations' : '') + '.' : '') + ' The birthday child gets first choice, a personalised birthday label, a special charm, a card signed by friends and a spotlight moment. We guide the birthday song and group photo, and handle the activity setup and cleanup. A personalised digital invitation and preparation checklist are included after confirmation. You provide the venue, suitable tables and chairs, food and cake. If a creation fails during the guided session, we repair or remake it. Estimated package price: ' + money(p.totalCents) + ' SGD, subject to team availability and the final quote.';
+  }
+
+  /* ---------- Rendering ---------- */
+  var form = document.getElementById('party-form');
+  var $ = function(id){ return document.getElementById(id); };
+  var put = function(id, text){ var el = $(id); if (el && el.textContent !== String(text)) { el.textContent = text; return true; } return false; };
+  var bump = function(id){ var el = $(id); if (!el) return; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); };
+  var state = { guests:15, experience:'both', wax:false };
+  var singleExperience = 'jelly';
+
+  function render(announce){
+    var p = calculatePackage(state);
+    form.querySelectorAll('[name="size"]').forEach(function(i){ i.checked = Number(i.value) === p.guests; });
+    if (p.offer === 'classic') singleExperience = p.experience;
+    form.querySelectorAll('[name="offer"]').forEach(function(i){ i.checked = i.value === p.offer; });
+    form.querySelectorAll('[name="experience"]').forEach(function(i){ i.checked = i.value === singleExperience; });
+    $('single-texture-options').hidden = p.offer === 'signature';
+    $('wax').checked = p.wax;
+    put('wax-quantity', p.guests + ' wax finishes, one for every child');
+    put('wax-price', '+' + short(p.guests * WAX_PER_CHILD_CENTS));
+    [15,20,30].forEach(function(g){
+      var c = calculatePackage({guests:g, experience:p.experience, wax:false});
+      put('size-price-' + g, short(c.packageCents)); put('size-duration-' + g, c.duration);
+    });
+    put('offer-price-classic', short(calculatePackage({guests:p.guests, experience:singleExperience, wax:false}).packageCents));
+    put('offer-price-signature', short(calculatePackage({guests:p.guests, experience:'both', wax:false}).packageCents));
+    put('classic-texture-label', singleExperience === 'jelly' ? 'Jelly included, Crunchy upgrade available' : 'Crunchy selected, includes the texture upgrade');
+    put('crunchy-upgrade-price', '+' + short(p.guests * 500) + ' for ' + p.guests + ' children');
+    put('summary-package-name', p.packageName);
+    put('summary-size', p.guests);
+    put('summary-duration', p.duration);
+    put('summary-experience', p.experienceName);
+    if (put('squishy-count', p.squishies)) bump('squishy-count');
+    if (put('container-count', p.containers)) bump('container-count');
+    put('summary-wax', p.wax ? p.waxFinishes + ' wax finishes + shared ASMR filming setup' : 'Shared ASMR filming setup included');
+    put('base-label', 'Squishy Party base, ' + p.guests + ' children');
+    put('base-price', money(p.baseCents));
+    $('upgrade-breakdown-row').hidden = p.experience === 'jelly';
+    put('upgrade-label', p.offer === 'signature' ? 'Signature: second creation & 30 extra minutes' : 'Crunchy upgrade, ' + p.guests + ' × $5');
+    put('upgrade-price', money(p.experienceUpgradeCents));
+    $('bundle-value').hidden = p.experience !== 'both';
+    $('wax-breakdown-row').hidden = !p.wax;
+    $('wax-inclusion').hidden = !p.wax;
+    put('wax-breakdown-label', 'Wax Cracking, ' + p.waxFinishes + ' finishes');
+    put('wax-breakdown-price', money(p.waxCents));
+    if (put('total-price', money(p.totalCents))) bump('total-price');
+    put('per-child', money(p.perChildCents));
+    put('child-squishy-title', p.experience === 'both' ? 'Two take-home squishies' : 'A take-home squishy');
+    put('child-squishy-copy', p.experience === 'both' ? 'One Jelly and one Crunchy creation each, with a skin from the party menu: paw, ball and more.' : 'One self-created ' + p.experienceName + ' squishy, with their choice of skin: paw, ball and more.');
+    put('child-container-title', p.experience === 'both' ? 'Two decorated containers' : 'Their own decorated container');
+    put('child-container-copy', p.experience === 'both' ? 'Decorate two containers with the supplied decoration pack, one for each squishy. A name label and care card are included.' : 'Personalise a container with the supplied decoration pack. A name label and care card are included.');
+    put('wax-help', p.experience === 'both' ? '$5 per child covers one of their two squishies. Each child chooses which creation gets the wax finish.' : '$5 per child covers one wax finish on their squishy. Quantity and price follow the selected guest count.');
+    var sig = p.offer === 'signature';
+    put('programme-description', sig ? 'A two-hour programme with both textures, container decorating, shared filming and a birthday finale.' : 'A 90-minute programme with one texture, container decorating, shared filming and a birthday finale.');
+    put('programme-time-3', sig ? '20–80 min' : '20–50 min');
+    put('programme-making-title', sig ? 'Make both textures' : 'Make their ' + p.experienceName);
+    put('programme-making-copy', sig ? 'Guided Jelly making, followed by Crunchy making.' : 'Guided making with colours, skin and portioned toppings.');
+    put('programme-time-4', sig ? '80–100 min' : '50–70 min');
+    put('programme-time-5', sig ? '100–120 min' : '70–90 min');
+    put('parent-copy', parentSummary(p));
+    put('parent-guests', 'Up to ' + p.guests + ' children');
+    put('parent-time', p.duration);
+    put('parent-texture', p.packageName);
+    $('parent-wax').hidden = !p.wax;
+    put('parent-total', money(p.totalCents));
+    put('booking-package-label', p.packageName + ', ' + p.guests + ' children');
+    put('booking-package-price', money(p.totalCents));
+    put('booking-package-extras', p.squishies + ' squishies and ' + p.containers + ' containers, ' + p.duration + (p.wax ? ', with Wax Cracking' : ''));
+    put('mobile-caption', p.guests + ' children, ' + (sig ? 'Signature' : p.experienceName) + (p.wax ? ' + Wax' : ''));
+    put('mobile-price', money(p.totalCents));
+    if (announce) put('live', p.guests + ' children, ' + p.experienceName + (p.wax ? ', ' + p.waxFinishes + ' wax finishes' : '') + '. Estimated package price ' + money(p.totalCents) + '.');
+    return p;
+  }
+  form.addEventListener('change', function(){
+    var d = new FormData(form);
+    state = { guests:Number(d.get('size')), experience: d.get('offer') === 'signature' ? 'both' : d.get('experience'), wax: d.has('wax') };
+    render(true);
+  });
+  render(false);
+
+  /* ---------- Booking form: validated, but this offline export never sends ---------- */
+  var bf = $('booking-form'), err = $('booking-error');
+  bf.addEventListener('input', function(e){ if (e.target.getAttribute('aria-invalid') === 'true' && e.target.checkValidity()) { e.target.removeAttribute('aria-invalid'); var m = e.target.parentElement.querySelector('.err-msg'); if (m) m.remove(); } });
+  bf.addEventListener('submit', function(e){
+    e.preventDefault();
+    bf.querySelectorAll('.err-msg').forEach(function(m){ m.remove(); });
+    var bad = [];
+    bf.querySelectorAll('input[required]').forEach(function(i){
+      if (!i.checkValidity()) {
+        bad.push(i);
+        if (i.type !== 'checkbox') {
+          i.setAttribute('aria-invalid','true');
+          var m = document.createElement('span'); m.className = 'err-msg'; m.id = i.name + '-err';
+          m.textContent = i.validity.valueMissing ? 'Please fill this in.' : (i.name === 'postalCode' ? 'Enter a 6-digit Singapore postal code.' : 'Please check this.');
+          i.setAttribute('aria-describedby', m.id); i.insertAdjacentElement('afterend', m);
+        }
+      }
+    });
+    err.hidden = false;
+    if (bad.length) {
+      err.textContent = 'Please check the highlighted details' + (bf.consent.checked ? '.' : ', and tick the contact consent box.');
+      bad[0].focus();
+      return;
+    }
+    err.textContent = 'This is an offline HTML export, so no request has been sent. Booking submission needs the live website.';
+    err.focus();
+  });
+
+  /* ---------- Header + reveal ---------- */
+  var header = $('site-header');
+  var onScroll = function(){ header.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  window.addEventListener('load', function(){ document.body.classList.add('loaded'); });
+  var els = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){ entries.forEach(function(en){ if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }); }, {rootMargin:'0px 0px -8% 0px', threshold:.06});
+    els.forEach(function(el){ io.observe(el); });
+  } else { els.forEach(function(el){ el.classList.add('in'); }); }
+})();
+</script>
+</body>
+</html>
