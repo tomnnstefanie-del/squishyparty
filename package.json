@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Squishy Party by Tom & Stefanie: party planner website + request API (Telegram, email code, PayNow deposit).",
+  "description": "Squishy Party by Tom & Stefanie: party planner website + request API (Telegram, email code).",
   "engines": {
     "node": ">=20"
   },
@@ -18,8 +18,7 @@
     "chat-id": "node dev/get-chat-id.mjs"
   },
   "dependencies": {
-    "nodemailer": "10.0.16",
-    "qrcode": "1.5.4"
+    "nodemailer": "10.0.16"
   },
   "devDependencies": {
     "playwright": "1.55.1"

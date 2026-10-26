@@ -15,7 +15,12 @@
   // Cake stores, shown as one card each. 'thumb' replaces the logo on the card; 'hero' is the store banner.
   var STORES = {
     'Butter Studio': {area:'Handcrafted cakes · Tai Seng', tags:['Halal','Cakes & bakes'], hero:'img/cakes/bs-nutella.jpg'},
-    'Styling partner, to be selected': {title:'Party styling partner', area:'Partner being confirmed', tags:['Balloon backdrops','Dessert tables','Props'], pill:'Sample listing'},
+    // Styling partner: Bloom (bloomball.sg). 'palette' and 'gallery' add a colour row and recent setups to the store page.
+    'Bloom': {title:'Bloom', area:'Balloon garlands & backdrops · Singapore', tags:['Fabric backdrops','Balloon garlands','Custom foamboard'], pill:'Styling partner', from:'Backdrops from $199',
+      thumb:'img/bloom/logo.png', hero:'img/bloom/setup-daisy.jpg',
+      note:'We book Bloom for your date and coordinate set-up with them. Your colours and wording are confirmed in your quote.',
+      palette:[['Pink','#f4a7c0'],['Terracotta','#d2683f'],['White','#ffffff'],['Cream','#efe4cc'],['Sage','#b7c29f'],['Black','#141414'],['Baby blue','#a8d2ee'],['Lilac','#c4a4de'],['Grey','#c6c6ce'],['Brown','#8a6a3d']],
+      gallery:[['img/bloom/setup-daisy.jpg','Daisy first birthday'],['img/bloom/setup-navy.jpg','Navy & gold 55th'],['img/bloom/setup-blush.jpg','Blush 18th tea party']]},
     'Tom & Stefanie': {title:'Tom & Stefanie', area:'Party favours from our own stores', tags:['Since 1994'], pill:'Our own', icon:'i-gift'},
     'Entertainment partner, to be selected': {title:'Party entertainers', area:'Partner being confirmed', tags:['Face painting','Balloon sculpting','Magic'], pill:'Sample listing'},
     'Photography partner, to be selected': {title:'Party photographer', area:'Partner being confirmed', tags:['Candid & group photos'], pill:'Sample listing', icon:'i-camera'}
@@ -50,10 +55,26 @@
     {id:'e-photo', cat:'entertainment', name:'Party photographer, 2 hours', vendor:'Photography partner, to be selected', status:'demo', basis:'booking', price:45000, rec:4, along:'Photographer', cap:'One photographer', inc:['Candid and group photos','Edited gallery within 7 days'], cond:['Book at least 14 days ahead']},
     {id:'e-balloon', cat:'entertainment', name:'Balloon sculpting, 90 minutes', vendor:'Entertainment partner, to be selected', status:'demo', basis:'booking', price:28000, rec:0, along:'Balloon sculpting', cap:'One sculptor', inc:['One balloon creation per child'], cond:['Book at least 14 days ahead']},
     {id:'e-magic', cat:'entertainment', name:'Magic show, 30 minutes', vendor:'Entertainment partner, to be selected', status:'demo', basis:'booking', price:35000, rec:0, slot:{min:30,title:'Magic show',copy:'A 30-minute show with the birthday child as assistant.'}, cap:'For up to 40 guests', inc:['Interactive show','Birthday-child volunteer moment'], cond:['Book at least 14 days ahead','Needs a 2 m clear performance space']},
-    {id:'s-backdrop', cat:'styling', name:'Balloon garland & name backdrop', vendor:'Styling partner, to be selected', status:'demo', basis:'booking', price:28000, rec:5, cap:'One 2 m backdrop', inc:['Balloon garland in your theme colours','Child’s name sign','Setup and removal'], cond:['Book at least 7 days ahead','Indoor venues, helium-free']},
-    {id:'s-dessert', cat:'styling', name:'Dessert table styling', vendor:'Styling partner, to be selected', status:'demo', basis:'booking', price:22000, rec:0, cap:'One table', inc:['Themed tablecloth and stands','Cake toppers and signage'], cond:['Needs a 1.8 m table at the venue']},
+    // Bloom menu (bloomball.sg). Grouped items (g) are one menu tile with a size choice.
+    {id:'bl-fabric-std', custom:{colours:true,text:true,notes:true,images:true}, sec:'Fabric backdrop packages', cat:'styling', name:'Fabric backdrop · Standard', vendor:'Bloom', status:'approved', basis:'booking', price:19900, rec:5, img:'img/bloom/fabric-standard.jpg', cap:'1 fabric backdrop, your text and a full balloon garland', inc:['1 fabric backdrop (1.2 m × 2.2 m)','1 custom vinyl text, e.g. the birthday child’s name','1 full-length balloon garland in your colours'], cond:['10 backdrop colours to choose from','Colours and wording confirmed in your quote']},
+    {id:'bl-fabric-dlx', custom:{colours:true,text:true,notes:true,images:true}, sec:'Fabric backdrop packages', cat:'styling', name:'Fabric backdrop · Deluxe', vendor:'Bloom', status:'approved', basis:'booking', price:29900, rec:0, img:'img/bloom/fabric-deluxe.jpg', cap:'2 backdrops, your text, a balloon garland and a 3D standee', inc:['2 fabric backdrops (1.2 m × 2.2 m and 1 m × 2 m)','1 custom vinyl text','1 full-length balloon garland','1 3D standee (0.8 m tall)'], cond:['10 backdrop colours to choose from','Colours, wording and standee design confirmed in your quote']},
+    {id:'bl-foam-std', custom:{colours:true,text:true,notes:true,images:true}, sec:'Custom foamboard backdrops', cat:'styling', name:'Custom foamboard · Standard', vendor:'Bloom', status:'approved', basis:'booking', price:39900, rec:0, img:'img/bloom/foam-standard.jpg', cap:'A fully printed backdrop designed for your theme', inc:['1 custom-printed backdrop (1.2 m × 2.2 m)','1 full-length balloon garland','Design and customisation included'], cond:['Design approved with you before printing']},
+    {id:'bl-foam-dlx', custom:{colours:true,text:true,notes:true,images:true}, sec:'Custom foamboard backdrops', cat:'styling', name:'Custom foamboard · Deluxe', vendor:'Bloom', status:'approved', basis:'booking', price:49900, rec:0, img:'img/bloom/foam-deluxe.jpg', cap:'2 printed backdrops, a garland and a standee', inc:['2 custom-printed backdrops (2.2 m × 1.2 m and 2 m × 0.8 m)','1 full-length balloon garland','1 3D standee (0.8 m) or a number standee (1 m / 1.2 m)','Design and customisation included'], cond:['Design approved with you before printing']},
+    {id:'bl-arch', sec:'Balloon arches & towers', cat:'styling', name:'Classic balloon arch', vendor:'Bloom', status:'approved', basis:'booking', price:22900, rec:0, img:'img/bloom/arch.jpg', cap:'A full balloon arch for an entrance or stage', inc:['1 classic balloon arch in your colours'], cond:['Great for entrances, schools and company events']},
+    {id:'bl-twin-15', custom:{colours:true,text:true}, g:'bl-twin', gname:'Twin balloon towers', size:'1.5 m tall', sec:'Balloon arches & towers', cat:'styling', name:'Twin balloon towers, 1.5 m', vendor:'Bloom', status:'approved', basis:'booking', price:15000, rec:0, img:'img/bloom/twin-tower.jpg', cap:'A pair of balloon columns with your text on top', inc:['2 balloon columns','2 clear balloons with custom vinyl text'], cond:['Price is for the pair']},
+    {id:'bl-twin-18', custom:{colours:true,text:true}, g:'bl-twin', gname:'Twin balloon towers', size:'1.8 m tall', sec:'Balloon arches & towers', cat:'styling', name:'Twin balloon towers, 1.8 m', vendor:'Bloom', status:'approved', basis:'booking', price:18000, rec:0, img:'img/bloom/twin-tower.jpg', cap:'A pair of balloon columns with your text on top', inc:['2 balloon columns','2 clear balloons with custom vinyl text'], cond:['Price is for the pair']},
+    {id:'bl-number', sec:'Add-ons', cat:'styling', name:'Number standee', vendor:'Bloom', status:'approved', basis:'booking', price:3500, rec:0, img:'img/bloom/number-standee.jpg', cap:'A foil number on a balloon base, 1 m or 1.2 m', inc:['1 number standee (1 m or 1.2 m)'], cond:['Price is per number']},
+    {id:'bl-col-12', custom:{colours:true,text:true}, g:'bl-col', gname:'Balloon column', size:'1.2 m tall', sec:'Add-ons', cat:'styling', name:'Balloon column, 1.2 m', vendor:'Bloom', status:'approved', basis:'booking', price:6000, rec:0, img:'img/bloom/balloon-column.jpg', cap:'A balloon column topped with a clear balloon and your text', inc:['1 balloon column with a clear text balloon'], cond:['Price is per column']},
+    {id:'bl-col-15', custom:{colours:true,text:true}, g:'bl-col', gname:'Balloon column', size:'1.5 m tall', sec:'Add-ons', cat:'styling', name:'Balloon column, 1.5 m', vendor:'Bloom', status:'approved', basis:'booking', price:9000, rec:0, img:'img/bloom/balloon-column.jpg', cap:'A balloon column topped with a clear balloon and your text', inc:['1 balloon column with a clear text balloon'], cond:['Price is per column']},
+    {id:'bl-half', sec:'Add-ons', cat:'styling', name:'Half balloon garland', vendor:'Bloom', status:'approved', basis:'booking', price:6500, rec:0, img:'img/bloom/half-garland.jpg', cap:'A shorter garland, 1 m or 1.2 m', inc:['1 half balloon garland (1 m or 1.2 m)'], cond:['Price is per garland']},
+    {id:'bl-led', sec:'Add-ons', cat:'styling', name:'“Happy Birthday” LED light', vendor:'Bloom', status:'approved', basis:'booking', price:1500, rec:0, img:'img/bloom/led-light.jpg', cap:'Neon-style sign in white or warm white', inc:['1 LED sign (white or warm white)'], cond:[]},
+    {id:'bl-themed', sec:'Add-ons', cat:'styling', name:'Themed foil balloons', vendor:'Bloom', status:'approved', basis:'booking', price:null, rec:0, img:'img/bloom/themed-balloons.jpg', cap:'From $5 to $15 each, priced in your quote', inc:['Foil balloons to match your theme'], cond:['Exact designs and price confirmed in your quote']},
+    {id:'bl-stand-08', g:'bl-stand', gname:'Cake stand pedestal', size:'0.8 m tall', sec:'Add-ons', cat:'styling', name:'Cake stand pedestal, 0.8 m', vendor:'Bloom', status:'approved', basis:'booking', price:2500, rec:0, img:'img/bloom/cake-stand.jpg', cap:'A fluted white pedestal to show off the cake', inc:['1 cake stand pedestal'], cond:[]},
+    {id:'bl-stand-10', g:'bl-stand', gname:'Cake stand pedestal', size:'1 m tall', sec:'Add-ons', cat:'styling', name:'Cake stand pedestal, 1 m', vendor:'Bloom', status:'approved', basis:'booking', price:3000, rec:0, img:'img/bloom/cake-stand.jpg', cap:'A fluted white pedestal to show off the cake', inc:['1 cake stand pedestal'], cond:[]},
+    {id:'bl-3d-08', g:'bl-3d', gname:'3D standee with stand', size:'0.8 m tall', sec:'Add-ons', cat:'styling', name:'3D standee, 0.8 m', vendor:'Bloom', status:'approved', basis:'booking', price:5500, rec:0, img:'img/bloom/3d-standee.jpg', cap:'A cut-out character or theme figure on a stand', inc:['1 custom 3D standee with stand'], cond:['A 0.9 m size is also available: ask in your notes']},
+    {id:'bl-3d-10', g:'bl-3d', gname:'3D standee with stand', size:'1 m tall', sec:'Add-ons', cat:'styling', name:'3D standee, 1 m', vendor:'Bloom', status:'approved', basis:'booking', price:7500, rec:0, img:'img/bloom/3d-standee.jpg', cap:'A cut-out character or theme figure on a stand', inc:['1 custom 3D standee with stand'], cond:['A 0.9 m size is also available: ask in your notes']},
+    {id:'bl-poster', sec:'Add-ons', cat:'styling', name:'Foamboard poster with easel', vendor:'Bloom', status:'approved', basis:'booking', price:5000, rec:0, img:'img/bloom/foam-poster.jpg', cap:'An A3 or A4 welcome sign on an easel', inc:['1 foamboard poster (A3 or A4)','1 easel stand'], cond:[]},
     {id:'s-favours', cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']},
-    {id:'s-props', cat:'styling', name:'Photo props & party hats', vendor:'Styling partner, to be selected', status:'demo', basis:'booking', price:9500, rec:0, cap:'Props and hats for up to 30', inc:['Theme-coloured party hats','Handheld photo props'], cond:['Order at least 5 days ahead']},
   ];
   var BYID = {}; P.forEach(function(p){ BYID[p.id] = p; });
   var STATUS = { demo:['st-demo','Sample listing'], prospective:['st-prospective','Prospective'], approved:['st-approved','Approved'], partner:['st-approved','Cake partner'], confirmed:['st-confirmed','Confirmed'] };
@@ -71,8 +92,8 @@
   function clamp(n, lo, hi){ n = Math.round(Number(n)); return isNaN(n) ? lo : Math.min(hi, Math.max(lo, n)); }
   function squishyCents(exp, n){ return EXP[exp].pax * billable(n); }
   function logoEl(vendor){ vendor = vendor || 'Butter Studio'; var w = el('span','bs-logo'), im = document.createElement('img'), done = false; function fallback(){ if (done) return; done = true; if (im.parentNode) im.replaceWith(el('span','bs-word', vendor)); } if (!LOGOS[vendor]) { w.appendChild(el('span','bs-word', vendor)); return w; } im.alt = vendor; im.decoding = 'async'; im.addEventListener('error', fallback); im.addEventListener('load', function(){ if (im.naturalWidth) done = true; else fallback(); }); im.src = LOGOS[vendor]; setTimeout(function(){ if (!im.complete || !im.naturalWidth) fallback(); }, 6000); w.appendChild(im); return w; }
-  function basisLabel(p){ return {booking:'per order', cake:'per cake', box:'per box', child:'per child', pax:'per guest'}[p.basis]; }
-  function qtyFor(p, s){ if (p.basis === 'child') return Math.max(s.children, p.min || 0); if (p.basis === 'pax') return Math.max(s.children + s.adults, p.min || 0); return 1; }
+  function basisLabel(p){ return {booking:'per order', cake:'per cake', box:'per box', child:'per person', pax:'per person'}[p.basis]; }
+  function qtyFor(p, s){ if (p.basis === 'child' || p.basis === 'pax') return Math.max(s.participants, p.min || 0); return 1; }
   function costFor(p, s){ return p.price == null ? null : p.price * qtyFor(p, s); }
   function clock(start, mins){ if (!start) return null; var hm = start.split(':'), t = (+hm[0]) * 60 + (+hm[1]) + mins, h = Math.floor(t / 60) % 24, m = t % 60; return (h % 12 || 12) + ':' + String(m).padStart(2,'0') + (h < 12 ? ' am' : ' pm'); }
   function range(start, a, b){ var x = clock(start, a), y = clock(start, b); if (!x) return null; var sx = x.slice(-2), sy = y.slice(-2); return (sx === sy ? x.slice(0, -3) : x) + '–' + y; }
@@ -80,25 +101,43 @@
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { children:15, adults:10, budgetMode:'total', budgetCents:null, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'splash', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
 
   function foundation(s){
-    var n = billable(s.children), e = EXP[s.experience], items = [];
-    items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' children, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
+    var n = billable(s.participants), e = EXP[s.experience], items = [];
+    items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
     items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
     if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + (n * 2) + ' squishies × $2.50' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + (n * 2) + ' × $2.50' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
     items.push({label:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', sub:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', cents:LOGISTICS, ic:'i-users'});
     return items;
   }
+  // Our suggested add-ons: everything with a rec rank, on-quote items (cakes) first, then by rank.
+  // The party running order, shared by the Schedule tab and the invitation's schedule for parents.
+  function partyBlocks(s){
+    var exp = EXP[s.experience];
+    var blocks = [
+      {m:10, t:'Welcome & arrivals', c:'Guests arrive while our squishy station is ready to go.'},
+      {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.wax ? ', finished with Wax Cracking.' : '.'), cls:'sq', kid:'Make their own squishies' + (s.wax ? ' + Wax Cracking' : '')}
+    ];
+    var slotted = {}; s.selected.forEach(function(id){ var p = BYID[id]; if (p.slot && !slotted[p.slot.title]) { slotted[p.slot.title] = 1; blocks.push({m:p.slot.min, t:p.slot.title, c:p.slot.copy, cls:'food'}); } else if (p.slot && slotted[p.slot.title]) { blocks.filter(function(b){ return b.t === p.slot.title; })[0].c += ' Plus ' + p.name.toLowerCase() + '.'; } });
+    var hasCake = s.selected.some(function(id){ return BYID[id].cat === 'cake'; });
+    var finale = {m:20, t:'Birthday finale', c:hasCake ? 'Cake, candles, birthday song and group photo.' : 'Birthday spotlight, song and group photo.', kid:hasCake ? 'Cake, song & group photo' : 'Birthday song & group photo'};
+    var used = blocks.reduce(function(a, b){ return a + b.m; }, 0) + finale.m, free = s.length - used;
+    if (free >= 10) blocks.push({m:free, t:'Free play & photos', c:'Time to squish, mingle and take photos.', cls:'free'});
+    blocks.push(finale);
+    return {blocks:blocks, used:used};
+  }
+  // Short lines for other parents: what the children do, when, and when to pick up.
+  function scheduleRows(s){
+    var rows = [], at = 0, B = partyBlocks(s).blocks;
+    B.forEach(function(b){ rows.push({time: s.time ? clock(s.time, at) : at + ' min', what: b.kid || b.t}); at += b.m; });
+    rows.push({time: s.time ? clock(s.time, Math.max(at, s.length)) : 'End', what:'Party ends · pick-up time'});
+    return rows;
+  }
   function recommend(s){
-    var base = foundation(s).reduce(function(a, i){ return a + i.cents; }, 0), picks = [], missed = [];
-    if (s.budgetCents == null) return {base:base, picks:picks, missed:missed, left:null};
-    var left = s.budgetCents - base;
-    P.filter(function(p){ return p.rec > 0 && p.price != null; }).sort(function(a, b){ return a.rec - b.rec; }).forEach(function(p){
-      var c = costFor(p, s); if (c <= left) { picks.push(p.id); left -= c; } else missed.push({p:p, short:c - left});
-    });
+    var picks = P.filter(function(p){ return p.rec > 0 && p.price != null; }).sort(function(a, b){ return a.rec - b.rec; }).map(function(p){ return p.id; });
     P.filter(function(p){ return p.rec > 0 && p.price == null; }).forEach(function(p){ picks.unshift(p.id); });
-    return {base:base, picks:picks, missed:missed, left:left};
+    return {picks:picks};
   }
   function totals(s){
     var f = foundation(s), sum = f.reduce(function(a, i){ return a + i.cents; }, 0), pending = [], partners = [];
@@ -121,7 +160,7 @@
         var c = el('article','vcard');
         var top = el('div','vtop ' + cat.id), vi = el('span','vi'); vi.appendChild(icon(cat.icon)); top.appendChild(p.cat === 'cake' ? logoEl(p.vendor) : vi);
         var st = el('span','st ' + STATUS[p.status][0], STATUS[p.status][1]); top.appendChild(st);
-        var rec = el('span','vrec','Suggested for your budget'); rec.hidden = true; top.appendChild(rec); c.appendChild(top);
+        var rec = el('span','vrec','Suggested'); rec.hidden = true; top.appendChild(rec); c.appendChild(top);
         var b = el('div','vbody'), nm = el('div'); nm.appendChild(el('p','vname', p.name)); nm.appendChild(el('p','vvendor', p.vendor)); b.appendChild(nm);
         var pr = el('div','vprice'), ps = el('strong', p.price == null ? 'quote' : null, p.price == null ? 'Priced in your quote' : short(p.price)), pb = el('span', null, '');
         pr.appendChild(ps); pr.appendChild(pb); b.appendChild(pr);
@@ -149,7 +188,7 @@
     var tl = $('how-tl'); if (!tl) return;
     // Step 1: the three Squishy DIY options, reusing the photos from the planner
     var ex = $('tl-exp');
-    [['both','Duo','Best value'],['jelly','Jelly',''],['crunchy','Crunchy','']].forEach(function(o){
+    [['jelly','Jelly',''],['crunchy','Crunchy',''],['both','Duo','Best value']].forEach(function(o){
       var src = document.querySelector('.exp-tile input[value="' + o[0] + '"]'), img = src && src.parentNode.querySelector('img');
       var c = el('div','tl-exp-card' + (o[0] === 'both' ? ' best' : ''));
       if (img) { var im = document.createElement('img'); im.src = img.src; im.alt = ''; im.decoding = 'async'; c.appendChild(im); }
@@ -172,7 +211,7 @@
     });
     // Step 3: a sample invitation
     var inv = $('tl-invite');
-    if (inv) inv.innerHTML = invSVG('splash', { name:'Mia', age:6, ageLine:'6th Birthday', dateLine:'Saturday, 21 November', dayLine:'Saturday', dayDate:'Nov 21', timeLine:'2:00 pm – 4:00 pm', startLine:'at 2:00 pm', venue:'Clubhouse II, 1 Example Road', rsvp:'' }, 'tl');
+    if (inv) inv.innerHTML = invSVG('disco', { name:'Mia', age:6, ageLine:'6th Birthday', dateLine:'Saturday, 21 November', dayLine:'Saturday', dayDate:'Nov 21', timeLine:'2:00 pm – 4:00 pm', startLine:'at 2:00 pm', venue:'Clubhouse II, 1 Example Road', rsvp:'' }, 'tl');
     // Scroll: the line fills and each step lights up and fades in as it reaches the middle of the screen.
     var steps = [].slice.call(tl.querySelectorAll('.tl-step'));
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -215,6 +254,7 @@
   function per(p){ return p.basis === 'child' ? ' / child' : p.basis === 'pax' ? ' / guest' : ''; }
   function priceTxt(p){ return p.price == null ? 'Price in your quote' : money(p.price) + per(p); }
   function fromTxt(vendor){
+    if (storeOf(vendor).from) return storeOf(vendor).from; // a store can lead with its headline price
     var c = P.filter(function(p){ return p.vendor === vendor && p.price != null; }).sort(function(a, b){ return a.price - b.price; })[0];
     return c ? 'From ' + money(c.price) + per(c) : 'Priced in your quote';
   }
@@ -243,6 +283,7 @@
         '<div class="ss-hero"><div class="ss-hero-img" id="ss-hero"></div><button type="button" class="ss-back" data-close aria-label="Back to all vendors"><svg class="icon flip" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>' +
         '<div class="ss-card"><div class="ss-logo" id="ss-logo"></div><div class="ss-meta"><span class="store-pill" id="ss-pill"></span><h3 id="ss-name"></h3><p class="ss-area" id="ss-area"></p><p class="ss-tags" id="ss-tags"></p></div></div>' +
         '<p class="ss-deliv"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span id="ss-deliv"></span></p>' +
+        '<div class="ss-extra" id="ss-extra"></div>' +
         '<h4 class="ss-h">Menu</h4><div class="ss-grid" id="ss-grid"></div>' +
         '<div class="ss-foot"><p id="ss-foot-txt" aria-live="polite"></p><button type="button" class="btn btn-primary" data-close>Done</button></div>' +
       '</div>' +
@@ -250,16 +291,21 @@
         '<div class="ss-opt-ph" id="ss-opt-ph"></div><h4 id="ss-opt-h"></h4><p class="ss-opt-price" id="ss-opt-price"></p><p class="ss-opt-cap" id="ss-opt-cap"></p>' +
         '<div id="ss-opt-sizes"><p class="ss-opt-sub">Choose a size</p><div class="ss-opt-list" id="ss-opt-list" role="radiogroup" aria-labelledby="ss-opt-h"></div></div>' +
         '<div class="ss-opt-info" id="ss-opt-info"></div>' +
+        '<div class="ss-custom" id="ss-custom" hidden></div>' +
         '<div class="ss-opt-actions"><button type="button" class="btn btn-ghost" id="ss-opt-remove">Remove</button><button type="button" class="btn btn-primary" id="ss-opt-add">Add to plan</button></div></div></div>';
     document.body.appendChild(sheet);
     sheet.addEventListener('click', function(e){ var t = e.target.closest('[data-close]'); if (t) { e.preventDefault(); closeStore(); } });
     sheet.addEventListener('keydown', function(e){
       if (e.key === 'Escape') { e.preventDefault(); if (!$('ss-opt').hidden) closeOpt(); else closeStore(); return; }
-      if (e.key === 'Tab') { var f = [].slice.call(sheet.querySelectorAll('button:not([disabled]), input:not([disabled])')).filter(function(x){ return x.offsetParent !== null && !x.closest('[hidden]'); }); if (!$('ss-opt').hidden) f = f.filter(function(x){ return x.closest('#ss-opt'); }); if (!f.length) return; var a = f[0], z = f[f.length - 1]; if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); } }
+      if (e.key === 'Tab') { var f = [].slice.call(sheet.querySelectorAll('button:not([disabled]), input:not([disabled]):not([type=file]), textarea')).filter(function(x){ return x.offsetParent !== null && !x.closest('[hidden]'); }); if (!$('ss-opt').hidden) f = f.filter(function(x){ return x.closest('#ss-opt'); }); if (!f.length) return; var a = f[0], z = f[f.length - 1]; if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); } }
     });
     $('ss-opt').addEventListener('click', function(e){ if (e.target.id === 'ss-opt') closeOpt(); });
     $('ss-opt-x').addEventListener('click', function(){ closeOpt(); });
-    $('ss-opt-add').addEventListener('click', function(){ var r = sheet.querySelector('input[name="ss-size"]:checked'); setGroup(optGroup, r ? r.value : optGroup.items[0].id); closeOpt(); });
+    $('ss-opt-add').addEventListener('click', function(){
+      var r = sheet.querySelector('input[name="ss-size"]:checked'), id = r ? r.value : optGroup.items[0].id;
+      if (!customReady(optGroup, BYID[id])) return; // colours and vinyl text are needed first
+      setGroup(optGroup, id); render(false); closeOpt();
+    });
     $('ss-opt-remove').addEventListener('click', function(){ setGroup(optGroup, null); closeOpt(); });
   }
   function openStore(v, from){
@@ -271,6 +317,19 @@
     put('ss-pill', st.pill || 'Cake partner'); $('ss-pill').classList.toggle('sample', st.pill === 'Sample listing');
     put('ss-name', st.title || v); put('ss-area', st.area || ''); put('ss-tags', st.tags.join(' · ')); $('ss-tags').hidden = !st.tags.length;
     put('ss-deliv', st.note || (cat === 'cake' ? 'We order and deliver to your venue. Delivery fee is confirmed in your quote.' : 'We book and coordinate this partner for your date, all in one quote.'));
+    // Optional store extras: a strip of recent setups and the backdrop colours on offer.
+    var ex = $('ss-extra'); ex.textContent = '';
+    if (st.gallery && st.gallery.length) {
+      ex.appendChild(el('h4','ss-h','Recent setups'));
+      var strip = el('div','ss-gallery'); strip.setAttribute('role','list');
+      st.gallery.forEach(function(gp){ var f = el('figure','ss-gal'); f.setAttribute('role','listitem'); f.appendChild(photoEl(gp[0], gp[1], 'ss-gal-img', ic)); f.appendChild(el('figcaption', null, gp[1])); strip.appendChild(f); });
+      ex.appendChild(strip);
+    }
+    if (st.palette && st.palette.length) {
+      var pal = el('div','ss-palette'); pal.appendChild(el('span','ss-pal-h','Backdrop colours'));
+      var dots = el('span','ss-pal-dots'); st.palette.forEach(function(c){ var d0 = el('span','ss-pal-dot'); d0.style.background = c[1]; d0.title = c[0]; d0.setAttribute('aria-label', c[0]); d0.setAttribute('role','img'); dots.appendChild(d0); });
+      pal.appendChild(dots); ex.appendChild(pal);
+    }
     var grid = $('ss-grid'); grid.textContent = ''; itemEls = {}; var lastSec = null;
     storeGroups(v).forEach(function(g){
       var p0 = g.items[0], multi = g.items.length > 1, t = el('article','ss-item');
@@ -282,7 +341,8 @@
       var nm = el('button','ss-name', g.name); nm.type = 'button'; t.appendChild(nm);
       var price = el('p','ss-price'); t.appendChild(price);
       var sub = el('p','ss-sub'); t.appendChild(sub);
-      plus.addEventListener('click', function(e){ e.stopPropagation(); if (multi) openOpt(g); else toggle(p0.id); });
+      // Items with sizes or personalisation always open their sheet, so details are chosen before they're added.
+      plus.addEventListener('click', function(e){ e.stopPropagation(); if (multi || p0.custom) openOpt(g); else toggle(p0.id); });
       ph.addEventListener('click', function(){ openOpt(g); }); nm.addEventListener('click', function(){ openOpt(g); });
       grid.appendChild(t); itemEls[g.key] = {g:g, tile:t, plus:plus, price:price, sub:sub, sug:sug, multi:multi};
     });
@@ -314,10 +374,94 @@
     var info = $('ss-opt-info'); info.textContent = '';
     [['Included', p0.inc], ['Good to know', p0.cond]].forEach(function(r){ if (!r[1] || !r[1].length) return; info.appendChild(el('p','ss-info-h', r[0])); var ul = el('ul'); r[1].forEach(function(t){ ul.appendChild(el('li', null, t)); }); info.appendChild(ul); });
     if (p0.status === 'demo') info.appendChild(el('p','ss-info-note','Sample listing: the partner and rate are confirmed before launch.'));
-    $('ss-opt-remove').hidden = !pick; put('ss-opt-add', pick ? (multi ? 'Update plan' : 'Added ✓') : 'Add to plan');
-    $('ss-opt-add').disabled = !!pick && !multi;
+    buildCustom(g, p0, !!pick);
+    $('ss-opt-remove').hidden = !pick; put('ss-opt-add', pick ? (multi || p0.custom ? 'Save changes' : 'Added ✓') : 'Add to plan');
+    $('ss-opt-add').disabled = !!pick && !multi && !p0.custom;
     $('ss-opt').hidden = false; $('ss-opt').querySelector('.ss-opt-in').scrollTop = 0;
     requestAnimationFrame(function(){ $('ss-opt').classList.add('open'); var c = list.querySelector('input:checked'); (multi && c ? c : $('ss-opt-x')).focus(); });
+  }
+  /* Personalise (Bloom backdrops etc.): colours, custom vinyl text, inspiration notes and up to 3 moodboard images.
+     Kept per menu item in S.custom and sent with the request for the items in the plan. */
+  function customFor(key){ S.custom = S.custom || {}; return S.custom[key] || (S.custom[key] = {colours:[], text:'', notes:'', images:[]}); }
+  function customSummary(key){
+    var c = S.custom && S.custom[key]; if (!c) return '';
+    return [c.colours.join(', '), c.text ? '“' + c.text + '”' : '', c.images.length ? c.images.length + ' moodboard image' + (c.images.length > 1 ? 's' : '') : ''].filter(Boolean).join(' · ');
+  }
+  function shrinkImage(file, cb){ // phone photos are large: resize to about 900 px and re-encode as JPEG before sending
+    var rd = new FileReader();
+    rd.onload = function(){ var im = new Image(); im.onload = function(){
+      var out = null;
+      [[900, .72], [900, .55], [700, .55]].some(function(t){ var k = Math.min(1, t[0] / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); out = c.toDataURL('image/jpeg', t[1]); return out.length < 440000; });
+      cb(out && out.length < 440000 ? out : null);
+    }; im.onerror = function(){ cb(null); }; im.src = rd.result; };
+    rd.onerror = function(){ cb(null); }; rd.readAsDataURL(file);
+  }
+  var customTimer = null;
+  function buildCustom(g, p0, inPlan){
+    var box = $('ss-custom'), opt = p0.custom; box.textContent = ''; box.hidden = !opt; if (!opt) return;
+    var c = customFor(g.key), st = storeOf(p0.vendor);
+    function changed(){ if (!S.personalTracked) { S.personalTracked = true; track('addon_personalised', {id:p0.id}); } clearTimeout(customTimer); customTimer = setTimeout(function(){ render(false); }, 250); syncSheet(); }
+    box.appendChild(el('p','ss-info-h','Personalise'));
+    if (opt.colours && st.palette) {
+      var head = el('div','ss-c-head'); head.appendChild(el('span','ss-c-label','Colours')); head.appendChild(el('span','ss-c-hint','Required · tap one or more'));
+      var chips = el('div','ss-chips'); chips.setAttribute('role','group'); chips.setAttribute('aria-label','Colours');
+      var chosen = el('p','ss-c-chosen'); chosen.setAttribute('aria-live','polite');
+      var upd = function(){ chosen.textContent = c.colours.length ? 'Chosen: ' + c.colours.join(', ') : 'No colours chosen yet'; };
+      st.palette.forEach(function(cl){
+        var b = el('button','ss-chip'), dot = el('span','ss-chip-dot'); b.type = 'button'; dot.style.background = cl[1];
+        b.appendChild(dot); b.appendChild(el('span','ss-chip-name', cl[0])); b.setAttribute('aria-label', cl[0]); b.setAttribute('aria-pressed', String(c.colours.indexOf(cl[0]) >= 0));
+        b.addEventListener('click', function(){ var i = c.colours.indexOf(cl[0]); if (i >= 0) c.colours.splice(i, 1); else c.colours.push(cl[0]); b.setAttribute('aria-pressed', String(i < 0)); upd(); changed(); hideErr(); });
+        chips.appendChild(b);
+      });
+      upd(); box.appendChild(head); box.appendChild(chips); box.appendChild(chosen);
+    }
+    if (opt.text) {
+      var lt = el('label','field ss-c-field'), ti = document.createElement('input'), ls = el('span'); ls.appendChild(document.createTextNode('Custom vinyl text ')); ls.appendChild(el('span','opt-tag','(required)')); lt.appendChild(ls);
+      ti.maxLength = 60; ti.value = c.text; ti.placeholder = 'e.g. Happy 7th Birthday, Mia!'; ti.id = 'ss-c-text'; ti.required = true;
+      ti.addEventListener('input', function(){ c.text = ti.value; if (ti.value.trim()) ti.removeAttribute('aria-invalid'); changed(); hideErr(); }); lt.appendChild(ti); box.appendChild(lt);
+    }
+    if (opt.notes) {
+      var ln = el('label','field ss-c-field'), ta = document.createElement('textarea'); ln.appendChild(document.createTextNode('Inspiration & colour notes'));
+      ta.rows = 3; ta.maxLength = 600; ta.value = c.notes; ta.placeholder = 'e.g. pastel rainbow, sage and cream, a Frozen theme…'; ta.id = 'ss-c-notes';
+      ta.addEventListener('input', function(){ c.notes = ta.value; changed(); }); ln.appendChild(ta); box.appendChild(ln);
+    }
+    if (opt.images) {
+      var mh = el('div','ss-c-head'); mh.appendChild(el('span','ss-c-label','Moodboard images')); mh.appendChild(el('span','ss-c-hint','Optional, up to 3'));
+      var thumbs = el('div','ss-mood'), fi = document.createElement('input'), add = el('button','ss-mood-add');
+      fi.type = 'file'; fi.accept = 'image/*'; fi.multiple = true; fi.hidden = true; fi.id = 'ss-mood-file';
+      add.type = 'button'; add.appendChild(icon('i-plus')); add.appendChild(el('span', null, 'Add image'));
+      var draw = function(){
+        thumbs.textContent = '';
+        c.images.forEach(function(u, i){ var t = el('div','ss-mood-th'), im = document.createElement('img'), x = el('button','ss-mood-x'); im.src = u; im.alt = 'Moodboard image ' + (i + 1); x.type = 'button'; x.setAttribute('aria-label', 'Remove moodboard image ' + (i + 1)); x.appendChild(icon('i-x')); x.addEventListener('click', function(){ c.images.splice(i, 1); draw(); changed(); }); t.appendChild(im); t.appendChild(x); thumbs.appendChild(t); });
+        if (c.images.length < 3) thumbs.appendChild(add);
+      };
+      add.addEventListener('click', function(){ fi.click(); });
+      fi.addEventListener('change', function(){
+        var files = [].slice.call(fi.files || []).slice(0, 3 - c.images.length); fi.value = '';
+        (function next(){ var f = files.shift(); if (!f) { draw(); changed(); return; } shrinkImage(f, function(u){ if (u) c.images.push(u); next(); }); })();
+      });
+      draw(); box.appendChild(mh); box.appendChild(thumbs); box.appendChild(fi);
+    }
+    var err = el('p','ss-c-err'); err.id = 'ss-c-err'; err.setAttribute('role','alert'); err.hidden = true; box.appendChild(err);
+    box.appendChild(el('p','fine ss-c-note', inPlan ? 'Change anything here, then tap Save changes.' : 'Choose your colours and add your vinyl text, then tap Add to plan.'));
+  }
+  function hideErr(){ var e = $('ss-c-err'); if (e && !e.hidden) { e.hidden = true; } }
+  // Before a personalisable item goes into the plan: at least one colour and the vinyl text (notes and images stay optional).
+  function customReady(g, p){
+    if (!p || !p.custom) return true;
+    var c = customFor(g.key), err = $('ss-c-err'), miss = [];
+    if (p.custom.colours && !c.colours.length) miss.push('choose at least one colour');
+    if (p.custom.text && !c.text.trim()) miss.push('add the vinyl text');
+    var ti = $('ss-c-text'); if (ti) { if (p.custom.text && !c.text.trim()) ti.setAttribute('aria-invalid','true'); else ti.removeAttribute('aria-invalid'); }
+    if (!miss.length) { if (err) err.hidden = true; return true; }
+    if (err) { err.hidden = false; err.textContent = 'Before adding, please ' + miss.join(' and ') + '.'; }
+    var first = p.custom.colours && !c.colours.length ? sheet.querySelector('.ss-chip') : ti; if (first) { first.focus(); first.scrollIntoView({block:'center', behavior:'smooth'}); }
+    track('addon_details_missing', {id:p.id}); return false;
+  }
+  function customPayload(){ // personalisation for the items in the plan only
+    var out = {};
+    S.selected.forEach(function(id){ var p = BYID[id], c = S.custom && S.custom[p.g || p.id]; if (p.custom && c && (c.colours.length || c.text.trim() || c.notes.trim() || c.images.length)) out[id] = {colours:c.colours.slice(), text:c.text.trim(), notes:c.notes.trim(), images:c.images.slice()}; });
+    return out;
   }
   function closeOpt(silent){
     var o = $('ss-opt'); if (!o || o.hidden) return; o.classList.remove('open'); o.hidden = true;
@@ -349,13 +493,14 @@
       var shown = pick || p0, q = qtyFor(shown, S), cost = costFor(shown, S);
       x.tile.classList.toggle('on', on);
       x.plus.textContent = ''; x.plus.appendChild(icon(on ? 'i-check' : 'i-plus'));
-      x.plus.setAttribute('aria-label', x.multi ? (on ? 'Change size of ' : 'Choose a size of ') + x.g.name : (on ? 'Remove ' : 'Add ') + x.g.name + (on ? ' from' : ' to') + ' your plan');
-      if (!x.multi) x.plus.setAttribute('aria-pressed', String(on)); else x.plus.removeAttribute('aria-pressed');
+      var opens = x.multi || !!p0.custom;
+      x.plus.setAttribute('aria-label', x.multi ? (on ? 'Change size of ' : 'Choose a size of ') + x.g.name : p0.custom ? (on ? 'Edit details of ' : 'Choose colours and text for ') + x.g.name : (on ? 'Remove ' : 'Add ') + x.g.name + (on ? ' from' : ' to') + ' your plan');
+      if (!opens) x.plus.setAttribute('aria-pressed', String(on)); else x.plus.removeAttribute('aria-pressed');
       x.sug.hidden = on || !x.g.items.some(function(p){ return lastR.picks.indexOf(p.id) >= 0; });
       x.price.textContent = priceTxt(shown);
       var demo = shown.status === 'demo' ? 'Demo price' : '';
       var extra = cost != null && q > 1 ? money(cost) + ' for ' + q : '';
-      x.sub.textContent = on ? [x.multi ? 'Added: ' + pick.size : 'Added to your plan', extra, demo].filter(Boolean).join(' · ') : x.multi ? x.g.items.length + ' sizes' : [extra, demo].filter(Boolean).join(' · ') || shown.cap;
+      x.sub.textContent = on ? [x.multi ? 'Added: ' + pick.size : 'Added to your plan', customSummary(x.g.key), extra, demo].filter(Boolean).join(' · ') : x.multi ? x.g.items.length + ' sizes' : [extra, demo].filter(Boolean).join(' · ') || shown.cap;
       x.sub.classList.toggle('demo', !on && !!demo);
     });
     put('ss-foot-txt', n ? n + ' item' + (n === 1 ? '' : 's') + ' from ' + (storeOf(sheetVendor).title || sheetVendor) + ' in your plan' : 'Tap + to add to your plan');
@@ -371,6 +516,8 @@
   /* ================= HOW IT WORKS: card-stack carousel =================
      Edit captions and image paths here. Each image path is tried on the live site; until the file exists,
      a clearly labelled placeholder card is shown. Put photos in public/img/how/. */
+  // Optional add-on, shown after the finished squishy and before decorating the capsule.
+  var WAX_STEP = {img:'img/how/wax.jpg', title:'Viral Wax Cracking experience!', caption:'Add-on: dip the finished squishy in colourful melted wax, let it set, then crack the shell to reveal it.'};
   var HOW_STEPS = {
     jelly: [
       {img:'img/how/jelly-1.jpg', title:'Explore the setup', caption:'Your squishy station is set up and ready when the children arrive.'},
@@ -378,6 +525,7 @@
       {img:'img/how/jelly-3.jpg', title:'Fill the beauty capsule', caption:'Take a 4-piece beauty capsule and fill 3 pieces with charms.'},
       {img:'img/how/jelly-4.jpg', title:'Mix and play', caption:'Mix and play on yellow trays, with fun tools provided.'},
       {img:'img/how/jelly-5.jpg', title:'The finished Jelly squishy', caption:'Their very own Jelly squishy, filled, tied and ready to squish.'},
+      WAX_STEP,
       {img:'img/how/jelly-6.jpg', title:'Decorate your take-home capsule', caption:'Rhinestone stickers, DIY, then their squishy goes home in it.'}
     ],
     crunchy: [
@@ -386,6 +534,7 @@
       {img:'img/how/crunchy-3.jpg', title:'Pick the crunch', caption:'Take 2 boxes and fill them with crunchy toppings.'},
       {img:'img/how/crunchy-4.jpg', title:'Mix and play', caption:'Mix and play on yellow trays, with fun tools provided.'},
       {img:'img/how/crunchy-5.jpg', title:'The finished Crunchy squishy', caption:'Their very own Crunchy squishy, filled, tied and ready to crunch.'},
+      WAX_STEP,
       {img:'img/how/crunchy-6.jpg', title:'Decorate your take-home capsule', caption:'Rhinestone stickers, DIY, then their squishy goes home in it.'}
     ],
     both: [
@@ -394,6 +543,7 @@
       {img:'img/how/duo-3.jpg', title:'Boxes and capsule', caption:'2 boxes of crunchy toppings in one hand, a 4-piece beauty capsule of charms in the other.'},
       {img:'img/how/duo-4.jpg', title:'Mix and play', caption:'Mix and play on yellow trays, with fun tools provided.'},
       {img:'img/how/duo-5.jpg', title:'The finished Duo', caption:'A Jelly and a Crunchy squishy each, filled, tied and ready to squish.'},
+      WAX_STEP,
       {img:'img/how/duo-6.jpg', title:'Decorate your take-home capsule', caption:'Rhinestone stickers, DIY, then both squishies go home in it.'}
     ]
   };
@@ -423,6 +573,7 @@
     {img:'img/making/2.jpg', title:'Choose toppings', caption:'Favourites from our 20-topping menu of charms, sprinkles and crunchy mix-ins.'},
     {img:'img/making/3.jpg', title:'Make & customise', caption:'Our team guides the mixing and making, then helps tie each squishy.'},
     {img:'img/making/4.jpg', title:'Squish it!', caption:'The best part: squeeze, squash and squish their brand-new creation.'},
+    WAX_STEP,
     {img:'img/making/5.jpg', title:'Decorate your capsule box', caption:'Rhinestone stickers, DIY, then it’s theirs to take home.'}
   ];
   function makeStack(root, onStep){
@@ -541,92 +692,150 @@
   function fit(text, maxW, size, k){ var w = String(text).length * (k || .56) * size; return w > maxW ? Math.max(18, Math.floor(maxW / (String(text).length * (k || .56)))) : size; }
   function T(x, y, txt, o){ o = o || {}; var size = o.fit ? fit(txt, o.fit, o.size, o.k) : o.size;
     return '<text x="' + x + '" y="' + y + '" text-anchor="' + (o.anchor || 'middle') + '" font-family="' + esc(o.font || F_ROUND) + '" font-size="' + size + '" font-weight="' + (o.weight || 700) + '"' + (o.italic ? ' font-style="italic"' : '') + ' fill="' + (o.fill || '#10173a') + '"' + (o.ls ? ' letter-spacing="' + o.ls + '"' : '') + (o.stroke ? ' stroke="' + o.stroke + '" stroke-width="' + o.sw + '" paint-order="stroke"' : '') + '>' + esc(txt) + '</text>'; }
-  function star4(x, y, r, fill){ return '<path d="M' + x + ' ' + (y - r) + 'Q' + (x + r * .18) + ' ' + (y - r * .18) + ' ' + (x + r) + ' ' + y + 'Q' + (x + r * .18) + ' ' + (y + r * .18) + ' ' + x + ' ' + (y + r) + 'Q' + (x - r * .18) + ' ' + (y + r * .18) + ' ' + (x - r) + ' ' + y + 'Q' + (x - r * .18) + ' ' + (y - r * .18) + ' ' + x + ' ' + (y - r) + 'Z" fill="' + fill + '"/>'; }
-  function dots(list){ return list.map(function(d){ return '<circle cx="' + d[0] + '" cy="' + d[1] + '" r="' + d[2] + '" fill="' + d[3] + '"/>'; }).join(''); }
-
-  // The hero illustration: a hand squishing a jelly squishy.
-  function handArt(cx, cy, s, u, pal){
-    pal = pal || {};
-    var j1 = pal.j1 || '#ff9fd0', j2 = pal.j2 || '#9f8cff', edge = pal.edge || '#7a5be0', skin = '#f5c9a9', skinE = '#d99a78', cuff = pal.cuff || '#2234b8';
-    var g = '<defs><radialGradient id="' + u + 'jg" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".25" stop-color="' + j1 + '"/><stop offset="1" stop-color="' + j2 + '"/></radialGradient></defs>';
-    var squ = '<ellipse cx="0" cy="-46" rx="156" ry="104" fill="url(#' + u + 'jg)" stroke="' + edge + '" stroke-width="5"/>' +
-      '<ellipse cx="-66" cy="-100" rx="48" ry="17" fill="#fff" opacity=".75" transform="rotate(-18 -66 -100)"/>' +
-      star4(60, -100, 17, '#fff6a8') + star4(-10, -122, 11, '#ffffff') + star4(110, -60, 10, '#ffffff') + dots([[100,-40,7,'#ffe27a'],[-110,-50,6,'#7fe3d2'],[24,-128,5,'#ffffff'],[-46,-70,6,'#ff6fae'],[-120,-80,5,'#ffffff']]) +
-      '<path d="M-52 -18 q16 -26 32 0 M-6 -20 q16 -26 32 0 M40 -18 q16 -26 32 0" fill="' + j1 + '" stroke="' + edge + '" stroke-width="3" opacity=".9"/>';
-    var hand = '<rect x="-150" y="-18" width="44" height="104" rx="22" fill="' + skin + '" stroke="' + skinE + '" stroke-width="4" transform="rotate(-32 -128 34)"/>' +
-      '<ellipse cx="6" cy="80" rx="128" ry="62" fill="' + skin + '" stroke="' + skinE + '" stroke-width="4"/>' +
-      [-78, -32, 14, 60].map(function(x, i){ return '<rect x="' + x + '" y="' + (-20 + (i === 0 || i === 3 ? 8 : 0)) + '" width="42" height="' + (92 - (i === 3 ? 10 : 0)) + '" rx="21" fill="' + skin + '" stroke="' + skinE + '" stroke-width="4"/><rect x="' + (x + 10) + '" y="' + (-12 + (i === 0 || i === 3 ? 8 : 0)) + '" width="22" height="16" rx="8" fill="#ffe4d4"/>'; }).join('') +
-      '<path d="M-60 132 Q6 156 72 132 L82 196 L-70 196 Z" fill="' + cuff + '"/><rect x="-74" y="126" width="160" height="22" rx="11" fill="' + cuff + '" opacity=".85"/>';
-    var fx = '<path d="M-176 -70 q-18 22 0 44 M-198 -84 q-26 36 0 72 M176 -70 q18 22 0 44 M198 -84 q26 36 0 72" stroke="' + (pal.lines || '#ffffff') + '" stroke-width="7" fill="none" stroke-linecap="round"/>' +
-      '<text x="138" y="-162" text-anchor="middle" font-family="' + esc(F_ROUND) + '" font-weight="800" font-size="40" fill="' + (pal.word || '#fff6a8') + '" stroke="' + (pal.wordStroke || '#10173a') + '" stroke-width="6" paint-order="stroke" transform="rotate(12 138 -162)">squish!</text>';
-    return g + '<g transform="translate(' + cx + ' ' + cy + ') scale(' + s + ')">' + squ + hand + fx + '</g>';
-  }
+  // GIF frames: while INV_PHASE is 0–1 the art animates (sparkles twinkle, confetti spins, glitter shimmers); null = still image.
+  var INV_PHASE = null;
+  function hr(n){ var s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+  function tw(x, y){ return INV_PHASE == null ? 1 : .45 + .55 * (.5 + .5 * Math.sin(2 * Math.PI * (INV_PHASE + hr(x * .37 + y * 1.13)))); }
+  function star4(x, y, r, fill){ r = r * tw(x, y); return '<path d="M' + x + ' ' + (y - r) + 'Q' + (x + r * .18) + ' ' + (y - r * .18) + ' ' + (x + r) + ' ' + y + 'Q' + (x + r * .18) + ' ' + (y + r * .18) + ' ' + x + ' ' + (y + r) + 'Q' + (x - r * .18) + ' ' + (y + r * .18) + ' ' + (x - r) + ' ' + y + 'Q' + (x - r * .18) + ' ' + (y - r * .18) + ' ' + x + ' ' + (y - r) + 'Z" fill="' + fill + '"/>'; }
+  function dots(list){ return list.map(function(d){ return '<circle cx="' + d[0] + '" cy="' + d[1] + '" r="' + (d[2] * tw(d[0], d[1])).toFixed(1) + '" fill="' + d[3] + '"/>'; }).join(''); }
 
   var TEMPLATES = [
-    {id:'splash', name:'Squishy Splash'},
-    {id:'balloons', name:'Pastel Balloons'},
-    {id:'sparkle', name:'Sparkle Pop'},
-    {id:'retro', name:'Sweet Retro'}
+    {id:'disco', name:'Disco Bow'},
+    {id:'confetti', name:'Confetti Letters'},
+    {id:'glitter', name:'Glitter Glam'}
   ];
-  function invSVG(tpl, d, u){
+  // Every line of wording on a card, in the order it appears. Parents can change or clear any of them.
+  var WORD_FIELDS = {
+    disco:[['turning','Line under the name'],['invite','Invitation line'],['when','Date and time'],['venue','Venue'],['foot','Bottom line']],
+    confetti:[['top','Top line'],['big1','Big letters, line 1'],['big2','Big letters, line 2'],['pre','Line above the name'],['turning','Line under the name'],['date','Date'],['time','Time'],['venue','Venue'],['foot','Bottom line']],
+    glitter:[['top','Top line'],['big1','Title, line 1'],['big2','Title, line 2'],['pre','Line above the name'],['turning','Line under the name'],['date','Date'],['time','Time'],['venue','Venue']]
+  };
+  function wordDefaults(tpl, d){
+    return {
+      turning: d.age ? 'IS TURNING ' + d.age + '!' : 'IS HAVING A PARTY!', invite:'join us for a squishy party',
+      when: d.dateLine + ' · ' + d.startLine, date: d.dateLine, time: d.timeLine, venue: d.venue,
+      top:'JOIN US FOR A', big1: tpl === 'glitter' ? 'BIRTHDAY' : 'SQUISHY', big2: tpl === 'glitter' ? 'SQUISHY PARTY' : 'PARTY',
+      pre: tpl === 'glitter' ? 'CELEBRATING' : 'HONORING', foot: tpl === 'disco' ? 'MAKE · SQUISH · TAKE HOME' : 'squishies, stickers and smiles provided'
+    };
+  }
+  function invSVG(tpl, d, u, words){
     var W = 840, H = 1188, o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '">';
-    var name = d.name ? d.name + '’s' : 'You’re invited!', who = d.name ? d.name + '’s' : '';
-    if (tpl === 'splash') {
-      o += '<rect width="840" height="1188" fill="#2234b8"/><circle cx="720" cy="120" r="260" fill="#3248d4"/><circle cx="90" cy="1040" r="300" fill="#1b2b9e"/>' +
-        dots([[90,120,10,'#f6e98c'],[160,210,6,'#ffd6e6'],[760,420,9,'#ffd6e6'],[700,560,6,'#f6e98c'],[120,560,7,'#7fe3d2'],[770,860,8,'#f6e98c'],[70,800,6,'#ffd6e6']]) + star4(150, 360, 22, '#f6e98c') + star4(700, 300, 16, '#ffffff') +
-        T(420, 130, 'YOU’RE INVITED TO', {size:30, fill:'#f6e98c', ls:6}) +
-        T(420, 238, d.name ? who : 'A Birthday', {size:96, font:F_DISPLAY, italic:true, weight:600, fill:'#ffffff', fit:720, k:.5}) +
-        T(420, 312, d.age ? d.ageLine : 'Birthday', {size:52, font:F_DISPLAY, weight:500, fill:'#ffffff'}) +
-        T(420, 420, 'SQUISHY PARTY', {size:96, weight:900, fill:'#f6e98c', stroke:'#e2477f', sw:14, ls:2, fit:760, k:.66}) +
-        '<circle cx="420" cy="650" r="200" fill="#eef0ff"/><circle cx="420" cy="650" r="200" fill="none" stroke="#f6e98c" stroke-width="10" stroke-dasharray="4 18" stroke-linecap="round"/>' +
-        handArt(420, 680, 1.02, u, {word:'#f6e98c', lines:'#2234b8'}) +
-        '<rect x="80" y="886" width="680" height="232" rx="40" fill="#ffffff"/>' +
-        T(420, 950, d.dateLine, {size:38, fill:'#10173a', fit:620}) + T(420, 1000, d.timeLine, {size:32, fill:'#2234b8', weight:700}) +
-        T(420, 1046, d.venue, {size:26, weight:600, fill:'#5a6282', fit:620}) + (d.rsvp ? T(420, 1090, 'RSVP ' + d.rsvp, {size:24, weight:700, fill:'#e2477f', fit:620}) : '') +
-        T(420, 1160, 'MAKE · SQUISH · TAKE HOME', {size:22, fill:'#f6e98c', ls:5});
-    } else if (tpl === 'balloons') {
-      var flags = function(x0, y0, dir){ var s = ''; for (var i = 0; i < 6; i++) { var x = x0 + dir * i * 62, y = y0 + i * i * 2 + i * 8, c = ['#f2607b','#ffc861','#7fdccb','#f2607b','#ffc861','#7fdccb'][i]; s += '<path d="M' + x + ' ' + y + ' L' + (x + dir * 54) + ' ' + (y + 6) + ' L' + (x + dir * 24) + ' ' + (y + 70) + ' Z" fill="' + c + '"/>'; } return '<path d="M' + x0 + ' ' + y0 + ' Q' + (x0 + dir * 180) + ' ' + (y0 + 80) + ' ' + (x0 + dir * 372) + ' ' + (y0 + 130) + '" stroke="#2f5d62" stroke-width="3" fill="none"/>' + s; };
-      var balloon = function(x, y, rx, c){ return '<path d="M' + x + ' ' + (y + rx * 1.2) + ' q-30 60 10 120 q40 60 -10 130" stroke="#2f5d62" stroke-width="3" fill="none"/><ellipse cx="' + x + '" cy="' + y + '" rx="' + rx + '" ry="' + (rx * 1.2) + '" fill="' + c + '"/><ellipse cx="' + (x - rx * .35) + '" cy="' + (y - rx * .45) + '" rx="' + (rx * .22) + '" ry="' + (rx * .35) + '" fill="#fff" opacity=".5"/><path d="M' + (x - 10) + ' ' + (y + rx * 1.2 + 14) + ' l10 -16 l10 16 z" fill="' + c + '"/>'; };
-      o += '<rect width="840" height="1188" fill="#fdf3e7"/>' + flags(-20, 40, 1) + flags(860, 40, -1) +
-        balloon(80, 560, 70, '#ffc861') + balloon(770, 520, 64, '#7fdccb') + balloon(760, 860, 70, '#f2607b') + balloon(70, 930, 60, '#7fdccb') +
-        dots([[260,90,9,'#ffc861'],[580,130,7,'#f2607b'],[200,330,8,'#7fdccb'],[650,350,9,'#f2607b'],[200,1160,8,'#f2607b'],[650,1165,8,'#ffc861']]) +
-        T(420, 260, 'YOU’RE INVITED TO', {size:30, fill:'#2f5d62', ls:4}) +
-        T(420, 360, d.name ? who : 'A very squishy', {size:92, font:F_DISPLAY, italic:true, weight:600, fill:'#e0476e', fit:600, k:.5}) +
-        T(420, 440, (d.age ? d.ageLine + ' ' : '') + 'Squishy Party', {size:58, font:F_DISPLAY, italic:true, weight:600, fill:'#e0476e', fit:620, k:.48}) +
-        handArt(420, 680, .92, u, {j1:'#ffb3cf', j2:'#8fd9ff', edge:'#e0476e', cuff:'#7fdccb', lines:'#2f5d62', word:'#ffc861', wordStroke:'#2f5d62'}) +
-        '<line x1="250" y1="890" x2="590" y2="890" stroke="#2f5d62" stroke-width="2"/>' + T(420, 942, d.dateLine.toUpperCase(), {size:34, fill:'#2f5d62', fit:560}) + '<line x1="250" y1="972" x2="590" y2="972" stroke="#2f5d62" stroke-width="2"/>' +
-        T(420, 1024, d.venue.toUpperCase(), {size:26, fill:'#2f5d62', fit:560}) + T(420, 1094, d.timeLine.toUpperCase(), {size:58, weight:900, fill:'#2f5d62', fit:560, k:.62}) +
-        (d.rsvp ? T(420, 1140, 'RSVP ' + d.rsvp, {size:22, fill:'#e0476e', fit:520}) : '');
-    } else if (tpl === 'sparkle') {
-      o += '<defs><linearGradient id="' + u + 'bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bba7ff"/><stop offset=".55" stop-color="#e6c6ff"/><stop offset="1" stop-color="#ffc4e1"/></linearGradient><radialGradient id="' + u + 'disco" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#d8ccff"/><stop offset="1" stop-color="#9c8ae6"/></radialGradient></defs>' +
-        '<rect width="840" height="1188" fill="url(#' + u + 'bg)"/>' +
-        '<line x1="420" y1="0" x2="420" y2="60" stroke="#ffffff" stroke-width="3"/><circle cx="420" cy="150" r="90" fill="url(#' + u + 'disco)"/>';
-      for (var gx = -2; gx <= 2; gx++) o += '<ellipse cx="420" cy="150" rx="' + Math.abs(gx * 22 + .1) + '" ry="90" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>';
-      for (var gy = -3; gy <= 3; gy++) { var yy = 150 + gy * 24, hw = Math.sqrt(Math.max(0, 8100 - (gy * 24) * (gy * 24))); o += '<line x1="' + (420 - hw) + '" y1="' + yy + '" x2="' + (420 + hw) + '" y2="' + yy + '" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>'; }
-      o += [[110,120,26],[720,170,32],[160,420,18],[700,450,22],[90,760,20],[760,720,26],[640,1130,18],[180,1120,22]].map(function(s0){ return star4(s0[0], s0[1], s0[2], '#ffffff'); }).join('') +
-        T(420, 290, 'JOIN US TO CELEBRATE!', {size:32, fill:'#5b3fa8', ls:3}) +
-        handArt(420, 540, .98, u, {j1:'#ffb3dd', j2:'#a08bff', edge:'#5b3fa8', cuff:'#f06aa8', lines:'#ffffff', word:'#ffffff', wordStroke:'#5b3fa8'}) +
-        '<path d="M70 700 L150 700 L130 740 L150 780 L70 780 Z" fill="#d94d8f"/><path d="M770 700 L690 700 L710 740 L690 780 L770 780 Z" fill="#d94d8f"/><rect x="120" y="684" width="600" height="112" rx="14" fill="#f06aa8"/>' +
-        T(420, 762, (d.name ? who : 'YOU’RE INVITED').toUpperCase(), {size:72, font:F_DISPLAY, weight:700, fill:'#ffffff', fit:540, k:.62}) +
-        T(420, 866, (d.age ? d.ageLine + ' ' : '') .toUpperCase() + 'SQUISHY PARTY', {size:46, font:F_DISPLAY, weight:600, fill:'#5b3fa8', fit:700, k:.6}) +
-        '<line x1="300" y1="912" x2="300" y2="1000" stroke="#5b3fa8" stroke-width="2"/><line x1="540" y1="912" x2="540" y2="1000" stroke="#5b3fa8" stroke-width="2"/>' +
-        T(190, 968, d.dayLine.toUpperCase(), {size:28, fill:'#d94d8f', fit:200}) + T(420, 972, d.dayDate.toUpperCase(), {size:46, font:F_DISPLAY, weight:700, fill:'#5b3fa8', fit:220, k:.6}) + T(650, 968, d.startLine.toUpperCase(), {size:28, fill:'#d94d8f', fit:200}) +
-        T(420, 1062, d.venue.toUpperCase(), {size:26, fill:'#4a3590', fit:680}) + (d.rsvp ? T(420, 1104, 'RSVP: ' + d.rsvp, {size:24, weight:600, fill:'#4a3590', fit:680}) : '');
-    } else {
-      var rays = function(cx, cy){ var s = ''; for (var i = 0; i < 12; i++) { var a = i * Math.PI / 6; s += '<path d="M' + cx + ' ' + cy + ' L' + (cx + Math.cos(a) * 170) + ' ' + (cy + Math.sin(a) * 170) + ' L' + (cx + Math.cos(a + .14) * 170) + ' ' + (cy + Math.sin(a + .14) * 170) + ' Z" fill="#fff4ea" opacity=".85"/>'; } return s; };
-      o += '<rect width="840" height="1188" fill="#f7c6cc"/>' + rays(0, 0) + rays(840, 0) +
-        '<path d="M330 0 L510 0 L470 70 L420 30 L370 70 Z" fill="#f9e7b5"/><path d="M0 860 Q220 780 440 850 T840 820 L840 1188 L0 1188 Z" fill="#8fcfcf"/>' +
-        T(420, 168, 'BIRTHDAY SQUISHY PARTY', {size:30, fill:'#fff4ea', ls:6, fit:720}) +
-        T(420, 290, d.name || 'Someone', {size:128, font:F_DISPLAY, weight:800, italic:true, fill:'#4a2a1f', fit:700, k:.52}) +
-        T(420, 360, d.age ? 'IS TURNING' : 'IS HAVING A PARTY', {size:38, fill:'#4a2a1f', ls:6}) +
-        '<path d="M290 620 q-20 60 20 110 q30 50 -10 110" stroke="#4a2a1f" stroke-width="3" fill="none"/><ellipse cx="290" cy="520" rx="112" ry="128" fill="#fbe48a"/><path d="M280 646 l10 -14 l10 14 z" fill="#fbe48a"/><ellipse cx="250" cy="470" rx="22" ry="36" fill="#fff" opacity=".45"/>' +
-        T(290, 572, d.age || '★', {size:150, font:F_DISPLAY, weight:800, fill:'#4a2a1f'}) +
-        handArt(580, 600, .78, u, {j1:'#ffc2d6', j2:'#8fcfcf', edge:'#4a2a1f', cuff:'#f2a65a', lines:'#4a2a1f', word:'#fbe48a', wordStroke:'#4a2a1f'}) +
-        T(420, 958, d.dateLine.toUpperCase(), {size:40, fill:'#ffffff', fit:720}) + T(420, 1012, 'START ' + d.startLine.toUpperCase(), {size:36, fill:'#ffffff', ls:2}) +
-        T(420, 1066, d.venue.toUpperCase(), {size:24, fill:'#ffffff', fit:700}) + (d.rsvp ? T(420, 1104, 'RSVP ' + d.rsvp.toUpperCase(), {size:24, fill:'#ffffff', fit:700}) : '');
+    var ph = INV_PHASE || 0, moving = INV_PHASE != null;
+    var WD = wordDefaults(tpl, d), own = (words && words[tpl]) || {};
+    var w = function(k){ return Object.prototype.hasOwnProperty.call(own, k) ? own[k] : WD[k]; };
+    var turning = w('turning');
+    if (tpl === 'disco') {
+      // Blush paper, a pink mirror-tile disco ball with a bow, and pink glitter lettering.
+      var mix = function(a, b, t){ var A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16), r = function(sh){ return Math.round(((A >> sh) & 255) + (((B >> sh) & 255) - ((A >> sh) & 255)) * t); }; return 'rgb(' + r(16) + ',' + r(8) + ',' + r(0) + ')'; };
+      o += '<defs><pattern id="' + u + 'pg" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="translate(' + (ph * 8).toFixed(1) + ' 0)"><rect width="8" height="8" fill="#e2468e"/><circle cx="2" cy="2" r="1.2" fill="#ff9fcd"/><circle cx="6" cy="5.5" r="1" fill="#ffd0e6"/><circle cx="5" cy="1" r=".8" fill="#b81f68"/></pattern>' +
+        '<clipPath id="' + u + 'ball"><circle cx="420" cy="340" r="176"/></clipPath><radialGradient id="' + u + 'hl" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>' +
+        '<rect width="840" height="1188" fill="#f7ddd4"/>';
+      for (var sp = 0; sp < 60; sp++) o += '<circle cx="' + Math.round(hr(sp) * 840) + '" cy="' + Math.round(hr(sp + 99) * 1188) + '" r="' + (1 + hr(sp + 7) * 2).toFixed(1) + '" fill="#eecabd" opacity=".7"/>';
+      o += '<line x1="420" y1="0" x2="420" y2="166" stroke="#d98fae" stroke-width="3"/><g clip-path="url(#' + u + 'ball)"><circle cx="420" cy="340" r="176" fill="#9c3d70"/>';
+      var ti = 0;
+      for (var ty = 164; ty < 520; ty += 22) for (var tx = 244; tx < 600; tx += 22) {
+        var nx = (tx + 11 - 420) / 176, ny = (ty + 11 - 340) / 176; ti++;
+        if (nx * nx + ny * ny > 1.08) continue;
+        var lt = .5 - nx * .32 - ny * .38 + (hr(ti) - .5) * .35 + (moving ? .28 * Math.sin(2 * Math.PI * (ph + hr(ti * 3))) : 0);
+        o += '<rect x="' + tx + '" y="' + ty + '" width="20" height="20" rx="2" fill="' + mix('#8a2f62', '#ffe3f0', Math.max(0, Math.min(1, lt))) + '"/>';
+      }
+      o += '<circle cx="420" cy="340" r="176" fill="url(#' + u + 'hl)"/></g><circle cx="420" cy="340" r="176" fill="none" stroke="#c4527f" stroke-width="3"/>' +
+        star4(352, 262, 26, '#ffffff') + star4(478, 408, 16, '#ffffff') + star4(395, 450, 12, '#ffffff') +
+        // bow
+        '<path d="M418 178 C350 104 272 116 286 180 C298 228 372 214 418 186 Z" fill="#f48cb6" stroke="#d2508a" stroke-width="4"/><path d="M422 178 C490 104 568 116 554 180 C542 228 468 214 422 186 Z" fill="#f48cb6" stroke="#d2508a" stroke-width="4"/>' +
+        '<path d="M408 190 C384 250 352 312 328 380 L366 368 C390 306 410 250 426 200 Z" fill="#f7a3c6" stroke="#d2508a" stroke-width="4"/><path d="M432 190 C456 250 488 312 512 380 L474 368 C450 306 430 250 414 200 Z" fill="#f7a3c6" stroke="#d2508a" stroke-width="4"/>' +
+        '<ellipse cx="420" cy="186" rx="28" ry="24" fill="#e86aa0" stroke="#d2508a" stroke-width="4"/>' +
+        [[150,210,22,'#e2468e'],[690,240,26,'#e2468e'],[118,470,14,'#ffffff'],[724,520,18,'#e2468e'],[180,610,12,'#ffffff'],[660,640,14,'#e2468e'],[96,880,16,'#e2468e'],[744,900,20,'#ffffff'],[620,92,14,'#ffffff'],[230,70,12,'#e2468e']].map(function(s0){ return star4(s0[0], s0[1], s0[2], s0[3]); }).join('') +
+        T(420, 652, d.name || 'Our birthday star', {size:112, font:F_DISPLAY, italic:true, weight:700, fill:'url(#' + u + 'pg)', fit:700, k:.5}) +
+        T(420, 762, turning, {size:84, font:F_DISPLAY, weight:800, fill:'url(#' + u + 'pg)', fit:740, k:.66, ls:2}) +
+        T(420, 842, w('invite'), {size:42, font:F_DISPLAY, italic:true, weight:600, fill:'#d8508c', fit:700}) +
+        T(420, 918, w('when').toUpperCase(), {size:30, weight:800, fill:'#d8508c', ls:2, fit:720}) +
+        T(420, 964, w('venue').toUpperCase(), {size:26, weight:800, fill:'#d8508c', ls:2, fit:720}) +
+        T(420, 1138, w('foot'), {size:20, fill:'#e08ab0', ls:5, fit:720});
+    } else if (tpl === 'confetti') {
+      // Cream card, confetti and chunky letters, each in its own pattern.
+      var C6 = ['#f2607b','#ffc23d','#2bb3c0','#7b61ff','#3ab26b','#ff8a3d','#f49ac1'];
+      o += '<defs>' +
+        '<pattern id="' + u + 'p0" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#f49ac1"/><circle cx="6" cy="6" r="3" fill="#fff"/><circle cx="17" cy="16" r="3" fill="#fff"/></pattern>' +
+        '<pattern id="' + u + 'p1" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="18" height="18" fill="#ffc23d"/><rect width="6" height="18" fill="#f2607b"/></pattern>' +
+        '<pattern id="' + u + 'p2" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#2bb3c0"/><rect y="8" width="20" height="4" fill="#bdf0f3"/></pattern>' +
+        '<pattern id="' + u + 'p3" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#3ab26b"/><circle cx="12" cy="12" r="4" fill="#f49ac1"/></pattern>' +
+        '<pattern id="' + u + 'p4" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#7b61ff"/><circle cx="5" cy="5" r="2.5" fill="#ffe36b"/><circle cx="16" cy="15" r="2.5" fill="#ffe36b"/></pattern>' +
+        '<pattern id="' + u + 'p5" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)"><rect width="18" height="18" fill="#ff8a3d"/><rect width="18" height="5" fill="#ffe0c2"/></pattern>' +
+        '</defs><rect width="840" height="1188" fill="#fbf7ef"/>';
+      for (var cf = 0; cf < 70 && o.length < 40000; cf++) {
+        var cx0 = Math.round(20 + hr(cf) * 800), cy0 = Math.round(20 + hr(cf + 50) * 1148);
+        if (cx0 > 140 && cx0 < 700 && cy0 > 90 && cy0 < 1100) continue;
+        var col = C6[cf % 7], ang = Math.round(hr(cf + 9) * 360 + (moving ? ph * 360 * (cf % 2 ? 1 : -1) : 0)), kind = cf % 4;
+        var g0 = '<g transform="translate(' + cx0 + ' ' + cy0 + ') rotate(' + ang + ')">';
+        if (kind === 0) o += g0 + '<path d="M0 -14 L13 10 L-13 10 Z" fill="' + col + '"/></g>';
+        else if (kind === 1) o += g0 + '<path d="M-14 0 q4 -9 8 0 t8 0 t8 0" stroke="' + col + '" stroke-width="5" fill="none" stroke-linecap="round"/></g>';
+        else if (kind === 2) o += '<circle cx="' + cx0 + '" cy="' + cy0 + '" r="' + (7 * tw(cx0, cy0)).toFixed(1) + '" fill="' + col + '"/>';
+        else o += g0 + '<rect x="-10" y="-5" width="20" height="10" rx="3" fill="' + col + '"/></g>';
+      }
+      // Letters are spaced by their own width, so a narrow I doesn't leave gaps.
+      var LW = {I:.36, J:.55, L:.6, T:.66, Y:.7, M:.9, W:.95, Q:.82, O:.8, ' ':.35};
+      // Shrinks to fit when parents type a longer word.
+      var word = function(txt, y, size){ txt = String(txt).toUpperCase(); var ws = txt.split('').map(function(ch){ return LW[ch] || .72; }), tot = ws.reduce(function(a, v){ return a + v; }, 0); size = Math.min(size, tot ? 760 / tot : size);
+        var x = 420 - tot * size / 2, s = '';
+        for (var i = 0; i < txt.length; i++) { if (txt[i] !== ' ') s += T(Math.round(x + ws[i] * size / 2), y, txt[i], {size:Math.round(size), weight:900, fill:'url(#' + u + 'p' + ((i + (y > 400 ? 3 : 0)) % 6) + ')', stroke:'#2a2140', sw:3}); x += ws[i] * size; } return s; };
+      o += T(420, 150, w('top'), {size:30, weight:800, fill:'#e8553f', ls:5, fit:700}) +
+        word(w('big1'), 300, 132) + word(w('big2'), 450, 132) +
+        T(420, 560, w('pre'), {size:28, weight:800, fill:'#e8553f', ls:5, fit:700}) +
+        T(420, 664, d.name || 'Our birthday star', {size:100, font:F_DISPLAY, italic:true, weight:700, fill:'#e8553f', fit:700, k:.5}) +
+        T(420, 742, turning, {size:40, weight:800, fill:'#e8553f', ls:3, fit:700}) +
+        T(420, 840, w('date').toUpperCase(), {size:28, weight:800, fill:'#e8553f', ls:2, fit:680}) +
+        T(420, 884, w('time').toUpperCase(), {size:28, weight:800, fill:'#e8553f', ls:2, fit:680}) +
+        T(420, 928, w('venue').toUpperCase(), {size:26, weight:800, fill:'#e8553f', ls:2, fit:680}) +
+        T(420, 990, w('foot'), {size:26, weight:700, fill:'#e8553f', fit:680});
+    } else if (tpl === 'glitter') {
+      // Plum glitter fading into dusty pink, with an elegant serif and script name.
+      // Fine, low-contrast flecks on a large tile, so the glitter reads as texture rather than a polka-dot repeat.
+      var GC = ['#8f3a80','#a24c92','#6a2560','#b765a6','#7f3373','#c27ab3','#5e2056','#e7b9dc'];
+      o += '<defs><pattern id="' + u + 'gl" width="96" height="96" patternUnits="userSpaceOnUse" patternTransform="translate(' + (ph * 96).toFixed(1) + ' ' + (ph * 48).toFixed(1) + ')"><rect width="96" height="96" fill="#74296a"/>';
+      for (var gd = 0; gd < 150; gd++) { var gx0 = (hr(gd) * 96).toFixed(1), gy0 = (hr(gd + 400) * 96).toFixed(1), shine = gd % 8 === 7, gop = shine && moving ? (.2 + .8 * (.5 + .5 * Math.sin(2 * Math.PI * (ph * 2 + hr(gd + 3))))).toFixed(2) : (shine ? '.7' : '1'); o += '<circle cx="' + gx0 + '" cy="' + gy0 + '" r="' + (shine ? 1.2 + hr(gd + 80) : 1.4 + hr(gd + 80) * 2.2).toFixed(1) + '" fill="' + GC[gd % 8] + '" opacity="' + gop + '"/>'; }
+      o += '</pattern><linearGradient id="' + u + 'gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".38" stop-color="#fff"/><stop offset=".58" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="' + u + 'gm"><rect width="840" height="1188" fill="url(#' + u + 'gf)"/></mask></defs>' +
+        '<rect width="840" height="1188" fill="#e2a7b7"/><rect width="840" height="1188" fill="url(#' + u + 'gl)" mask="url(#' + u + 'gm)"/>' +
+        T(420, 170, w('top'), {size:30, weight:600, fill:'#ffffff', ls:8, fit:700}) +
+        T(420, 320, w('big1'), {size:128, font:F_DISPLAY, weight:400, fill:'#ffffff', ls:4, fit:760, k:.72, stroke:'#5c1f55', sw:4}) +
+        T(420, 452, w('big2'), {size:100, font:F_DISPLAY, weight:400, fill:'#ffffff', ls:2, fit:760, k:.68, stroke:'#5c1f55', sw:4}) +
+        T(420, 620, w('pre'), {size:28, weight:600, fill:'#5a2347', ls:7, fit:700}) +
+        T(420, 730, d.name || 'Our birthday star', {size:104, font:F_DISPLAY, italic:true, weight:400, fill:'#5a2347', fit:700, k:.5}) +
+        T(420, 814, turning, {size:34, weight:600, fill:'#5a2347', ls:5, fit:700}) +
+        T(420, 906, w('date').toUpperCase(), {size:26, weight:600, fill:'#5a2347', ls:4, fit:700}) +
+        T(420, 950, w('time').toUpperCase(), {size:26, weight:600, fill:'#5a2347', ls:4, fit:700}) +
+        T(420, 994, w('venue').toUpperCase(), {size:26, weight:600, fill:'#5a2347', ls:4, fit:700});
     }
     return o + '</svg>';
   }
+  // "What the kids will be doing": a schedule panel added under the card, in the design's colours.
+  var PANEL = {
+    disco:{bg:'#f7ddd4', card:'#fff7f3', head:'#c23f7d', time:'#d8508c', text:'#5b2a3f', line:'#f1c3d3'},
+    confetti:{bg:'#fbf7ef', card:'#ffffff', head:'#e8553f', time:'#e8553f', text:'#2a2140', line:'#f3dccf'},
+    glitter:{bg:'#e2a7b7', card:'#fbeef2', head:'#5a2347', time:'#7a2e6e', text:'#5a2347', line:'#e8c4d0'}
+  };
+  function schedPanel(tpl, rows, y0){
+    var p = PANEL[tpl] || PANEL.disco, top = y0 + 136, gap = 58, h = 176 + rows.length * gap;
+    var s = '<rect y="' + y0 + '" width="840" height="' + h + '" fill="' + p.bg + '"/><rect x="60" y="' + (y0 + 16) + '" width="720" height="' + (h - 52) + '" rx="32" fill="' + p.card + '"/>' +
+      T(420, y0 + 80, 'WHAT THE KIDS WILL BE DOING', {size:26, weight:800, fill:p.head, ls:4, fit:640});
+    if (rows.length > 1) s += '<line x1="282" y1="' + (top - 9) + '" x2="282" y2="' + (top - 9 + (rows.length - 1) * gap) + '" stroke="' + p.line + '" stroke-width="4"/>';
+    rows.forEach(function(r, i){
+      var y = top + i * gap;
+      s += T(256, y, r.time, {size:27, weight:800, fill:p.time, anchor:'end', fit:180, k:.55}) + '<circle cx="282" cy="' + (y - 9) + '" r="8" fill="' + p.time + '"/>' +
+        T(306, y, r.what, {size:27, weight:600, fill:p.text, anchor:'start', fit:440, k:.52});
+    });
+    return {svg:s, h:h};
+  }
+  // With the schedule shown, the card is trimmed just below its last line of details, so the schedule follows straight on.
+  var CARD_END = {disco:1000, confetti:1022, glitter:1028};
+  function invFull(tpl, d, u, rows){
+    var base = invSVG(tpl, d, u, S.words);
+    if (!rows || !rows.length) return {svg:base, h:1188};
+    var cut = CARD_END[tpl] || 1188, P = schedPanel(tpl, rows, cut), H = cut + P.h;
+    return {svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 ' + H + '" width="840" height="' + H + '">' + base.slice(base.indexOf('>') + 1, base.lastIndexOf('</svg>')) + P.svg + '</svg>', h:H};
+  }
+  function schedRows(){ return S.schedEdited ? S.sched : scheduleRows(S); }
+  function inviteRows(){ return S.schedOn === false ? [] : schedRows().filter(function(r){ return (r.time + r.what).trim(); }); }
   function ordinal(n){ n = +n; var s = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({1:'st',2:'nd',3:'rd'}[n % 10] || 'th'); return n + s; }
   function invData(s){
     var dt = s.date ? new Date(s.date + 'T00:00') : null;
@@ -635,7 +844,7 @@
       dateLine: dt ? dt.toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}) : 'Date to be confirmed',
       dayLine: dt ? dt.toLocaleDateString('en-SG', {weekday:'long'}) : 'Date', dayDate: dt ? dt.toLocaleDateString('en-SG', {month:'short', day:'numeric'}) : 'TBC',
       timeLine: s.time ? clock(s.time, 0) + ' – ' + clock(s.time, s.length) : 'Time to be confirmed', startLine: s.time ? 'at ' + clock(s.time, 0) : 'time TBC',
-      venue: s.venue || 'Venue to be confirmed', rsvp: s.rsvp
+      venue: s.venue || 'Venue to be confirmed', rsvp: '' // no RSVP line on the cards
     };
   }
   function makeCaption(s){
@@ -649,13 +858,14 @@
     sel.forEach(function(p){
       if (p.cat === 'entertainment') extras.push(p.name.replace(/,.*$/, '').toLowerCase());
       if (p.cat === 'food' && extras.indexOf('party food') < 0) extras.push('party food');
-      if (p.cat === 'styling' && p.id === 's-backdrop') extras.push('a balloon photo backdrop');
+      if (p.vendor === 'Bloom' && /backdrop|arch/i.test(p.name) && extras.indexOf('a balloon backdrop by Bloom') < 0) extras.push('a balloon backdrop by Bloom');
       if (p.cat === 'styling' && p.id === 's-favours') extras.push('party favour bags');
       if (p.cat === 'cake') extras.push('a birthday ' + (/cupcake/i.test(p.name) ? 'cupcake treat' : 'cake') + ' from ' + p.vendor);
     });
     if (extras.length) lines.push('There’ll also be ' + (extras.length > 1 ? extras.slice(0, -1).join(', ') + ' and ' + extras[extras.length - 1] : extras[0]) + ' 🎂');
     lines.push('');
-    if (s.rsvp) { var by = ''; if (s.date) { var r = new Date(s.date + 'T00:00'); r.setDate(r.getDate() - 7); by = ' by ' + r.toLocaleDateString('en-SG', {day:'numeric', month:'short'}); } lines.push('Please RSVP to ' + s.rsvp + by + '.'); }
+    var rows = inviteRows();
+    if (rows.length) { lines.push('🗓 What the kids will be doing:'); rows.forEach(function(r){ lines.push('• ' + [r.time, r.what].filter(Boolean).join(' – ')); }); lines.push(''); }
     lines.push('See you there! 💖');
     return lines.join('\n');
   }
@@ -666,22 +876,135 @@
     invTimer = setTimeout(function(){
       var d = invData(S);
       // thumbnails
-      $('tpl-grid').querySelectorAll('[data-tpl]').forEach(function(b){ var id = b.dataset.tpl; b.querySelector('.tpl-art').innerHTML = invSVG(id, d, 'th' + id); b.setAttribute('aria-checked', String(S.tpl === id)); b.tabIndex = S.tpl === id ? 0 : -1; });
-      var svg = invSVG(S.tpl, d, 'big'), img = new Image(), out = $('inv-img');
+      $('tpl-grid').querySelectorAll('[data-tpl]').forEach(function(b){ var id = b.dataset.tpl; b.querySelector('.tpl-art').innerHTML = invSVG(id, d, 'th' + id, S.words); b.setAttribute('aria-checked', String(S.tpl === id)); b.tabIndex = S.tpl === id ? 0 : -1; });
+      if (!S.schedEdited) buildSchedEditor();
+      syncWordsEditor(d);
+      var F = invFull(S.tpl, d, 'big', inviteRows()), svg = F.svg, img = new Image(), out = $('inv-img');
+      out.height = F.h;
+      if (!S.captionEdited) $('inv-caption').value = makeCaption(S);
+      $('wa-link').href = 'https://wa.me/?text=' + encodeURIComponent($('inv-caption').value);
+      if (gifURL && gifKey === svg) return; // keep showing the moving GIF until the design changes
+      gifURL = null;
       img.onload = function(){
-        var c = document.createElement('canvas'); c.width = 1240; c.height = 1754;
+        var c = document.createElement('canvas'); c.width = 1240; c.height = Math.round(1240 * F.h / 840);
         var x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height);
         try { out.src = c.toDataURL('image/png'); lastCanvas = c; } catch (err) { out.src = img.src; lastCanvas = null; }
       };
       img.onerror = function(){ out.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); lastCanvas = null; };
       img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-      if (!S.captionEdited) $('inv-caption').value = makeCaption(S);
-      $('wa-link').href = 'https://wa.me/?text=' + encodeURIComponent($('inv-caption').value);
     }, 90);
   }
   function invFileName(){ return (S.childName ? S.childName.replace(/[^\w-]+/g, '-') + '-' : '') + 'squishy-party-invitation.png'; }
   function invStatus(msg){ put('copy-status', msg); }
   function withBlob(cb){ if (!lastCanvas || !lastCanvas.toBlob) { invStatus('Long-press or right-click the invitation to save or copy it.'); return; } lastCanvas.toBlob(function(b){ b ? cb(b) : invStatus('Long-press or right-click the invitation to save or copy it.'); }, 'image/png'); }
+  /* Change any wording: one box per line of the chosen design, pre-filled. Edits are kept per design; a cleared box removes the line. */
+  var wordsFor = null;
+  function syncWordsEditor(d){
+    var box = $('words-edit'); if (!box) return;
+    S.words = S.words || {}; var own = S.words[S.tpl] || {}, defs = wordDefaults(S.tpl, d);
+    if (wordsFor !== S.tpl) {
+      wordsFor = S.tpl; box.textContent = '';
+      WORD_FIELDS[S.tpl].forEach(function(f){
+        var lab = el('label','field'), inp = document.createElement('input');
+        lab.appendChild(document.createTextNode(f[1])); inp.maxLength = 60; inp.dataset.word = f[0]; inp.autocomplete = 'off';
+        inp.addEventListener('input', function(){ (S.words[S.tpl] = S.words[S.tpl] || {})[f[0]] = inp.value; $('words-reset').hidden = false; drawInvite(); });
+        lab.appendChild(inp); box.appendChild(lab);
+      });
+    }
+    box.querySelectorAll('input[data-word]').forEach(function(inp){ var k = inp.dataset.word, has = Object.prototype.hasOwnProperty.call(own, k); if (document.activeElement !== inp) inp.value = has ? own[k] : defs[k]; });
+    $('words-reset').hidden = !Object.keys(own).length;
+  }
+
+  /* Schedule for parents: filled in from the plan until a parent edits it, then kept as they wrote it. */
+  function buildSchedEditor(){
+    var box = $('sched-edit'); if (!box) return; box.textContent = '';
+    schedRows().forEach(function(r, i){
+      var row = el('div','sched-row'), t = document.createElement('input'), w = document.createElement('input'), x = el('button','sched-x');
+      t.value = r.time; t.maxLength = 12; t.setAttribute('aria-label', 'Time, line ' + (i + 1)); t.className = 'sched-time';
+      w.value = r.what; w.maxLength = 44; w.setAttribute('aria-label', 'What happens, line ' + (i + 1)); w.className = 'sched-what';
+      x.type = 'button'; x.setAttribute('aria-label', 'Remove line ' + (i + 1)); x.appendChild(icon('i-x'));
+      t.addEventListener('input', captureSched); w.addEventListener('input', captureSched);
+      x.addEventListener('click', function(){ var rows = readSched(); rows.splice(i, 1); S.sched = rows; S.schedEdited = true; buildSchedEditor(); drawInvite(); });
+      row.appendChild(t); row.appendChild(w); row.appendChild(x); box.appendChild(row);
+    });
+    $('sched-reset').hidden = !S.schedEdited;
+  }
+  function readSched(){ return [].map.call($('sched-edit').querySelectorAll('.sched-row'), function(r){ return {time:r.querySelector('.sched-time').value.trim(), what:r.querySelector('.sched-what').value.trim()}; }); }
+  function captureSched(){ S.sched = readSched(); if (!S.schedEdited) track('schedule_edited', {}); S.schedEdited = true; $('sched-reset').hidden = false; drawInvite(); }
+
+  /* Moving GIF: the same design drawn at 12 points of an animation loop, encoded right here in the browser. */
+  function gifEncode(w, h, frames, delayCs){
+    var samp = [], step = Math.max(1, Math.floor(frames.length * w * h / 30000)), f, p, o, i, c;
+    for (f = 0; f < frames.length; f++) for (p = (f * 7) % step; p < w * h; p += step) { o = p * 4; samp.push([frames[f][o], frames[f][o + 1], frames[f][o + 2]]); }
+    var boxes = [samp];
+    while (boxes.length < 256) { // median cut into a 256-colour palette shared by every frame
+      var bi = -1, best = 0, bc = 0;
+      for (i = 0; i < boxes.length; i++) { var b = boxes[i]; if (b.length < 2) continue; var mn = [255,255,255], mx = [0,0,0];
+        for (var j = 0; j < b.length; j++) for (c = 0; c < 3; c++) { var v = b[j][c]; if (v < mn[c]) mn[c] = v; if (v > mx[c]) mx[c] = v; }
+        for (c = 0; c < 3; c++) if (mx[c] - mn[c] > best) { best = mx[c] - mn[c]; bi = i; bc = c; } }
+      if (bi < 0) break;
+      var B = boxes[bi]; B.sort(function(a, z){ return a[bc] - z[bc]; }); boxes.splice(bi, 1, B.slice(0, B.length >> 1), B.slice(B.length >> 1));
+    }
+    var pal = new Uint8Array(768), np = boxes.length;
+    boxes.forEach(function(b, k){ var s = [0,0,0]; b.forEach(function(q){ s[0] += q[0]; s[1] += q[1]; s[2] += q[2]; }); for (var cc = 0; cc < 3; cc++) pal[k * 3 + cc] = Math.round(s[cc] / b.length); });
+    var cache = new Int16Array(32768).fill(-1);
+    function idx(r, g, b2){ var k = ((r >> 3) << 10) | ((g >> 3) << 5) | (b2 >> 3), hit = cache[k]; if (hit >= 0) return hit;
+      var bd = 1e9, bx = 0; for (var n = 0; n < np; n++) { var dr = pal[n * 3] - r, dg = pal[n * 3 + 1] - g, db = pal[n * 3 + 2] - b2, dd = dr * dr + dg * dg + db * db; if (dd < bd) { bd = dd; bx = n; } } cache[k] = bx; return bx; }
+    var buf = new Uint8Array(1 << 20), len = 0;
+    function put(x){ if (len >= buf.length) { var nb = new Uint8Array(buf.length * 2); nb.set(buf); buf = nb; } buf[len++] = x; }
+    function put16(x){ put(x & 255); put((x >> 8) & 255); }
+    function str(s){ for (var n = 0; n < s.length; n++) put(s.charCodeAt(n)); }
+    function lzw(ind){ // GIF LZW, 8-bit codes, written in 255-byte sub-blocks
+      put(8); var block = new Uint8Array(255), bl = 0, cur = 0, nbits = 0, size = 9, dict = new Map(), next = 258;
+      function outByte(x){ block[bl++] = x; if (bl === 255) { put(255); for (var n = 0; n < 255; n++) put(block[n]); bl = 0; } }
+      function emit(code){ cur |= code << nbits; nbits += size; while (nbits >= 8) { outByte(cur & 255); cur >>>= 8; nbits -= 8; } }
+      emit(256); var prefix = ind[0];
+      for (var n = 1; n < ind.length; n++) { var k = ind[n], key = (prefix << 8) | k, hit = dict.get(key);
+        if (hit !== undefined) { prefix = hit; continue; }
+        emit(prefix);
+        if (next === 4096) { emit(256); dict.clear(); next = 258; size = 9; } else { if (next >= (1 << size)) size++; dict.set(key, next++); }
+        prefix = k; }
+      emit(prefix); emit(257); if (nbits > 0) outByte(cur & 255);
+      if (bl) { put(bl); for (n = 0; n < bl; n++) put(block[n]); } put(0);
+    }
+    str('GIF89a'); put16(w); put16(h); put(0xF7); put(0); put(0); for (i = 0; i < 768; i++) put(pal[i]);
+    put(0x21); put(0xFF); put(11); str('NETSCAPE2.0'); put(3); put(1); put16(0); put(0); // loop forever
+    frames.forEach(function(px){
+      put(0x21); put(0xF9); put(4); put(4); put16(delayCs); put(0); put(0);
+      put(0x2C); put16(0); put16(0); put16(w); put16(h); put(0);
+      var ind = new Uint8Array(w * h); for (var q = 0; q < w * h; q++) ind[q] = idx(px[q * 4], px[q * 4 + 1], px[q * 4 + 2]);
+      lzw(ind);
+    });
+    put(0x3B); return buf.slice(0, len);
+  }
+  var gifURL = null, gifKey = '', gifBusy = false;
+  function makeGif(){
+    if (gifBusy) return; gifBusy = true;
+    var btn = $('inv-gif'), N = 12, W = 480, d = invData(S), rows = inviteRows(), frames = [], H = Math.round(W * invFull(S.tpl, d, 'g', rows).h / 840);
+    btn.disabled = true; btn.setAttribute('aria-busy','true'); invStatus('Making your moving GIF. This takes a few seconds…');
+    var c = document.createElement('canvas'); c.width = W; c.height = H; var x = c.getContext('2d');
+    function done(msg){ gifBusy = false; btn.disabled = false; btn.removeAttribute('aria-busy'); invStatus(msg); }
+    (function frame(i){
+      if (i === N) {
+        setTimeout(function(){
+          try {
+            var blob = new Blob([gifEncode(W, H, frames, 10)], {type:'image/gif'}); gifURL = URL.createObjectURL(blob); gifKey = invFull(S.tpl, d, 'big', rows).svg;
+            $('inv-img').src = gifURL;
+            var a = document.createElement('a'); a.href = gifURL; a.download = invFileName().replace(/\.png$/, '.gif'); document.body.appendChild(a); a.click(); a.remove();
+            track('invitation_gif_saved', {design:S.tpl}); S.done.invite = true; render(false);
+            done('Moving GIF saved. The preview now moves too: on a phone, long-press it and choose “Save to Photos”.');
+          } catch (e) { done('Couldn’t make the GIF in this browser. Save the still image instead.'); }
+        }, 20);
+        return;
+      }
+      INV_PHASE = i / N; var svg = invFull(S.tpl, d, 'g', rows).svg; INV_PHASE = null;
+      var im = new Image();
+      im.onload = function(){ try { x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H); x.drawImage(im, 0, 0, W, H); frames.push(x.getImageData(0, 0, W, H).data); frame(i + 1); } catch (e) { done('Couldn’t make the GIF in this browser. Save the still image instead.'); } };
+      im.onerror = function(){ done('Couldn’t make the GIF in this browser. Save the still image instead.'); };
+      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    })(0);
+  }
+
   function buildInvite(){
     var grid = $('tpl-grid');
     TEMPLATES.forEach(function(t){
@@ -693,7 +1016,11 @@
     });
     $('child-name').addEventListener('input', function(e){ S.childName = e.target.value.trim(); render(false); drawInvite(); });
     $('child-age').addEventListener('input', function(e){ var n = parseInt(e.target.value, 10); S.childAge = n >= 1 && n <= 18 ? String(n) : ''; render(false); drawInvite(); });
-    $('inv-rsvp').addEventListener('input', function(e){ S.rsvp = e.target.value.trim(); drawInvite(); });
+    $('sched-on').addEventListener('change', function(e){ S.schedOn = e.target.checked; $('sched-box').classList.toggle('off', !S.schedOn); drawInvite(); });
+    $('sched-add').addEventListener('click', function(){ S.sched = schedRows().concat([{time:'', what:''}]); S.schedEdited = true; buildSchedEditor(); var ts = $('sched-edit').querySelectorAll('.sched-time'); if (ts.length) ts[ts.length - 1].focus(); drawInvite(); });
+    $('sched-reset').addEventListener('click', function(){ S.schedEdited = false; S.sched = null; buildSchedEditor(); drawInvite(); });
+    $('inv-gif').addEventListener('click', makeGif);
+    $('words-reset').addEventListener('click', function(){ if (S.words) delete S.words[S.tpl]; wordsFor = null; drawInvite(); });
     $('inv-caption').addEventListener('input', function(){ S.captionEdited = true; $('cap-reset').hidden = false; $('wa-link').href = 'https://wa.me/?text=' + encodeURIComponent($('inv-caption').value); });
     $('cap-reset').addEventListener('click', function(){ S.captionEdited = false; $('cap-reset').hidden = true; drawInvite(); });
     $('copy-caption').addEventListener('click', function(){
@@ -704,7 +1031,7 @@
     $('wa-link').addEventListener('click', function(){ track('whatsapp_opened', {design:S.tpl}); });
     $('inv-download').addEventListener('click', function(){
       track('invitation_saved', {design:S.tpl});
-      withBlob(function(b){ try { var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = invFileName(); document.body.appendChild(a); a.click(); a.remove(); S.done.invite = true; render(false); invStatus('Invitation saved as an A4 image, and “Send invitations” is ticked. Send it on WhatsApp with the caption below.'); } catch (e) { invStatus('Long-press or right-click the invitation to save it.'); } });
+      withBlob(function(b){ try { var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = invFileName(); document.body.appendChild(a); a.click(); a.remove(); S.done.invite = true; render(false); invStatus('Invitation saved as an image, and “Send invitations” is ticked. Send it on WhatsApp with the caption below.'); } catch (e) { invStatus('Long-press or right-click the invitation to save it.'); } });
     });
     $('inv-share').addEventListener('click', function(){
       withBlob(function(b){
@@ -729,10 +1056,10 @@
       {id:'venue', t:'Book your venue', sub:s.venue ? s.venue + '. Tick when it’s confirmed.' : 'Add the venue in step 1, then tick when it’s booked', act:s.venue ? null : ['Add venue', 1]},
       {id:'cake', auto:!!cake, done:!!cake || !!S.done.cake, t:cake ? 'Cake chosen: ' + cake.vendor : 'Choose a cake', sub:cake ? cake.name + '. Size and flavour confirmed in your quote.' : 'Add one from our partner bakeries, or tick if you’re bringing your own', act:cake ? null : ['Browse cakes', 3, 'tab-a-cake']},
       {id:'food', auto:!!food, done:!!food || !!S.done.food, t:food ? 'Food chosen' : 'Sort out party food', sub:food ? food.name : 'Add catering from our partners, or tick if you’re arranging it', act:food ? null : ['Browse food', 3, 'tab-a-food']},
-      {id:'invite', t:'Send invitations', sub:'Pick a design and share it on WhatsApp with the ready-made caption', act:['Make invitation', 4, 'tab-p-inv']},
-      {id:'request', auto:true, done:!!S.requested, t:'Request availability', sub:'We confirm every partner and send you one quotation', act:['Go to request', 5]},
-      {id:'tables', t:'Arrange tables and chairs', sub:'Your coordinator confirms how many for ' + s.children + ' children'},
-      {id:'headcount', t:'Confirm the final headcount', sub:'About ' + s.children + ' children and ' + s.adults + ' adults so far'},
+      {id:'invite', t:'Send invitations', sub:'Pick a design and share it on WhatsApp with the ready-made caption', act:['Make invitation', 'ready', 'tab-p-inv']},
+      {id:'request', auto:true, done:!!S.requested, t:'Request availability', sub:'We confirm every partner and send you one quotation', act:['Go to request', 4]},
+      {id:'tables', t:'Arrange tables and chairs', sub:'Your coordinator confirms how many for ' + s.participants + ' participants'},
+      {id:'headcount', t:'Confirm the final headcount', sub:'About ' + s.participants + ' participants so far'},
       {id:'diet', t:'Share dietary needs', sub:'Tell your coordinator once you’ve requested availability'}
     ];
     items.forEach(function(x){ if (!x.auto) x.done = !!S.done[x.id]; });
@@ -754,7 +1081,7 @@
       ol.appendChild(li);
     });
     // our team + waiting (collapsed)
-    var team = ['Squishy DIY hosts and all materials: ' + EXP[s.experience].name + ' for ' + s.children + ' children', 'A squishy capsule and rhinestone stickers for every child', 'For a birthday girl: a Birthday Girl sash and tiara to wear during the party (we take them back after)', 'One-time travel and 15-minute set-up, then pack-down'];
+    var team = ['Squishy DIY hosts and all materials: ' + EXP[s.experience].name + ' for ' + s.participants + ' participants', 'A squishy capsule and rhinestone stickers for everyone', 'For a birthday girl: a Birthday Girl sash and tiara to wear during the party (we take them back after)', 'One-time travel and 15-minute set-up, then pack-down'];
     if (s.selected.length) team.push('Booking and coordinating ' + s.selected.length + ' partner service' + (s.selected.length > 1 ? 's' : ''));
     team.push('One consolidated quotation', 'A coordinator on the day');
     var wait = ['Our team’s availability' + (dt ? ' on ' + dt : '')];
@@ -766,53 +1093,32 @@
 
   /* ================= RENDER ================= */
   function render(announce, msg){
-    var s = S, n = billable(s.children), R = recommend(s);
-    var hasB = s.budgetCents != null, shown = s.started;
+    var s = S, n = billable(s.participants), R = recommend(s);
+    var shown = s.started;
     var T = totals(s), exp = EXP[s.experience];
 
     var exp0 = EXP[s.experience];
-    // step 1
-    var perChild = Math.round((s.budgetCents || 0) / s.children);
-    var perGuest = Math.round((s.budgetCents || 0) / (s.children + s.adults));
-    if (!hasB) { put('budget-alt-label','Add a budget'); put('budget-alt', '—'); put('budget-alt-sub','to see it per child and per guest'); put('budget-label', s.budgetMode === 'total' ? 'Your budget for the whole party' : 'Your budget per child, for the whole party'); }
-    else if (s.budgetMode === 'total') { put('budget-alt-label','About'); put('budget-alt', money(perChild)); put('budget-alt-sub','per child · ' + money(perGuest) + ' per guest incl. ' + s.adults + ' adults'); put('budget-label','Your budget for the whole party'); }
-    else { put('budget-alt-label','Whole-party budget'); put('budget-alt', money(s.budgetCents)); put('budget-alt-sub','for ' + s.children + ' children and ' + s.adults + ' adults'); put('budget-label','Your budget per child, for the whole party'); }
     // step 2
     ['both','jelly','crunchy'].forEach(function(e){ put('price-' + e, short(EXP[e].pax)); });
     var dup = s.experience === 'both', COPY = { both:'Make both textures: a smooth Jelly and a satisfying Crunchy. Both go home in a squishy capsule they decorate with our rhinestone stickers.', jelly:'Smooth, clear and endlessly squishable. It goes home in a squishy capsule they decorate with our rhinestone stickers.', crunchy:'Extra texture and that satisfying crunch. It goes home in a squishy capsule they decorate with our rhinestone stickers.' };
     put('exp-chosen', exp0.name); put('exp-title', exp0.name); put('exp-pp', short(exp0.pax));
     put('exp-eyebrow', dup ? 'Best value · two squishies each' : 'One squishy each');
-    put('exp-copy', COPY[s.experience]); put('exp-n', s.children);
+    put('exp-copy', COPY[s.experience]); put('exp-n', s.participants);
     var fl = $('exp-feats'); fl.textContent = '';
     [dup ? 'Two squishies each' : 'One ' + exp0.name + ' squishy each', 'Take-home squishy capsule', 'DIY rhinestone stickers', '45 minutes of guided play', 'Birthday Girl sash & tiara to wear on the day'].forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); fl.appendChild(li); });
     var expSum = exp0.pax * n + CONTAINER * n + (s.wax ? waxCents(s.experience, n) : 0) + LOGISTICS;
     put('pl-n', n); put('pl-diy', money((exp0.pax + CONTAINER) * n));
-    put('pl-sub', short(exp0.pax) + ' ' + (dup ? 'Duo' : exp0.name) + ' + $2 squishy capsule, per child' + (s.children < MIN_PAX ? ' (minimum 10)' : ''));
+    put('pl-sub', short(exp0.pax) + ' ' + (dup ? 'Duo' : exp0.name) + ' + $2 squishy capsule, per person' + (s.participants < MIN_PAX ? ' (minimum 10)' : ''));
     put('wax-title', dup ? 'Wax Cracking duo deal!' : 'Wax Cracking');
     $('exp-panel').classList.toggle('is-duo', dup);
     renderHow(s.experience);
     if (put('exp-total', money(expSum))) { var et = $('exp-total'); et.classList.remove('bump'); void et.offsetWidth; et.classList.add('bump'); }
-    put('wax-quantity', dup ? (n * 2) + ' squishies, two per child, at $2.50 each' : (n * exp0.per) + ' squishies to crack, one per child');
+    put('wax-quantity', dup ? (n * 2) + ' squishies, two per person, at $2.50 each' : (n * exp0.per) + ' squishies to crack, one per person');
     put('wax-price', '+' + money(waxCents(s.experience, n)).replace('.00',''));
     var up = $('wax-up'); up.hidden = !dup; if (dup) put('wax-up', 'U.P. ' + money(300 * n * 2).replace('.00',''));
-    put('tier-note', s.children < MIN_PAX ? 'Minimum 10 children: for ' + s.children + ' we charge for 10, and spare materials are yours to keep.' : 'Minimum 10 children.');
+    put('tier-note', s.participants < MIN_PAX ? 'Minimum 10 participants: for ' + s.participants + ' we charge for 10, and spare materials are yours to keep.' : 'Minimum 10 participants.');
 
-    // step 3: recommendation
-    var rl = $('rec-list'); rl.textContent = '';
-    function recRow(ic, title, sub, amt, cls, demo){ var r = el('div','rec-row' + (cls ? ' ' + cls : '')), i = el('span','ri'); i.appendChild(icon(ic)); r.appendChild(i); var t = el('div'), b = el('b', null, title); if (demo) b.appendChild(el('span','tagmini','Demo price')); t.appendChild(b); if (sub) t.appendChild(el('small', null, sub)); r.appendChild(t); r.appendChild(el('span','amt', amt)); rl.appendChild(r); }
-    var foundSum = T.found.reduce(function(a, f){ return a + f.cents; }, 0);
-    put('ma-title', 'Squishy DIY total'); put('ma-sub', EXP[s.experience].name + ' · ' + s.children + ' children' + (s.wax ? ' · with Wax Cracking' : '')); put('ma-total', money(foundSum));
-    var mb = $('ma-break'); mb.textContent = ''; T.found.forEach(function(f){ var li = el('li'); li.appendChild(el('span', null, f.sub)); li.appendChild(el('span', null, money(f.cents))); mb.appendChild(li); });
-    R.picks.forEach(function(id){ var p = BYID[id], c = CATS.filter(function(x){ return x.id === p.cat; })[0], cc = costFor(p, s); recRow(c.icon, p.name + (p.cat === 'cake' ? ' by ' + p.vendor : ''), cc == null ? 'Suggested · ' + (R.left > 0 ? money(R.left) + ' of your budget left for it' : 'priced in your quotation') : p.vendor + ' · suggested', cc == null ? 'On quote' : money(cc), '', p.status === 'demo'); });
-    R.missed.slice(0, 2).forEach(function(m){ var c = CATS.filter(function(x){ return x.id === m.p.cat; })[0]; recRow(c.icon, m.p.name, 'Add ' + money(m.short) + ' to your budget to include this', 'Not in budget', 'miss'); });
-    if (!hasB) recRow('i-wallet', 'Add your budget in step 1', 'We’ll suggest styling, activities and cake that fit what’s left after Squishy DIY.', '', 'miss');
-    var over = hasB && s.budgetCents < R.base;
-    $('budget-warn').hidden = !over;
-    if (over) put('budget-warn-text', 'Your budget is ' + money(R.base - s.budgetCents) + ' below the required Squishy DIY foundation of ' + money(R.base) + '. Try Jelly, skip Wax Cracking or raise the budget.');
-    var missing = R.picks.filter(function(id){ return s.selected.indexOf(id) < 0; });
-    put('rec-state', 'Squishy DIY ' + money(foundSum) + (!hasB ? ' · add a budget for suggestions' : ' · ' + R.picks.length + ' suggestion' + (R.picks.length === 1 ? '' : 's')));
-    $('use-rec').hidden = !missing.length;
-    put('use-rec', missing.length === R.picks.length ? 'Add all ' + missing.length + ' suggestions' : 'Add the other ' + missing.length + ' suggestion' + (missing.length === 1 ? '' : 's'));
+    // step 3: suggested add-ons are marked on the vendor cards (see syncStores)
 
     // cards
     P.forEach(function(p){
@@ -828,8 +1134,8 @@
     syncStores(R);
 
     // summary
-    put('summary-exp', exp.short); put('summary-children', s.children); put('summary-adults', s.adults); put('summary-length', lengthLabel(s.length));
-    put('squishy-count', s.children * exp.per); put('partner-count', s.selected.length);
+    put('summary-exp', exp.short); put('summary-participants', s.participants); put('summary-length', lengthLabel(s.length));
+    put('squishy-count', s.participants * exp.per); put('partner-count', s.selected.length);
     var bd = $('breakdown'); bd.textContent = '';
     function row(dt, dd, cls, ddcls){ var d = el('div', cls); d.appendChild(el('dt', null, dt)); d.appendChild(el('dd', ddcls, dd)); bd.appendChild(d); }
     bd.appendChild(el('div','grp','Main activity'));
@@ -837,31 +1143,18 @@
     T.found.forEach(function(f){ row(f.sub, money(f.cents), 'bd-sub'); });
     if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
     $('pending-note').hidden = !T.pending.length || !shown;
-    if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation' + (hasB && s.budgetCents > T.total ? ', with ' + money(s.budgetCents - T.total) + ' of your budget still free for it.' : '.'));
+    if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
     var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—';
     put('total-price', totalTxt);
-    put('per-child', shown ? money(Math.round(T.total / s.children)) : '—');
-    $('meter-wrap').hidden = !(shown && hasB); $('sum-acc').hidden = !shown; $('summary-hint').hidden = shown;
-    var pct = !hasB ? 0 : s.budgetCents > 0 ? Math.min(100, T.total / s.budgetCents * 100) : 100, isOver = T.total > s.budgetCents;
-    $('meter-fill').style.width = pct + '%'; $('meter').classList.toggle('over', isOver);
-    if (hasB) put('meter-label', short(T.total) + ' of ' + short(s.budgetCents));
-    if (hasB) put('meter-note', isOver ? money(T.total - s.budgetCents) + ' over your budget' : money(s.budgetCents - T.total) + ' of your budget left');
+    put('per-child', shown ? money(Math.round(T.total / s.participants)) : '—');
+    $('sum-acc').hidden = !shown; $('summary-hint').hidden = shown;
 
     // included
     put('child-squishy-title', s.experience === 'both' ? 'Two take-home squishies' : 'A take-home ' + exp.name + ' squishy');
     put('child-squishy-copy', s.experience === 'both' ? 'One Jelly and one Crunchy creation each, made in a 45-minute guided session.' : 'One ' + exp.name + ' creation each, made in a 45-minute guided session.');
 
     // schedule
-    var blocks = [
-      {m:10, t:'Welcome & arrivals', c:'Guests arrive while our squishy station is ready to go.'},
-      {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.wax ? ', finished with Wax Cracking.' : '.'), cls:'sq'}
-    ];
-    var slotted = {}; s.selected.forEach(function(id){ var p = BYID[id]; if (p.slot && !slotted[p.slot.title]) { slotted[p.slot.title] = 1; blocks.push({m:p.slot.min, t:p.slot.title, c:p.slot.copy, cls:'food'}); } else if (p.slot && slotted[p.slot.title]) { blocks.filter(function(b){ return b.t === p.slot.title; })[0].c += ' Plus ' + p.name.toLowerCase() + '.'; } });
-    var hasCake = s.selected.some(function(id){ return BYID[id].cat === 'cake'; });
-    var finale = {m:20, t:'Birthday finale', c:hasCake ? 'Cake, candles, birthday song and group photo.' : 'Birthday spotlight, song and group photo.'};
-    var used = blocks.reduce(function(a, b){ return a + b.m; }, 0) + finale.m, free = s.length - used;
-    if (free >= 10) blocks.push({m:free, t:'Free play & photos', c:'Time to squish, mingle and take photos.', cls:'free'});
-    blocks.push(finale);
+    var PB = partyBlocks(s), blocks = PB.blocks, used = PB.used;
     var tl = $('timeline'); tl.textContent = ''; tl.style.setProperty('--n', blocks.length + 1 <= 6 ? blocks.length + 1 : 4); var at = 0;
     var pre = el('li','free'), ps0 = clock(s.time, -SETUP_MIN); pre.appendChild(el('span','time', ps0 ? range(s.time, -SETUP_MIN, 0) : 'Before guests')); pre.appendChild(el('h3', null, 'Our team sets up')); pre.appendChild(el('p', null, '15 minutes to set up the squishy station before guests arrive.')); tl.appendChild(pre);
     blocks.forEach(function(b){ var li = el('li', b.cls), a = clock(s.time, at), z = clock(s.time, at + b.m); li.appendChild(el('span','time', a ? range(s.time, at, at + b.m) : at + '–' + (at + b.m) + ' min')); li.appendChild(el('h3', null, b.t)); li.appendChild(el('p', null, b.c)); tl.appendChild(li); at += b.m; });
@@ -877,29 +1170,23 @@
     renderTodo(s, T);
     if ($('tpl-grid').childNodes.length) drawInvite();
 
-    // request step: deposit + fields prefilled from the plan (kept in sync both ways)
-    var squishyTotal = T.found.reduce(function(a, f){ return a + f.cents; }, 0), dep = Math.round(squishyTotal / 2);
-    var hold = Math.round(squishyTotal / 10); S.holdCents = hold;
-    put('hold-amount', money(hold)); put('hold-note', money(hold)); put('dep-sub', '10% of your Squishy DIY total of ' + money(squishyTotal) + '. Refunded in full if we’re unable to attend; deducted from your full amount if you go ahead.');
+    // request step: fields prefilled from the plan (kept in sync both ways)
     [['req-date', s.date], ['req-time', s.time], ['req-end', s.end], ['req-address', s.venue], ['req-spot', s.spot], ['req-postal', s.postal]].forEach(function(p){ var e = $(p[0]); if (e && document.activeElement !== e && e.value !== (p[1] || '')) e.value = p[1] || ''; if (e) e.classList.toggle('prefilled', !!e.value); });
-    S.depositCents = dep;
 
-    // recap + mobile
-    var rc = $('recap-list'); rc.textContent = '';
-    [['Children · adults', s.children + ' · ' + s.adults], ['Date', s.date ? new Date(s.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}) : 'Not set'], ['Time', s.time ? clock(s.time, 0) + ', ' + lengthLabel(s.length) : 'Not set'], ['Squishy DIY', exp.name + (s.wax ? ' + Wax' : '')], ['Partner services', s.selected.length ? String(s.selected.length) : 'None'], ['Budget', hasB ? money(s.budgetCents) : 'Not set']].forEach(function(r){ var d = el('div'); d.appendChild(el('dt', null, r[0])); d.appendChild(el('dd', null, r[1])); rc.appendChild(d); });
+    // plan review (request step) + mobile
     put('recap-total', money(T.total) + (T.pending.length ? '+' : ''));
     CATS.forEach(function(c){ var k = s.selected.filter(function(id){ return BYID[id].cat === c.id; }).length, e = $('count-' + c.id); if (e) { e.textContent = k; e.dataset.n = k; } });
     put('theme-meta', {cobalt:'Cobalt', pink:'Pink', lemon:'Lemon'}[s.theme]);
     var rv = $('review-list'); rv.textContent = '';
     function rrow(a, b2, cls){ var d = el('div', cls); d.appendChild(el('dt', null, a)); if (b2 != null) d.appendChild(el('dd', null, b2)); rv.appendChild(d); }
     rrow('Main activity', null, 'grp');
-    rrow('Squishy DIY total: ' + EXP[s.experience].name + ', ' + s.children + ' children', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)), 'rv-main');
+    rrow('Squishy DIY total: ' + EXP[s.experience].name + ', ' + s.participants + ' participants', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)), 'rv-main');
     T.found.forEach(function(f){ rrow(f.sub, money(f.cents), 'rv-sub'); });
-    if (T.partners.length) { rrow('Add-ons', null, 'grp'); T.partners.forEach(function(x){ rrow((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents)); }); }
+    if (T.partners.length) { rrow('Add-ons', null, 'grp'); T.partners.forEach(function(x){ var cs = x.p.custom ? customSummary(x.p.g || x.p.id) : ''; rrow((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.status === 'demo' ? ' (demo price)' : '') + (cs ? ' · ' + cs : ''), x.cents == null ? 'On quote' : money(x.cents)); }); }
     put('review-total', money(T.total) + (T.pending.length ? '+' : ''));
-    put('review-note', (T.pending.length ? 'Cake prices are added to your quotation. ' : '') + (!hasB ? '' : T.total > s.budgetCents ? money(T.total - s.budgetCents) + ' over your budget.' : money(s.budgetCents - T.total) + ' of your budget left.'));
-    put('mobile-caption', shown ? s.children + ' children · ' + exp.short + ' · ' + s.selected.length + ' add-on' + (s.selected.length === 1 ? '' : 's') : 'Your estimate starts at step 2');
-    put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.children + ' children · ' + s.adults + ' adults');
+    put('review-note', T.pending.length ? 'Cake prices are added to your quotation.' : '');
+    put('mobile-caption', shown ? s.participants + ' participants · ' + exp.short + ' · ' + s.selected.length + ' add-on' + (s.selected.length === 1 ? '' : 's') : 'Your estimate starts at step 2');
+    put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.participants + ' participants');
     $('mobile-price').classList.toggle('muted-price', !shown);
     if (announce) put('live', (msg ? msg + ' ' : '') + 'Estimated total ' + money(T.total) + (T.pending.length ? ' plus items pending price' : '') + '.');
   }
@@ -909,13 +1196,8 @@
   form.addEventListener('submit', function(e){ e.preventDefault(); }); // the planner form never submits; pressing Enter in a field must not reload the page
   function readForm(){
     var d = new FormData(form);
-    S.children = clamp(d.get('children'), 1, 60);
-    $('children-warn').hidden = !(Number(d.get('children')) > 60);
-    S.adults = clamp(d.get('adults'), 0, 80);
-    var mode = d.get('budgetMode'), raw = String(d.get('budget') || '').trim(), v = raw === '' ? null : Math.max(0, Number(raw) || 0);
-    if (mode !== S.budgetMode) { S.budgetMode = mode; if (S.budgetCents != null) $('budget').value = mode === 'child' ? Math.round(S.budgetCents / S.children / 100) : Math.round(S.budgetCents / 100); }
-    else S.budgetCents = v == null ? null : Math.round(mode === 'child' ? v * 100 * S.children : v * 100);
-    if (mode === 'child' && S.budgetCents != null) S.budgetCents = Math.round((Number($('budget').value) || 0) * 100 * S.children);
+    S.participants = clamp(d.get('participants'), 1, 60);
+    $('participants-warn').hidden = !(Number(d.get('participants')) > 60);
     S.date = d.get('date') || ''; S.time = d.get('time') || ''; S.end = d.get('end') || '';
     var a = mins(S.time), b = mins(S.end), ok = a != null && b != null && b > a;
     S.length = ok ? b - a : 120; S.timeOk = ok || a == null || b == null;
@@ -927,15 +1209,12 @@
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
   form.addEventListener('change', function(e){
     if (e.target.dataset && e.target.dataset.todo) return; // to-do ticks are handled separately
-    if (e.target.name === 'children') e.target.value = S.children;
-    if (e.target.name === 'adults') e.target.value = S.adults;
+    if (e.target.name === 'participants') e.target.value = S.participants;
     readForm(); render(true);
     if (e.target.name === 'experience') track('experience_selected', {experience:S.experience});
     if (e.target.name === 'wax') track('wax_toggled', {on:S.wax, experience:S.experience});
-    if (e.target.name === 'budget' && S.budgetCents != null && !S.budgetTracked) { S.budgetTracked = true; track('budget_set', {mode:S.budgetMode}); }
   });
   form.querySelectorAll('[data-step]').forEach(function(b){ b.addEventListener('click', function(){ var i = $(b.dataset.step); i.value = clamp(Number(i.value) + Number(b.dataset.d), Number(i.min), Number(i.max)); readForm(); render(true); }); });
-  $('use-rec').addEventListener('click', function(){ var pk = recommend(S).picks; track('suggestions_added', {count:pk.length}); pk.forEach(function(id){ if (S.selected.indexOf(id) < 0) S.selected.push(id); }); render(true, 'Suggestions added.'); });
 
   // The yellow 'offline preview' notice only applies to the offline file, not the live site.
   if (isWeb()) { var pn = $('preview-notice'); if (pn) pn.hidden = true; }
@@ -965,7 +1244,10 @@
   document.querySelectorAll('[data-bakery-logos]').forEach(function(h){ BAKERIES.forEach(function(v){ h.appendChild(logoEl(v)); }); });
 
   /* ================= VIEWS + WIZARD (hash routing keeps Back working) ================= */
-  var STEPS = ['The basics','Squishy DIY','Add-ons','Your plan','Request'], cur = 1, reached = 1;
+  // Four planner steps, then a "Get ready" view (to-do list, schedule, invitation) that sits outside the stepper.
+  // View 5 is that page; its route is #plan-ready. Section ids: step 4 (Request) is #wstep-5, Get ready is #wstep-4.
+  var STEPS = ['The basics','Squishy DIY','Add-ons','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-2', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 4, READY = 5, cur = 1, reached = 1;
+  function route(k){ return k === READY ? '#plan-ready' : '#plan-' + k; }
   var homeV = $('view-home'), planV = $('view-plan');
   /* Navigation is driven by JS state, not the URL, so it also works inside sandboxed
      previews (srcdoc iframes) where hash links are blocked. History is used when allowed. */
@@ -977,27 +1259,32 @@
     if (t && t.id !== 'top') t.scrollIntoView({behavior:'smooth', block:'start'}); else window.scrollTo(0, 0);
   }
   function showStep(k, focus){
-    k = Math.max(1, Math.min(5, k, reached + 1)); reached = Math.max(reached, k);
+    // Get ready opens once the planner has reached Request (or a request was sent); otherwise steps unlock one at a time.
+    k = k === READY && (reached >= LAST || S.requested) ? READY : Math.max(1, Math.min(LAST, k, reached + 1)); reached = Math.max(reached, Math.min(k, LAST));
     if (planV.hidden && !S.openedOnce) { S.openedOnce = true; track('planner_opened'); }
     if (k !== cur || planV.hidden) track('step_viewed', {step:k, step_name:STEPS[k - 1]});
     cur = k;
     if (k >= 2 && !S.started) { S.started = true; render(false); }
-    homeV.hidden = true; planV.hidden = false; document.body.classList.add('planning');
-    for (var i = 1; i <= 5; i++) $('wstep-' + i).hidden = i !== k;
-    $('stepper').querySelectorAll('li').forEach(function(li, i){ li.className = i + 1 < k ? 'done' : i + 1 === k ? 'current' : (i + 1 <= reached ? 'done' : 'locked'); var a = li.querySelector('a'); if (i + 1 === k) a.setAttribute('aria-current','step'); else a.removeAttribute('aria-current'); });
-    put('wiz-count', 'Step ' + k + ' of 5'); put('wiz-name', STEPS[k - 1]);
-    $('wiz-back').lastChild.textContent = k === 1 ? 'Home' : 'Back';
+    homeV.hidden = true; planV.hidden = false; document.body.classList.add('planning'); document.body.classList.toggle('ready-view', k === READY);
+    for (var i = 1; i <= READY; i++) $(SECTION[i]).hidden = i !== k;
+    $('stepper').querySelectorAll('li').forEach(function(li, i){
+      if (i + 1 === READY) li.className = 'ready-step ' + (k === READY ? 'current' : reached >= LAST || S.requested ? 'open' : 'locked');
+      else li.className = i + 1 < k ? 'done' : i + 1 === k ? 'current' : (i + 1 <= reached ? 'done' : 'locked');
+      var a = li.querySelector('a'); if (i + 1 === k) a.setAttribute('aria-current','step'); else a.removeAttribute('aria-current'); });
+    put('wiz-count', k === READY ? 'Next steps' : 'Step ' + k + ' of ' + LAST); put('wiz-name', STEPS[k - 1]);
+    $('wiz-back').lastChild.textContent = k === 1 ? 'Home' : k === READY ? 'Back to request' : 'Back';
     var nx = $('wiz-next'), nm = $('wiz-next-m');
-    nx.hidden = k === 5; nx.firstChild.textContent = k < 5 ? 'Next: ' + STEPS[k] + ' ' : '';
-    nm.textContent = k < 5 ? 'Next' : 'Send request'; nm.hidden = k === 5 && !!S.requested;
+    nx.hidden = k >= LAST; nx.firstChild.textContent = k < LAST ? 'Next: ' + STEPS[k] + ' ' : '';
+    nm.textContent = k < LAST ? 'Next' : 'Send request'; nm.hidden = k === READY || (k === LAST && !!S.requested);
     window.scrollTo(0, 0);
-    var h = $('ws' + k + '-h'); if (h && focus) h.focus({preventScroll:true});
+    var h = $(k === READY ? 'ws4-h' : k === LAST ? 'ws5-h' : 'ws' + k + '-h'); if (h && focus) h.focus({preventScroll:true});
   }
   function go(target, push){
-    var m = /^#?plan-([1-5])$/.exec(target || '');
-    if (m) showStep(+m[1], true); else showHome((target || '').replace('#',''));
-    if (push !== false && canHistory()) { try { history.pushState({t:target}, '', m ? '#plan-' + cur : '#' + ((target || '').replace('#','') || 'top')); } catch (e) {} }
+    var m = /^#?plan-([1-4]|ready)$/.exec(target || '');
+    if (m) showStep(m[1] === 'ready' ? READY : +m[1], true); else showHome((target || '').replace('#',''));
+    if (push !== false && canHistory()) { try { history.pushState({t:target}, '', m ? route(cur) : '#' + ((target || '').replace('#','') || 'top')); } catch (e) {} }
   }
+  function goReady(tabId){ go('#plan-ready'); var t = tabId && $(tabId); if (t) selectTab(t, false); }
   // Every in-page link goes through go(), with the default jump prevented.
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
@@ -1007,10 +1294,10 @@
     go(href);
   });
   window.addEventListener('popstate', function(){ var h = ''; try { h = location.hash; } catch (e) {} go(h || '#top', false); });
-  $('wiz-next').addEventListener('click', function(){ if (cur < 5) go('#plan-' + (cur + 1)); });
-  $('wiz-next-m').addEventListener('click', function(){ if (cur < 5) go('#plan-' + (cur + 1)); else $('booking-submit').click(); });
-  $('wiz-back').addEventListener('click', function(){ go(cur > 1 ? '#plan-' + (cur - 1) : '#top'); });
-  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-[1-5]$/.test(h)) go(h, false); })();
+  $('wiz-next').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); });
+  $('wiz-next-m').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); else if (cur === LAST) $('booking-submit').click(); });
+  $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */
   var bf = $('booking-form'), err = $('booking-error');
@@ -1018,7 +1305,7 @@
   // Sandboxed previews block real form submission, so the button runs validation directly.
   bf.addEventListener('submit', function(e){ e.preventDefault(); sendRequest(); });
   $('booking-submit').addEventListener('click', function(e){ e.preventDefault(); sendRequest(); });
-  // Request fields in step 5 write back to the plan, so the plan stays the single source of truth.
+  // Request fields in step 4 write back to the plan, so the plan stays the single source of truth.
   [['req-date','date'], ['req-time','time'], ['req-end','end'], ['req-address','venue'], ['req-spot','spot'], ['req-postal','postal']].forEach(function(p){
     $(p[0]).addEventListener('input', function(e){ $(p[1]).value = e.target.value; if (p[1] === 'time') autoEnd(); readForm(); render(false); });
   });
@@ -1079,35 +1366,18 @@
   function syncBookingFor(){
     var co = isCompany();
     $('company-fields').hidden = !co; $('company-name').required = co;
-    $('dep-family').hidden = co; $('dep-company').hidden = !co;
-    $('note-family').hidden = co; $('fine-family').hidden = co; $('note-company').hidden = !co;
+    $('note-family').hidden = co; $('note-company').hidden = !co;
   }
   bf.querySelectorAll('input[name="bookingFor"]').forEach(function(r){ r.addEventListener('change', function(){ syncBookingFor(); track('booking_for_selected', {booking_for:r.value}); }); });
   syncBookingFor();
 
-  /* ---------- PayNow holding deposit ---------- */
-  var PAY = null;
-  function showPay(b){
-    var co = b.bookingFor === 'company'; $('sent-company').hidden = !co; $('pay-card').hidden = co;
-    if (co) { put('sent-bill', ($('billing-email').value || $('req-email').value).trim()); var nm0 = $('wiz-next-m'); if (nm0) nm0.hidden = true; return; }
+  /* ---------- after sending: what happens next ---------- */
+  function showSent(b){
+    var co = b.bookingFor === 'company'; $('sent-company').hidden = !co; $('sent-family').hidden = co;
+    if (co) put('sent-bill', ($('billing-email').value || $('req-email').value).trim());
     var nm = $('wiz-next-m'); if (nm) nm.hidden = true;
-    PAY = { ref:b.ref, cents:b.holdCents, sig:b.paynow ? b.paynow.sig : '' };
-    put('pay-amount', money(b.holdCents)); put('pay-amount-2', money(b.holdCents)); put('pay-ref', b.ref);
-    var has = !!b.paynow; $('pay-qr-wrap').hidden = !has; $('pay-none').hidden = has; $('pay-done').hidden = !has;
-    if (has) { $('pay-qr').innerHTML = b.paynow.svg; put('pay-payee', b.paynow.payee); put('pay-label', b.paynow.label); }
+    var rs = document.querySelector('#stepper .ready-step'); if (rs) rs.className = 'ready-step open';
   }
-  $('pay-done').addEventListener('click', function(){
-    if (!PAY || !PAY.sig) return;
-    var btn = this, st = $('pay-status'); btn.disabled = true; btn.textContent = 'Letting us know…';
-    fetch('/api/paid', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ ref:PAY.ref, cents:PAY.cents, sig:PAY.sig }) })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {status:r.status, body:j}; }); })
-      .then(function(res){
-        st.hidden = false;
-        if (res.status === 200 && res.body.ok) { btn.hidden = true; st.className = 'pay-status ok'; st.textContent = 'Thank you! We’ll check the payment and WhatsApp you to confirm.'; track('deposit_marked_paid', {}); }
-        else { btn.disabled = false; btn.textContent = 'I’ve paid the deposit'; st.className = 'pay-status err'; st.textContent = res.body.error || 'We couldn’t send that just now. Please try again in a minute.'; }
-      })
-      .catch(function(){ btn.disabled = false; btn.textContent = 'I’ve paid the deposit'; st.hidden = false; st.className = 'pay-status err'; st.textContent = 'We couldn’t reach our server. Please try again.'; });
-  });
   function phoneDigits(v){ var d = String(v || '').replace(/[^0-9]/g, ''); if (d.length === 10 && d.indexOf('65') === 0) d = d.slice(2); return d; }
   function sendRequest(){
     bf.querySelectorAll('.err-msg').forEach(function(m){ m.remove(); });
@@ -1126,7 +1396,7 @@
     var d = new FormData(bf), T = totals(S);
     var payload = {
       v: 1,
-      plan: { children:S.children, adults:S.adults, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, budgetCents:S.budgetCents },
+      plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
       contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
       bookingFor: isCompany() ? 'company' : 'family',
@@ -1141,13 +1411,13 @@
         clearTimeout(timer);
         if (res.status === 200 && res.body.ok) {
           S.requested = true;
-          track('request_sent', {experience:S.experience, children:S.children, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
+          track('request_sent', {experience:S.experience, participants:S.participants, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
           put('sent-ref', res.body.ref); put('sent-phone', '+65 ' + payload.contact.phone.replace(/(\d{4})(\d{4})/, '$1 $2'));
           put('sent-date', new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}));
           put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
-          showPay(res.body);
+          showSent(res.body);
           $('request-panel').hidden = true; $('sent-card').hidden = false; $('sent-card').focus();
-          render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. Pay the holding deposit by PayNow to lock it in.'));
+          render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. We’ll send a quotation once we confirm.'));
           return;
         }
         if (res.body && res.body.field === 'email') { OTP.verified = ''; otpUI(); }
@@ -1156,9 +1426,33 @@
       .catch(function(){ clearTimeout(timer); fail('We couldn’t reach our server. Please check your connection and try again.'); });
     function fail(msg){ track('request_failed', {reason:msg.slice(0, 60)}); btn.removeAttribute('aria-busy'); btn.disabled = false; btn.textContent = 'Send my request'; err.hidden = false; err.textContent = msg + ' Your request has not been sent.'; err.focus(); }
   }
-  $('sent-todo').addEventListener('click', function(){ go('#plan-4'); selectTab($('tab-p-check'), false); });
+  document.querySelectorAll('[data-ready]').forEach(function(b){ b.addEventListener('click', function(){ goReady(b.dataset.ready); }); });
 
 
+
+  /* ================= FOR COMPANIES: rate card + quick quote ================= */
+  // The rate card reads the same price list as the planner, so the two never disagree.
+  (function(){
+    var rl = $('rate-list'), rx = $('rate-extras'); if (!rl) return;
+    function rateRow(ul, name, sub, price, tag){ var li = el('li'), d = el('div'), b = el('b', null, name); if (tag) b.appendChild(el('span','rate-tag', tag)); d.appendChild(b); if (sub) d.appendChild(el('small', null, sub)); li.appendChild(d); li.appendChild(el('strong', null, price)); ul.appendChild(li); }
+    rateRow(rl, 'Jelly', 'One smooth, clear squishy each', short(EXP.jelly.pax));
+    rateRow(rl, 'Crunchy', 'One squishy packed with crunchy toppings', short(EXP.crunchy.pax));
+    rateRow(rl, 'Duo', 'One Jelly and one Crunchy each', short(EXP.both.pax), 'Best value');
+    rateRow(rl, 'Take-home squishy capsule', 'Decorated with rhinestone stickers', '+' + short(CONTAINER));
+    rateRow(rx, 'Wax Cracking', 'Crack a wax shell to reveal each squishy', '+' + short(WAX) + ' / squishy');
+    rateRow(rx, 'Your logo on the capsule stickers', null, 'In your quote');
+    rateRow(rx, 'Extra hosts for bigger groups', null, 'In your quote');
+    rateRow(rx, 'Travel & set-up', 'Once per event, up to 2 hours on site', short(LOGISTICS));
+    var n = 30; put('rate-example', 'Example: Duo for ' + n + ' people = ' + short((EXP.both.pax + CONTAINER) * n + LOGISTICS) + ' in total. Minimum ' + MIN_PAX + ' participants; up to 60 per session, ask us about bigger groups.');
+  })();
+  // "Plan your company event" opens the same planner with "A company" already chosen in the Request step,
+  // so companies get the same email code and confirmation email as everyone else.
+  document.querySelectorAll('[data-company]').forEach(function(a){
+    a.addEventListener('click', function(){
+      var r = bf.querySelector('input[name="bookingFor"][value="company"]'); if (r) { r.checked = true; syncBookingFor(); }
+      track('company_planner_opened', {});
+    });
+  });
 
   /* ================= HEADER + REVEAL ================= */
   var header = $('site-header');

@@ -9,5 +9,7 @@ placeholder cards automatically on the live site (landscape 4:3, about 1200 x 90
              jelly-6.jpg  Decorate your take-home capsule
   Crunchy    crunchy-1.jpg ... crunchy-6.jpg  (step 3 = crunchy topping options + 2 boxes)
   Duo        duo-1.jpg ... duo-6.jpg          (step 3 = 2 boxes + beauty capsule, toppings behind)
+  All        wax.jpg      Viral Wax Cracking experience (add-on). Shown after the finished squishy,
+                          before decorating the capsule, in every carousel including the home page.
 
 To change a caption, title or file name, edit HOW_STEPS near the top of the script in public/index.html.

@@ -953,3 +953,162 @@ html:has(body.planning){scroll-padding-top:150px}
 .company-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1/-1}
 .company-fields[hidden]{display:none}
 @media (max-width:640px){.bf-opts{gap:8px}.bf-opt span{padding:10px 12px}.company-fields{grid-template-columns:1fr}}
+/* v23 step 01: squishy options sit under the text (no empty column on desktop); readable safety cards */
+.tl-text .tl-exp{margin-top:18px}
+.myths{gap:16px;margin-top:20px}
+.myth{display:flex;flex-direction:column;padding:20px;border-radius:20px}
+.myth-k,.fact-k{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;font-size:.75rem;padding:4px 10px 4px 8px}
+.myth-k .icon,.fact-k .icon{width:13px;height:13px;stroke-width:3}
+.myth h3{font-family:var(--sans);font-weight:700;font-size:1.125rem;line-height:1.4;letter-spacing:0;margin:10px 0 14px;color:var(--ink-2);text-decoration:none}
+.fact{flex:1;background:#f1faf5;border-radius:14px;padding:14px 16px;box-shadow:inset 0 0 0 1px #d3efdf}
+.fact-k{background:#d9f2e5;margin-bottom:8px}
+.myth .fact p:last-child{font-size:1rem;line-height:1.6;color:var(--ink)}
+.safe-grid{gap:16px;margin-top:16px;align-items:start}
+.safe-card{padding:22px}
+.safe-card h3{font-family:var(--sans);font-size:1.125rem;letter-spacing:0;gap:10px;margin-bottom:12px}
+.safe-card h3 .icon{width:22px;height:22px}
+.safe-card ul{gap:10px;font-size:1rem;line-height:1.55;color:var(--ink);padding-left:20px}
+@media (max-width:760px){.myth h3{font-size:1.0625rem}.safe-card{padding:18px}}
+/* v24 Wax Cracking add-on: full-bleed cracking photo under a cobalt wash, like the in-store card (.retail-photo) */
+.addon[for="wax"],.addon[for="wax"]:has(input:checked){color:#fff;box-shadow:none;background:linear-gradient(100deg,rgba(24,32,140,.94) 0%,rgba(24,32,140,.78) 45%,rgba(24,32,140,.25) 78%,rgba(24,32,140,.1) 100%),url('img/how/wax.jpg') 70% 55%/cover no-repeat,var(--cobalt)}
+.addon[for="wax"]:hover{box-shadow:0 0 0 2px var(--lemon)}
+.addon[for="wax"]:has(input:checked){box-shadow:0 0 0 3px var(--lemon)}
+.addon[for="wax"] .addon-title,.addon[for="wax"] #wax-title{color:#fff}
+.addon[for="wax"] .addon-copy{color:#dfe3ff}
+.addon[for="wax"] .addon-qty{color:var(--lemon)}
+.addon[for="wax"] .addon-title,.addon[for="wax"] .addon-copy,.addon[for="wax"] .addon-qty{text-shadow:0 1px 8px rgba(10,14,60,.35)}
+.addon[for="wax"] .addon-icon{background:rgba(30,42,170,.88)}
+.addon[for="wax"] .addon-icon .icon{color:var(--lemon)}
+.addon[for="wax"] .pill{background:rgba(255,255,255,.18);color:#fff}
+.addon[for="wax"] .wax-prices s{color:#fff;background:rgba(24,32,140,.6);border-radius:6px;padding:0 5px}
+.addon[for="wax"] #wax-price{color:var(--ink);background:var(--lemon);padding:4px 10px;border-radius:999px}
+.addon[for="wax"] .tickbox{background:rgba(255,255,255,.95);box-shadow:none}
+.addon[for="wax"]:has(input:checked) .tickbox{background:var(--lemon);color:var(--ink)}
+@media (max-width:640px){
+  .addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.78) 55%,rgba(24,32,140,.35) 100%),url('img/how/wax.jpg') center 60%/cover no-repeat,var(--cobalt)}
+}
+/* v25 4-step planner: the plan review lives in Request; to-do, schedule and invitation become "Get ready" next steps */
+.stepper{grid-template-columns:repeat(5,minmax(0,1fr))}
+.stepper li.ready-step a::before{background:repeating-linear-gradient(90deg,var(--step-todo) 0 6px,transparent 6px 10px)}
+.stepper li.ready-step.open a{color:var(--rose)}
+.stepper li.ready-step.open a::before{background:repeating-linear-gradient(90deg,var(--rose) 0 6px,transparent 6px 10px)}
+.stepper li.ready-step.current a::before{background:var(--rose)}
+.plan-review .review-total{box-shadow:none;padding:0;background:none}
+.ready-link{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 16px;border-radius:var(--r-md);background:var(--cobalt-50);color:var(--cobalt);font-weight:700;font-size:.9375rem;text-decoration:none;min-height:48px;transition:background-color 150ms ease}
+.ready-link:hover{background:#e3e7ff}
+.ready-link span{flex:1}
+.ready-link .icon{width:20px;height:20px;flex:none}
+.next-steps{width:100%;margin-top:8px;padding-top:18px;border-top:1px dashed var(--line-2);text-align:left}
+.next-steps .eyebrow{text-align:center;margin-bottom:12px}
+.ns-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ns-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;border:0;border-radius:var(--r-md);background:var(--cobalt-50);color:var(--ink);text-align:left;cursor:pointer;font:inherit;min-height:44px;transition:background-color 150ms ease,transform 150ms ease}
+.ns-card:hover{background:#e3e7ff}
+.ns-card:active{transform:scale(.98)}
+.ns-card:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.ns-ic{width:40px;height:40px;border-radius:12px;background:var(--cobalt);display:grid;place-items:center}
+.ns-ic .icon{width:20px;height:20px;color:var(--lemon)}
+.ns-card b{display:block;font-weight:800;font-size:1rem}
+.ns-card small{display:block;color:var(--muted);font-size:.8125rem;line-height:1.4;margin-top:2px}
+body.ready-view .wiz-bar{display:none!important}
+/* v26 For companies: outcome-led copy, rate card (prices from the catalogue) and how to book through the planner */
+.hero-corp a{color:var(--cobalt);font-weight:700;text-underline-offset:3px}
+.corp-lead{color:var(--ink-2);font-size:1.0625rem;line-height:1.55;max-width:46rem;margin-top:10px}
+.corp-why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}
+.corp-why article{background:var(--card);border-radius:20px;padding:20px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.corp-ic{width:44px;height:44px;border-radius:14px;background:var(--cobalt);display:grid;place-items:center;margin-bottom:12px}
+.corp-ic .icon{width:22px;height:22px;color:var(--lemon)}
+.corp-why h3{font-family:var(--sans);font-weight:800;font-size:1.125rem;letter-spacing:0;color:var(--ink);margin-bottom:6px}
+.corp-why p{color:var(--ink-2);font-size:1rem;line-height:1.55}
+.corp-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;margin-top:18px;align-items:start}
+.rate-card{background:var(--cobalt);color:#fff;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.rate-card .eyebrow{color:var(--lemon)}
+.rate-card h3{font-family:var(--display);font-weight:500;font-size:1.6rem;line-height:1.2;color:#fff}
+.rate-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.rate-list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.14)}
+.rate-list b{font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rate-list small{display:block;color:#dfe3ff;font-size:.8125rem;margin-top:2px}
+.rate-list strong{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:1.0625rem}
+.rate-tag{background:var(--lemon);color:var(--ink);font-size:.6875rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:999px}
+.rate-head{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--lemon);margin-top:6px}
+.rate-extras strong{font-size:.9375rem;color:#dfe3ff}
+.rate-example{background:rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;font-size:.9375rem;line-height:1.5}
+.corp-book{background:var(--card);border-radius:24px;padding:24px;box-shadow:var(--shadow-md);display:flex;flex-direction:column;gap:14px}
+.corp-book h3{font-family:var(--display);font-weight:500;font-size:1.6rem;line-height:1.2;color:var(--ink)}
+.corp-steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:cs}
+.corp-steps li{position:relative;padding-left:46px;counter-increment:cs}
+.corp-steps li::before{content:counter(cs);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--cobalt-50);color:var(--cobalt);font-weight:800;display:grid;place-items:center}
+.corp-steps b{display:block;font-weight:800;color:var(--ink)}
+.corp-steps span{display:block;color:var(--ink-2);font-size:.9375rem;line-height:1.5;margin-top:2px}
+.corp-book .btn{align-self:flex-start;margin-top:4px}
+@media (max-width:900px){.corp-grid{grid-template-columns:1fr}}
+/* v28 partner store extras (Bloom): recent setups strip and backdrop colours */
+.ss-extra:empty{display:none}
+.ss-gallery{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,46%);gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;margin-bottom:6px}
+.ss-gal{margin:0;scroll-snap-align:start}
+.ss-gal-img{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--cobalt-50)}
+.ss-gal-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ss-gal figcaption{font-size:.8125rem;font-weight:700;color:var(--ink-2);margin-top:6px}
+.ss-palette{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--line);margin:4px 0 12px}
+.ss-pal-h{font-size:.8125rem;font-weight:800;color:var(--ink)}
+.ss-pal-dots{display:flex;gap:6px;flex-wrap:wrap}
+.ss-pal-dot{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(16,23,58,.18)}
+.ss-opt-x{z-index:3;box-shadow:0 2px 8px rgba(16,23,58,.15)} /* stays tappable above the item photo */
+.ss-opt-ph .ss-img img{object-fit:contain;background:#fff}
+@media (min-width:760px){.ss-gallery{grid-auto-columns:minmax(0,1fr);grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}}
+/* v29 Personalise (item sheet): colour chips that show their name when chosen, vinyl text, notes, moodboard */
+.ss-custom{display:flex;flex-direction:column;gap:10px;margin-top:6px;padding-top:14px;border-top:1px dashed var(--line-2)}
+.ss-custom[hidden]{display:none}
+.ss-c-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ss-c-label{font-size:.875rem;font-weight:800;color:var(--ink)}
+.ss-c-hint{font-size:.75rem;color:var(--muted)}
+.ss-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ss-chip{display:inline-flex;align-items:center;gap:0;min-width:44px;min-height:44px;padding:6px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;cursor:pointer;font:inherit;transition:border-color 150ms ease,background-color 150ms ease,padding 150ms ease}
+.ss-chip-dot{width:28px;height:28px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(16,23,58,.2)}
+.ss-chip-name{max-width:0;overflow:hidden;white-space:nowrap;font-size:.8125rem;font-weight:700;color:var(--ink);transition:max-width 200ms ease,margin 200ms ease}
+.ss-chip[aria-pressed="true"]{border-color:var(--cobalt);background:var(--cobalt-50);padding-right:14px}
+.ss-chip[aria-pressed="true"] .ss-chip-name{max-width:120px;margin-left:8px}
+.ss-chip[aria-pressed="true"] .ss-chip-dot{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--cobalt)}
+.ss-chip:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
+.ss-c-chosen{font-size:.8125rem;color:var(--ink-2);margin:-2px 0 2px}
+.ss-c-field textarea,.ss-c-field input{min-height:44px}
+.ss-mood{display:flex;gap:10px;flex-wrap:wrap}
+.ss-mood-th,.ss-mood-add{position:relative;width:84px;height:84px;border-radius:14px;overflow:hidden;flex:none}
+.ss-mood-th img{width:100%;height:100%;object-fit:cover;display:block}
+.ss-mood-x{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(16,23,58,.75);color:#fff;display:grid;place-items:center;cursor:pointer}
+.ss-mood-x .icon{width:14px;height:14px}
+.ss-mood-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1.5px dashed var(--line-2);background:var(--paper);color:var(--cobalt);font:inherit;font-size:.75rem;font-weight:700;cursor:pointer}
+.ss-mood-add .icon{width:20px;height:20px}
+.ss-c-note{margin:0}
+.ss-c-err{margin:0;padding:10px 12px;border-radius:12px;background:#fde8ec;color:#a3203a;font-size:.875rem;font-weight:700}
+.ss-c-err[hidden]{display:none}
+.ss-c-field input[aria-invalid="true"]{border-color:#c2384f;box-shadow:0 0 0 3px rgba(194,56,79,.15)}
+@media (prefers-reduced-motion:reduce){.ss-chip,.ss-chip-name{transition:none}}
+/* v27 invitations: card + optional schedule panel (taller than A4), schedule editor, GIF button */
+.inv-preview{position:static}
+.inv-preview img{aspect-ratio:auto}
+.sched-box{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r-md);background:var(--cobalt-50)}
+.sched-toggle{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.9375rem;color:var(--ink);cursor:pointer;min-height:44px}
+.sched-toggle input{width:20px;height:20px;accent-color:var(--cobalt);flex:none}
+.sched-head,.sched-row{display:grid;grid-template-columns:112px minmax(0,1fr) 44px;gap:8px;align-items:center}
+.sched-head{font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 2px}
+.sched-edit{display:grid;gap:8px}
+.sched-row input{min-height:44px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--line-2);background:#fff;font:inherit;font-size:.9375rem;color:var(--ink);min-width:0}
+.sched-row input:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 3px rgba(34,52,184,.15)}
+.sched-time{font-weight:700;color:var(--cobalt)!important}
+.sched-x{width:44px;height:44px;border:0;border-radius:12px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.sched-x:hover{background:#fff;color:var(--rose)}
+.sched-x .icon{width:18px;height:18px}
+.sched-actions{margin:0}
+.sched-box.off .sched-head,.sched-box.off .sched-edit,.sched-box.off .sched-actions{opacity:.45;pointer-events:none}
+.tpl-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.words-acc{border-radius:var(--r-md);background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.words-acc>summary{padding:14px 16px;font-weight:700;min-height:44px}
+.words-edit{display:grid;gap:10px}
+.words-edit .field input{min-height:44px}
+.words-acc .btn{margin-top:4px}
+@media (max-width:640px){.sched-head,.sched-row{grid-template-columns:96px minmax(0,1fr) 44px}}
+@media (max-width:760px){.corp-why{grid-template-columns:1fr}.rate-card,.corp-book{padding:18px}.corp-book .btn{align-self:stretch;justify-content:center}}
+@media (max-width:640px){
+  .ns-grid{grid-template-columns:1fr}
+  .ns-card{flex-direction:row;align-items:center;padding:12px 14px}
+}

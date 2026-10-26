@@ -39,10 +39,11 @@ console.log('built public/index.html', (out.length / 1024).toFixed(0) + ' KB');
 if (process.argv.includes('--preview')) {
   // Offline preview: embed the photos from public/img too (the live site loads them as files).
   let prev = out, n = 0;
-  for (const sub of ['making', 'how', 'cakes']) {
+  for (const sub of ['making', 'how', 'cakes', 'bloom']) {
     const dir = path.join(root, 'public/img', sub);
-    for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.jpg')).sort()) {
-      prev = replaceAll(prev, `'img/${sub}/${f}'`, `'data:image/jpeg;base64,${b64(`public/img/${sub}/${f}`)}'`); n++;
+    for (const f of fs.readdirSync(dir).filter((x) => /\.(jpg|png)$/.test(x)).sort()) {
+      const type = f.endsWith('.png') ? 'image/png' : 'image/jpeg';
+      prev = replaceAll(prev, `'img/${sub}/${f}'`, `'data:${type};base64,${b64(`public/img/${sub}/${f}`)}'`); n++;
     }
   }
   prev = replaceAll(prev, 'src="img/store.jpg"', `src="data:image/jpeg;base64,${b64('public/img/store.jpg')}"`); n++;
