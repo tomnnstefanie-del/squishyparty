@@ -576,6 +576,41 @@
     WAX_STEP,
     {img:'img/making/5.jpg', title:'Decorate your capsule box', caption:'Rhinestone stickers, DIY, then it’s theirs to take home.'}
   ];
+  /* Reviews: copy real reviews word for word (with the customer's OK), e.g.
+     {name:'Sarah T.', text:'The kids loved it…', stars:5, when:'Oct 2026', source:'Google'}
+     Never write or edit a review. While the list is empty, an honest "reviews will appear here" note shows. */
+  var REVIEWS = [];
+  var GOOGLE_REVIEWS_URL = '';   // your Google Business profile link, to show the "Read our Google reviews" button
+  /* Photos from real events (landscape .jpg in public/img/events/, about 1200 x 900). Only use photos you're allowed to share,
+     and avoid children's faces unless parents agreed. */
+  var EVENT_PHOTOS = [
+    {img:'img/making/1.jpg', alt:'Pots of pastel pink, aqua blue and lavender slime bases'},
+    {img:'img/making/3.jpg', alt:'A squishy being made and customised'},
+    {img:'img/making/4.jpg', alt:'Squishing a finished squishy'},
+    {img:'img/how/wax.jpg', alt:'Wax Cracking: a squishy coated in wax, ready to crack'},
+    {img:'img/making/2.jpg', alt:'Toppings and charms laid out for the guests'},
+    {img:'img/making/5.jpg', alt:'Decorated take-home squishy capsules'}
+  ];
+  function renderReviews(){
+    var grid = $('rv-grid'); if (!grid) return;
+    REVIEWS.forEach(function(r){
+      var c = el('figure','rv-card'), n = Math.max(0, Math.min(5, r.stars || 0));
+      if (n) { var st = el('p','rv-stars', '★★★★★'.slice(0, n)); st.setAttribute('aria-label', n + ' out of 5 stars'); c.appendChild(st); }
+      var q = el('blockquote'); q.appendChild(el('p', null, r.text)); c.appendChild(q);
+      c.appendChild(el('figcaption', null, r.name + (r.when ? ' · ' + r.when : '') + (r.source ? ' · ' + r.source : '')));
+      grid.appendChild(c);
+    });
+    grid.hidden = !REVIEWS.length; $('rv-empty').hidden = !!REVIEWS.length;
+    if (GOOGLE_REVIEWS_URL) { $('google-reviews').href = GOOGLE_REVIEWS_URL; $('google-reviews').hidden = false; }
+    var ev = $('ev-grid');
+    EVENT_PHOTOS.forEach(function(ph){
+      var li = el('li','ev-item'), im = document.createElement('img');
+      im.src = ph.img; im.alt = ph.alt; im.loading = 'lazy'; im.decoding = 'async'; im.width = 600; im.height = 450;
+      im.addEventListener('error', function(){ li.remove(); });
+      li.appendChild(im); ev.appendChild(li);
+    });
+  }
+  renderReviews();
   function makeStack(root, onStep){
     var q = function(s){ return root.querySelector(s); };
     var st = { root:root, stage:q('.hw-stage'), cap:q('.hw-caption'), dots:q('.hw-dots'), prev:q('.hw-prev'), next:q('.hw-next'), steps:[], cards:[], i:0, key:null };
