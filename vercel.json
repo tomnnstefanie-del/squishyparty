@@ -25,5 +25,12 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/c",
+      "destination": "/?src=capsule#offer",
+      "permanent": false
+    }
   ]
 }

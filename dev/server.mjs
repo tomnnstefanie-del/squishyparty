@@ -21,6 +21,8 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+  // Same short link as vercel.json: the QR sticker on the capsule lids points here
+  if (url.pathname === '/c') { res.writeHead(307, { Location: '/?src=capsule#offer' }); return res.end(); }
   const handler = ROUTES[url.pathname];
   if (handler) {
     res.status = (c) => { res.statusCode = c; return res; };

@@ -1292,7 +1292,7 @@
   if (isWeb()) { var pn = $('preview-notice'); if (pn) pn.hidden = true; }
 
   /* ---------- Referrals and where people came from ----------
-     ?ref=MIA-K7Q2 is a friend's referral link (the friend's family gets nothing; the new customer gets $20 off).
+     ?ref=MIA-K7Q2 is a friend's referral link (the friend's family gets nothing; the new customer gets $10 off).
      ?src=capsule says where the link was (capsule QR sticker, Instagram...). Both are remembered for 60 days on this
      device and sent with the request. Analytics only learns that a code or source was present, never the code. */
   var REF = (function(){
@@ -1308,9 +1308,14 @@
     return saved;
   })();
   if (REF.code) { $('ref-banner').hidden = false; $('ref-code').value = REF.code; }
+  // Capsule QR sticker: one printed QR for every lid, so the offer comes from the source, not a personal code
+  if (REF.source === 'capsule') {
+    $('offer').hidden = false; $('sticker-field').hidden = false;
+    if (!REF.code) { $('ref-banner').hidden = false; $('ref-banner').querySelector('span').innerHTML = 'Scanned a squishy capsule? <b>$10 off your first hosted party</b> is added to your request.'; }
+  }
   function refHint(){
     var v = $('ref-code').value.trim(), ok = !v || /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v), h = $('ref-hint');
-    h.textContent = !v ? 'From a friend? New customers get $20 off their first Squishy Party.' : ok ? 'Thanks! We’ll take $20 off your quotation once we’ve checked the code.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
+    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? 'Thanks! We’ll take $10 off your quotation once we’ve checked the code.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
     h.classList.toggle('err', !ok); $('ref-code').toggleAttribute('aria-invalid', !ok);
   }
   $('ref-code').addEventListener('input', refHint); refHint();
@@ -1499,7 +1504,7 @@
       contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
       bookingFor: isCompany() ? 'company' : 'family',
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked, sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';

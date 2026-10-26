@@ -115,7 +115,7 @@ t('moodboard images must be small JPEG/PNG, at most 3 per item', () => {
   assert.throws(() => validateRequest(withCustom(['bl-fabric-std'], { 'bl-fabric-std': { images: [JPG, JPG, JPG, JPG] } })), (e) => e.field === 'custom');
   assert.throws(() => validateRequest(withCustom(['bl-fabric-std'], { 'bl-fabric-std': { images: ['data:image/jpeg;base64,' + 'A'.repeat(470000)] } })), (e) => e.field === 'custom');
 });
-console.log('referrals (friend gets $20 off, no database)');
+console.log('referrals (friend gets $10 off, no database)');
 {
   const { makeReferralCode, readReferralCode, samePerson } = await import('../lib/referral.js');
   const code = makeReferralCode('Mia Tan');
@@ -125,6 +125,13 @@ console.log('referrals (friend gets $20 off, no database)');
   const g = dateOK(); g.referral = { code, source: 'capsule', returning: true }; const vr = validateRequest(g);
   const m = buildMessage({ ref: 'SP-1', plan: vr.plan, contact: vr.contact, price: priceRequest(vr.plan), clientTotalCents: null, referral: vr.referral, shareCode: 'SARAH-AB23', site: 'https://example.sg' });
   t('Telegram shows the referral, source, returning flag and their own link to share', () => { assert.match(m, /Referred by a friend/); assert.match(m, /capsule QR sticker/); assert.match(m, /booked with us before/); assert.match(m, /https:\/\/example\.sg\/\?ref=SARAH-AB23/); });
+  t('capsule QR scans get the $10 offer in Telegram, with the "Made by" name', () => {
+    const c = dateOK(); c.referral = { source: 'capsule', sticker: 'Mia' }; const vc = validateRequest(c);
+    const mc = buildMessage({ ref: 'SP-2', plan: vc.plan, contact: vc.contact, price: priceRequest(vc.plan), clientTotalCents: null, referral: vc.referral, shareCode: 'X-AB23', site: 'https://example.sg' });
+    assert.match(mc, /Capsule QR offer<\/b>: \$10 off their first hosted party/); assert.match(mc, /Made by: Mia/);
+  });
+  const fs = await import('node:fs');
+  t('the sticker short link /c goes to the capsule offer', () => { const r = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).redirects; assert.ok(r.some((x) => x.source === '/c' && x.destination.includes('src=capsule'))); });
   t('a bad source value is dropped', () => { const b = dateOK(); b.referral = { source: '<script>' }; assert.equal(validateRequest(b).referral.source, ''); });
 }
 

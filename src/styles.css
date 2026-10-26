@@ -1168,3 +1168,16 @@ a.rv-name:hover{text-decoration:underline}
 #ref-code{text-transform:uppercase;letter-spacing:.06em}
 #ref-hint.err{color:var(--rose)}
 .consent.returning{grid-column:1/-1;margin-top:0}
+/* v32 capsule QR offer */
+.offer[hidden]{display:none}
+.offer{padding:20px 0 4px}
+.offer-card{display:flex;gap:22px;align-items:flex-start;padding:22px;border-radius:var(--r-xl);background:var(--lemon-50);box-shadow:inset 0 0 0 2px var(--lemon)}
+.offer-tag{flex:none;width:92px;height:92px;border-radius:50%;background:var(--cobalt);color:var(--lemon);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:var(--shadow-md)}
+.offer-tag b{font-size:2rem;line-height:1}
+.offer-tag span{font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.75rem}
+.offer-body h2{margin:4px 0 8px}
+.offer-body>p{margin:0 0 12px;color:var(--ink-2)}
+.offer-steps{margin:0 0 16px;padding-left:20px;display:grid;gap:8px}
+.offer-steps li span{display:block;color:var(--muted);font-size:.9375rem}
+.offer-terms{font-size:.8125rem;color:var(--muted);margin:12px 0 0}
+@media (max-width:640px){.offer-card{flex-direction:column;gap:14px;padding:18px;margin:0 16px}.offer-tag{width:72px;height:72px}.offer-tag b{font-size:1.5rem}.offer-body .btn{width:100%;justify-content:center}}
