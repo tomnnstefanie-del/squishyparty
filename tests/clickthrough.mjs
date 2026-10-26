@@ -45,7 +45,7 @@ async function run(label, width, setup){
   await f.click('#ss-opt-x'); ok('item details close', !(await vis('#ss-opt')));
   await f.click('.ss-foot .btn'); await p.waitForTimeout(400); ok('Done closes menu', !(await vis('.ss-panel')));
   ok('suggested add-ons are marked on the vendor cards', await f.evaluate(()=>[...document.querySelectorAll('.store-sug')].some(e=>!e.hidden)));
-  await f.click(next); ok('Next -> step 4 (Request, with plan review)', await vis('#wstep-5') && await vis('#review-list'));
+  await f.click(next); ok('Next -> step 4 (Request, straight to the form)', await vis('#wstep-5') && !(await vis('.plan-review')));
   await f.click('#ready-early'); ok('head-start link -> Get ready', await vis('#wstep-4'));
   await f.click('#wiz-back'); await f.click('#stepper li.ready-step a'); ok('stepper "Get ready" -> Get ready', await vis('#wstep-4'));
   for (const t of ['sched','inv','check']) { await f.click('#tab-p-'+t); ok('get-ready tab '+t, await vis('#panel-p-'+t)); }

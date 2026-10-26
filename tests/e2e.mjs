@@ -65,7 +65,7 @@ try {
   await page.click('#ss-opt-add'); await page.click('.ss-foot .btn'); await page.waitForTimeout(300);
   ok('Bloom backdrop: choose colours (names appear), type vinyl text and inspiration, add a moodboard image');
   await page.click('#wiz-next');
-  assert.ok(await page.isVisible('#wstep-5') && await page.isVisible('#review-list')); assert.equal(await txt('#wiz-count'), 'Step 4 of 4');
+  assert.ok(await page.isVisible('#wstep-5')); assert.equal(await txt('#wiz-count'), 'Step 4 of 4');
   ok('Add-ons goes straight to Request (step 4 of 4), with the itemised plan to check');
   assert.equal(await page.inputValue('#req-date'), date);
   assert.equal(await page.inputValue('#req-time'), '14:00');

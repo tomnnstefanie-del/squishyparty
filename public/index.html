@@ -1867,6 +1867,27 @@ footer .brand-logo{height:48px}
 #wstep-2 .exp-tile:has(input:checked) .exp-img{box-shadow:0 0 0 4px #fff,0 0 0 7px #2234b8,0 14px 30px rgba(34,52,184,.25)}
 #wstep-2 .exp-tile img.exp-img{filter:none}
 #wstep-2 .eyebrow{color:#2234b8}
+/* v37 hero kicker in the sans font, tighter top; brighter in-store photo; footer directory */
+.hero{padding-top:clamp(20px,3vw,44px)}
+.h1-kicker{display:block;font-family:var(--sans);font-weight:700;font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin-bottom:12px;line-height:1.4}
+.retail-photo::before{background:linear-gradient(100deg,rgba(11,22,64,.78) 0%,rgba(11,22,64,.5) 34%,rgba(11,22,64,0) 62%)}
+@media (max-width:640px){.retail-photo::before{background:linear-gradient(180deg,rgba(11,22,64,.78) 0%,rgba(11,22,64,.4) 45%,rgba(11,22,64,0) 75%)}}
+.retail-photo .retail-bg{filter:saturate(1.15) brightness(1.05)}
+.retail-photo > .icon{background:var(--pink);color:#fff}
+#explore{padding-bottom:clamp(24px,3vw,40px)}
+footer .wrap{padding:44px var(--gut) 24px}
+.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:28px 32px}
+.foot-brand p{margin:12px 0 16px;max-width:340px;font-size:.9375rem;color:var(--ink-2)}
+.foot-col{display:flex;flex-direction:column;gap:10px;font-size:.9375rem}
+.foot-col h2{font-family:var(--sans);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin:4px 0 4px}
+.foot-col a{color:var(--ink);text-decoration:none;min-height:28px;display:flex;align-items:center}
+.foot-col a:hover{color:var(--pink);text-decoration:underline}
+.foot-col span{color:var(--ink-2)}
+.foot-base{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted)}
+.foot-base a{color:var(--ink)}
+@media (max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}}
+@media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
+@media (min-width:641px){.retail-photo > div{max-width:52%}}
 </style>
 </head>
 <body>
@@ -1946,8 +1967,8 @@ footer .brand-logo{height:48px}
   <section class="hero" id="top">
     <div class="wrap hero-grid">
       <div class="reveal">
-        <h1><span class="eyebrow h1-kicker">Squishy-making birthday parties in Singapore</span>Make it <em>their</em> party.</h1>
-        <p class="lead">We bring a hosted squishy-making party to your home, condo function room or venue. Every celebration starts with our signature Squishy DIY. Tell us about the party, and we’ll guide you step by step to a complete plan, one total and one team to handle it.</p>
+        <h1><span class="h1-kicker">Birthday parties &amp; team bonding in Singapore</span>Parties worth <em>sharing</em>.</h1>
+        <p class="lead">A hosted squishy-making party at your home, office or venue. Everyone makes something to take home, every moment is made for photos, and we handle the rest. Plan it in 3 minutes, with one quote and one team.</p>
         <div class="hero-actions">
           <a class="btn btn-primary btn-xl" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="btn btn-ghost" href="#explore" data-tab-link="tab-how">How it works</a>
@@ -2196,10 +2217,39 @@ footer .brand-logo{height:48px}
 </main>
 
 <footer>
-  <div class="wrap footer-row">
-    <a class="brand" href="#top"><img class="brand-logo" src="img/logo.webp" alt="Confetti Club" width="609" height="240"></a>
-    <span>Trending activities for birthday parties, team bonding and every celebration in between. Hosted at your venue in Singapore, by Tom &amp; Stefanie.</span>
-    <a href="#top">Back to top</a>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><img class="brand-logo" src="img/logo.webp" alt="Confetti Club" width="609" height="240"></a>
+        <p>Trending activities for birthday parties, team bonding and every celebration in between. Hosted at your venue in Singapore, by Tom &amp; Stefanie.</p>
+        <a class="btn btn-primary" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <nav class="foot-col" aria-label="Parties">
+        <h2>Parties</h2>
+        <a href="#plan-1">Build my party</a>
+        <a href="#explore" data-tab-link="tab-how">How it works</a>
+        <a href="#explore" data-tab-link="tab-day">On the day</a>
+        <a href="#companies">For companies</a>
+      </nav>
+      <nav class="foot-col" aria-label="Help">
+        <h2>Help</h2>
+        <a href="#explore" data-tab-link="tab-faq">FAQ</a>
+        <a href="#explore" data-tab-link="tab-safety">Safety</a>
+        <a href="#care">Squishy care</a>
+        <a href="#reviews">Reviews</a>
+      </nav>
+      <div class="foot-col">
+        <h2>Partners</h2>
+        <span>Bloom · balloon styling</span>
+        <span>PartyPainters.sg · face painting</span>
+        <span>Butter Studio · cakes</span>
+        <span>Try it in store at Tom &amp; Stefanie outlets</span>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© <span id="foot-year">2026</span> Confetti Club by Tom &amp; Stefanie. All rights reserved.</span>
+      <a href="#top">Back to top</a>
+    </div>
   </div>
 </footer>
 <div class="mobile-cta"><a class="btn btn-primary" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
@@ -2398,9 +2448,9 @@ footer .brand-logo{height:48px}
       <!-- STEP 4: REQUEST (section id kept as wstep-5) -->
       <section class="wstep" id="wstep-5" aria-labelledby="ws5-h" hidden>
         <p class="eyebrow">Step 4</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
-        <p class="wlead">Check your plan, tell us how to reach you and verify your email. There’s nothing to pay now: we confirm availability on WhatsApp, then send you one quotation.</p>
+        <p class="wlead">Tell us how to reach you and verify your email. There’s nothing to pay now: we confirm availability on WhatsApp, then send you one quotation.</p>
         <a class="ready-link" href="#plan-ready" id="ready-early"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Want a head start? See your to-do list, schedule and invitation</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <details class="acc acc-card plan-review" open>
+        <details class="acc acc-card plan-review" open hidden>
           <summary>Your plan <span class="acc-meta" id="recap-total">$0.00</span></summary>
           <div class="acc-body">
             <div class="review-total">
@@ -3313,7 +3363,7 @@ footer .brand-logo{height:48px}
       turning: d.age ? 'IS TURNING ' + d.age + '!' : 'IS HAVING A PARTY!', invite:'join us for a squishy party',
       when: d.dateLine + ' · ' + d.startLine, date: d.dateLine, time: d.timeLine, venue: d.venue,
       top:'JOIN US FOR A', big1: tpl === 'glitter' ? 'BIRTHDAY' : 'SQUISHY', big2: tpl === 'glitter' ? 'SQUISHY PARTY' : 'PARTY',
-      pre: tpl === 'glitter' ? 'CELEBRATING' : 'HONORING', foot: tpl === 'disco' ? 'MAKE · SQUISH · TAKE HOME' : 'squishies, stickers and smiles provided'
+      pre: 'CELEBRATING', foot: tpl === 'disco' ? 'MAKE · SQUISH · TAKE HOME' : 'squishies, stickers and smiles provided'
     };
   }
   function invSVG(tpl, d, u, words){
@@ -3927,6 +3977,7 @@ footer .brand-logo{height:48px}
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
+  document.querySelectorAll('a[href="#care"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); $('tab-faq').click(); var d = $('care'); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */

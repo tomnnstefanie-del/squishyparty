@@ -796,7 +796,7 @@
       turning: d.age ? 'IS TURNING ' + d.age + '!' : 'IS HAVING A PARTY!', invite:'join us for a squishy party',
       when: d.dateLine + ' · ' + d.startLine, date: d.dateLine, time: d.timeLine, venue: d.venue,
       top:'JOIN US FOR A', big1: tpl === 'glitter' ? 'BIRTHDAY' : 'SQUISHY', big2: tpl === 'glitter' ? 'SQUISHY PARTY' : 'PARTY',
-      pre: tpl === 'glitter' ? 'CELEBRATING' : 'HONORING', foot: tpl === 'disco' ? 'MAKE · SQUISH · TAKE HOME' : 'squishies, stickers and smiles provided'
+      pre: 'CELEBRATING', foot: tpl === 'disco' ? 'MAKE · SQUISH · TAKE HOME' : 'squishies, stickers and smiles provided'
     };
   }
   function invSVG(tpl, d, u, words){
@@ -1410,6 +1410,7 @@
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
+  document.querySelectorAll('a[href="#care"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); $('tab-faq').click(); var d = $('care'); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */
