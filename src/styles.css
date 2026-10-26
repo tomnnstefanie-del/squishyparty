@@ -330,7 +330,7 @@ html:has(body.planning){scroll-padding-top:150px}
 
 /* ===== v7: bigger Duo, taglines, dealt-out how-it-works, mobile swipe cards ===== */
 .exp-picker{align-items:end}
-.exp-tile:first-child img.exp-img{width:min(158px,100%)}
+.exp-tile:has(input[value=both]) img.exp-img{width:min(158px,100%)}
 .exp-tag{font-family:var(--display);font-style:italic;font-size:1.0625rem;color:var(--cobalt);margin-top:4px}
 .exp-tag.in{animation:tagIn .5s var(--ease) both}
 @keyframes tagIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -355,7 +355,7 @@ html:has(body.planning){scroll-padding-top:150px}
 .how-nav{display:none}
 @media (max-width:900px) and (min-width:641px){.how-steps{gap:10px}.how-steps p{font-size:.75rem}}
 @media (max-width:640px){
-  .exp-tile:first-child img.exp-img{width:min(118px,100%)}
+  .exp-tile:has(input[value=both]) img.exp-img{width:min(118px,100%)}
   .how-steps{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:14px -14px 0;padding:2px 14px 6px;scroll-padding-left:14px;scrollbar-width:none;overscroll-behavior-x:contain}
   .how-steps::-webkit-scrollbar{display:none}
   .how-steps li{flex:0 0 78%;scroll-snap-align:start;background:var(--paper);border-radius:14px;padding:10px 10px 12px;box-shadow:inset 0 0 0 1px var(--line)}
@@ -472,7 +472,7 @@ html:has(body.planning){scroll-padding-top:150px}
   .hero h1{font-size:var(--m-h1)}
   .wstep h2,.section-head h2,.panel-title{font-size:var(--m-h2)}
   .exp-tile img.exp-img{width:min(var(--m-tile),100%)}
-  .exp-tile:first-child img.exp-img{width:min(var(--m-tile-duo),100%)}
+  .exp-tile:has(input[value=both]) img.exp-img{width:min(var(--m-tile-duo),100%)}
   .hw-card{width:var(--m-card);border-radius:var(--m-radius)}
   .exp-panel,.card-block,.form-panel,.hw,.todo,.inv-studio,.review-total,.flow,.cta-band{border-radius:var(--m-radius)}
   .mobile-cta .btn{min-height:var(--m-cta)}
@@ -1220,3 +1220,8 @@ footer a,.footer-row a{color:var(--ink)}
 footer .brand-logo{height:48px}
 /* Focus stays visible on cream */
 :focus-visible{outline-color:var(--teal-700)}
+/* v36 Squishy DIY step keeps the original bright look (cobalt ring, lavender tints, lemon) inside the new brand */
+#wstep-2{--cobalt:#2234b8;--cobalt-600:#1a2a9c;--cobalt-700:#141f78;--cobalt-50:#eef0ff;--cobalt-100:#dfe3ff;--lemon:#f6e98c;--lemon-50:#fdf8d7;--line:#e3e6f2;--line-2:#cfd5ea}
+#wstep-2 .exp-tile:has(input:checked) .exp-img{box-shadow:0 0 0 4px #fff,0 0 0 7px #2234b8,0 14px 30px rgba(34,52,184,.25)}
+#wstep-2 .exp-tile img.exp-img{filter:none}
+#wstep-2 .eyebrow{color:#2234b8}
