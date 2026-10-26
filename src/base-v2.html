@@ -7,7 +7,7 @@
 .step .grid2{margin-top:4px}
 .step .field input,.step .field select{min-height:50px}
 .field select{width:100%;min-height:50px;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff;font-size:1rem;font-weight:400}
-.field select:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(34,52,184,.14)}
+.field select:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(19,35,95,.14)}
 .counter{display:flex;align-items:center;gap:8px}
 .counter input{text-align:center;font-variant-numeric:tabular-nums}
 .counter button{flex:none;width:50px;height:50px;border-radius:var(--r-sm);border:1.5px solid var(--line-2);background:#fff;cursor:pointer;display:grid;place-items:center;transition:border-color .2s,color .2s}
@@ -84,7 +84,7 @@
 .rail.all{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));overflow:visible}
 .vcard{position:relative;display:flex;flex-direction:column;background:#fff;border-radius:var(--r-lg);box-shadow:inset 0 0 0 1.5px var(--line);overflow:hidden;transition:box-shadow .2s,transform .2s var(--ease)}
 .vcard:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1.5px var(--line-2),var(--shadow-md)}
-.vcard.on{box-shadow:inset 0 0 0 2px var(--cobalt),0 12px 28px rgba(34,52,184,.12)}
+.vcard.on{box-shadow:inset 0 0 0 2px var(--cobalt),0 12px 28px rgba(19,35,95,.12)}
 .vtop{position:relative;height:100px;display:flex;align-items:flex-end;justify-content:space-between;padding:14px 16px;background:var(--cobalt-50)}
 .vtop .vi{width:46px;height:46px;border-radius:14px;background:#fff;display:grid;place-items:center;color:var(--cobalt);box-shadow:var(--shadow-sm)}
 .vtop .vi .icon{width:22px;height:22px}
@@ -141,7 +141,7 @@
 .checkcol li small{display:block;color:var(--muted);font-size:.8125rem}
 .invite-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(24px,4vw,48px);align-items:center}
 .invite-inputs{display:grid;grid-template-columns:1fr 120px;gap:12px;margin-top:22px}
-.invite-inputs .field input{background:rgba(255,255,255,.85);border-color:rgba(16,23,58,.18)}
+.invite-inputs .field input{background:rgba(255,255,255,.85);border-color:rgba(11,22,64,.18)}
 .invite{position:relative;border-radius:var(--r-lg);padding:34px 30px 30px;text-align:center;overflow:hidden;box-shadow:var(--shadow-lg);background:var(--cobalt);color:#fff;isolation:isolate}
 .invite::before,.invite::after{content:"";position:absolute;border-radius:50%;z-index:-1}
 .invite::before{width:220px;height:220px;right:-70px;top:-80px;background:rgba(255,255,255,.12)}
@@ -159,7 +159,7 @@
 .invite.lemon{background:var(--lemon);color:var(--ink)}
 .invite.lemon .inv-star{color:var(--cobalt)}
 .invite.lemon .inv-facts{background:rgba(255,255,255,.6)}
-.invite.lemon::before{background:rgba(34,52,184,.1)}
+.invite.lemon::before{background:rgba(19,35,95,.1)}
 .invite.lemon::after{background:rgba(255,214,230,.8)}
 .inv-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .inv-actions .btn{min-height:46px;font-size:.9375rem}
@@ -183,7 +183,7 @@
 .exp-tile:has(input:focus-visible){outline:3px solid var(--rose);outline-offset:2px}
 .exp-img{width:min(128px,100%);aspect-ratio:1;border-radius:50%;background:var(--photo,var(--cobalt)) var(--pos)/310% auto no-repeat,var(--cobalt);box-shadow:0 0 0 3px #fff,0 0 0 4.5px var(--line-2);transition:box-shadow .25s,transform .3s var(--ease),filter .25s;filter:saturate(.8)}
 .exp-tile:hover .exp-img{transform:scale(1.04)}
-.exp-tile:has(input:checked) .exp-img{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--cobalt),0 14px 30px rgba(34,52,184,.25);filter:none}
+.exp-tile:has(input:checked) .exp-img{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--cobalt),0 14px 30px rgba(19,35,95,.25);filter:none}
 .exp-badge{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:1;background:var(--ink);color:var(--lemon);font-size:.625rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 0 0 3px #fff}
 .exp-name{font-weight:700;font-size:1rem;margin-top:14px}
 .exp-sub{font-size:.8125rem;color:var(--muted)}
@@ -360,7 +360,7 @@
               <label class="field">Preferred date<input name="date" id="date" type="date"></label>
               <label class="field">Start time<input name="time" id="time" type="time" value="14:00"><span class="hint">Singapore time, subject to availability</span></label>
               <div class="field"><span id="length-label">Party length</span><div class="seg" role="radiogroup" aria-labelledby="length-label"><label class="chipopt"><input type="radio" name="length" value="90">1½ hours</label><label class="chipopt"><input type="radio" name="length" value="120" checked>2 hours</label><label class="chipopt"><input type="radio" name="length" value="150">2½ hours</label><label class="chipopt"><input type="radio" name="length" value="180">3 hours</label></div></div>
-              <div class="field"><span id="theme-label">Colour theme</span><div class="seg" role="radiogroup" aria-labelledby="theme-label"><label class="chipopt"><input type="radio" name="theme" value="cobalt" checked><span class="swatch" style="background:#2234b8" aria-hidden="true"></span>Cobalt</label><label class="chipopt"><input type="radio" name="theme" value="pink"><span class="swatch" style="background:#e2477f" aria-hidden="true"></span>Pink</label><label class="chipopt"><input type="radio" name="theme" value="lemon"><span class="swatch" style="background:#f6e98c" aria-hidden="true"></span>Lemon</label></div></div>
+              <div class="field"><span id="theme-label">Colour theme</span><div class="seg" role="radiogroup" aria-labelledby="theme-label"><label class="chipopt"><input type="radio" name="theme" value="cobalt" checked><span class="swatch" style="background:#13235f" aria-hidden="true"></span>Cobalt</label><label class="chipopt"><input type="radio" name="theme" value="pink"><span class="swatch" style="background:#e2477f" aria-hidden="true"></span>Pink</label><label class="chipopt"><input type="radio" name="theme" value="lemon"><span class="swatch" style="background:#f6e98c" aria-hidden="true"></span>Lemon</label></div></div>
               <label class="field full">Venue<input name="venue" id="venue" maxlength="120" placeholder="e.g. condo function room, Tampines"><span class="hint">A name or area is enough for now. The full address goes with your request.</span></label>
             </div>
             <div class="warn" id="children-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-hourglass"/></svg><span>For more than 60 children, plan for 60 here and tell us the full number in your request.</span></div>
