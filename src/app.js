@@ -585,25 +585,45 @@
   var GOOGLE_REVIEWS_URL = '';   // the outlet's Google reviews page, to show the "Read our Google reviews" button
   /* Swipeable reel of our Instagram posts. Each item: a video file (public/video/, .mp4, portrait 9:16, muted) with a
      poster image, or a photo; ig = the post's Instagram link. Only share what you're allowed to (children's faces need consent). */
-  var REEL = [
-    {img:'img/events/making-slime.webp', alt:'A child stretching glittery blue slime with pastel pearls', ig:''},
-    {img:'img/making/1.jpg', alt:'Pots of pastel pink, aqua blue and lavender slime bases', ig:''},
-    {img:'img/how/wax.jpg', alt:'Wax Cracking: a squishy coated in wax, ready to crack', ig:''},
-    {img:'img/making/5.jpg', alt:'Decorated take-home squishy capsules', ig:''}
-  ];
+  var REEL = [];                 // e.g. {video:'video/wax-crack.mp4', img:'img/events/wax-crack.jpg', alt:'Cracking the wax shell', ig:'https://www.instagram.com/p/...'}
   var INSTAGRAM_URL = '';        // your Instagram profile, for the "Follow us" link
+  // Horizontal catalogue: swipe on phones, arrows on computers; shows "1–2 of 5" so people know there's more.
+  function scroller(track, prev, next, pos){
+    function card(){ var c = track.firstElementChild; return c ? c.getBoundingClientRect().width + 14 : 300; }
+    function update(){
+      prev.disabled = track.scrollLeft < 8; next.disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8;
+      if (pos) { var n = track.children.length, w = card(), a = Math.min(n, Math.round(track.scrollLeft / w) + 1), b = Math.min(n, a + Math.max(1, Math.floor((track.clientWidth + 14) / w)) - 1); pos.textContent = n > 1 ? (a === b ? a : a + '–' + b) + ' of ' + n : ''; }
+      var hideNav = track.scrollWidth <= track.clientWidth + 8; prev.hidden = next.hidden = hideNav;
+    }
+    prev.addEventListener('click', function(){ track.scrollBy({left:-card(), behavior:'smooth'}); });
+    next.addEventListener('click', function(){ track.scrollBy({left:card(), behavior:'smooth'}); });
+    track.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
+    track.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); setTimeout(update, 300);
+  }
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
-    REVIEWS.forEach(function(r){
-      var c = el('figure','rv-card'), n = Math.max(0, Math.min(5, r.stars || 0));
-      if (n) { var st = el('p','rv-stars', '★★★★★'.slice(0, n)); st.setAttribute('aria-label', n + ' out of 5 stars'); c.appendChild(st); }
-      var q = el('blockquote'); r.text.split('\n').forEach(function(t){ q.appendChild(el('p', null, t)); }); c.appendChild(q);
-      var cap = el('figcaption'), who = r.url ? el('a', null, r.name) : el('b', null, r.name);
-      if (r.url) { who.href = r.url; who.target = '_blank'; who.rel = 'noopener'; who.setAttribute('aria-label', r.name + '’s review on Google (opens in a new tab)'); }
-      cap.appendChild(who); cap.appendChild(el('span', null, 'Google review' + (r.when ? ' · ' + r.when : '') + ' · at a Tom & Stefanie outlet'));
-      c.appendChild(cap); grid.appendChild(c);
+    REVIEWS.forEach(function(r, idx){
+      var li = el('li','rv-card'), n = Math.max(0, Math.min(5, r.stars || 0));
+      li.setAttribute('aria-label', 'Review ' + (idx + 1) + ' of ' + REVIEWS.length + ', by ' + r.name);
+      var top = el('div','rv-top'), av = el('span','rv-av', r.name.charAt(0)); av.setAttribute('aria-hidden','true');
+      var who = el('div','rv-who'), nm = r.url ? el('a','rv-name', r.name) : el('b','rv-name', r.name);
+      if (r.url) { nm.href = r.url; nm.target = '_blank'; nm.rel = 'noopener'; nm.setAttribute('aria-label', r.name + '’s review on Google (opens in a new tab)'); }
+      who.appendChild(nm); who.appendChild(el('span','rv-meta', (r.when ? r.when + ' · ' : '') + 'Tom & Stefanie outlet'));
+      var g = el('span','rv-g','G'); g.setAttribute('title','Google review'); g.setAttribute('aria-label','Google review');
+      top.appendChild(av); top.appendChild(who); top.appendChild(g); li.appendChild(top);
+      if (n) { var st = el('p','rv-stars', '★★★★★'.slice(0, n)); st.setAttribute('aria-label', n + ' out of 5 stars'); li.appendChild(st); }
+      var q = el('blockquote','rv-text'); r.text.split('\n').forEach(function(t){ q.appendChild(el('p', null, t)); }); li.appendChild(q);
+      grid.appendChild(li);
+      // Long reviews show 5 lines with "Read more"
+      requestAnimationFrame(function(){
+        if (q.scrollHeight <= q.clientHeight + 2) return;
+        var more = el('button','rv-more','Read more'); more.type = 'button'; more.setAttribute('aria-expanded','false');
+        more.addEventListener('click', function(){ var open = q.classList.toggle('open'); more.textContent = open ? 'Show less' : 'Read more'; more.setAttribute('aria-expanded', String(open)); });
+        li.appendChild(more);
+      });
     });
     grid.hidden = !REVIEWS.length; $('rv-empty').hidden = !!REVIEWS.length;
+    scroller(grid, $('rv-prev'), $('rv-next'), $('rv-pos'));
     if (GOOGLE_REVIEWS_URL) { $('google-reviews').href = GOOGLE_REVIEWS_URL; $('google-reviews').hidden = false; }
     if (INSTAGRAM_URL) { $('ig-follow').href = INSTAGRAM_URL; $('ig-follow').hidden = false; }
     // Videos play (muted) only while mostly on screen
@@ -623,11 +643,9 @@
       if (it.ig) { var a = el('a','reel-ig','View on Instagram'); a.href = it.ig; a.target = '_blank'; a.rel = 'noopener'; li.appendChild(a); }
       track.appendChild(li);
     });
-    function step(d){ var w = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width + 12 : 300; track.scrollBy({left:d * w, behavior:'smooth'}); }
-    function ends(){ $('reel-prev').disabled = track.scrollLeft < 8; $('reel-next').disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8; }
-    $('reel-prev').addEventListener('click', function(){ step(-1); });
-    $('reel-next').addEventListener('click', function(){ step(1); });
-    track.addEventListener('scroll', ends, {passive:true}); window.addEventListener('resize', ends); setTimeout(ends, 300);
+    // Until the videos are added, small empty tiles hold their place
+    if (!REEL.length) for (var k = 0; k < 4; k++) { var ph = el('li','reel-item reel-soon'); ph.appendChild(icon('i-camera')); ph.appendChild(el('span', null, 'Video coming soon')); track.appendChild(ph); }
+    scroller(track, $('reel-prev'), $('reel-next'), null);
   }
   renderReviews();
   function makeStack(root, onStep){

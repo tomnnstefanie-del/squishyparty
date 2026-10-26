@@ -1752,39 +1752,53 @@ body.ready-view .wiz-bar{display:none!important}
 }
 /* v30 SEO hero kicker, reviews and event photos */
 .h1-kicker{display:block;margin-bottom:14px;font-size:.8125rem;line-height:1.3}
-.reviews .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
-.reviews .section-head>div{flex:1 1 320px;align-self:stretch}
-#google-reviews[hidden]{display:none}
-.rv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.rv-grid[hidden]{display:none}
-.rv-card{margin:0;padding:22px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;gap:10px}
-.rv-stars{margin:0;color:#e0a100;letter-spacing:2px;font-size:1.05rem}
-.rv-card blockquote{margin:0;color:var(--ink-2);line-height:1.55}
-.rv-card blockquote p{margin:0}
-.rv-card figcaption{margin-top:auto;font-weight:700;font-size:.875rem;color:var(--muted)}
+.rv-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px 20px;flex-wrap:wrap;margin-bottom:18px}
+.rv-head h2{margin:0}
+.rv-controls{display:flex;align-items:center;gap:8px}
+.rv-controls [hidden]{display:none}
+.rv-pos{font-weight:700;font-size:.875rem;color:var(--muted);min-width:56px;text-align:right}
+.rv-track,.reel{list-style:none;margin:0 -16px;padding:6px 16px 14px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:flex-start}
+.rv-track::-webkit-scrollbar,.reel::-webkit-scrollbar{display:none}
+.rv-track[hidden]{display:none}
+.rv-track:focus-visible,.reel:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px}
+.rv-card{flex:0 0 min(340px,82vw);scroll-snap-align:start;padding:18px 20px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column;gap:10px;transition:transform .2s ease,box-shadow .2s ease}
+.rv-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md),inset 0 0 0 1.5px var(--cobalt-100)}
+.rv-top{display:flex;align-items:center;gap:12px}
+.rv-av{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;color:#fff;background:var(--cobalt)}
+.rv-card:nth-child(3n+2) .rv-av{background:var(--rose)}
+.rv-card:nth-child(3n+3) .rv-av{background:#0f8a7e}
+.rv-who{display:flex;flex-direction:column;min-width:0;flex:1}
+.rv-name{font-weight:800;color:var(--ink);text-decoration:none}
+a.rv-name{color:var(--cobalt)}
+a.rv-name:hover{text-decoration:underline}
+.rv-meta{font-size:.8125rem;color:var(--muted)}
+.rv-g{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:900;font-size:.9375rem;color:#4285f4;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.rv-stars{margin:0;color:#e0a100;letter-spacing:2px;font-size:1rem;line-height:1}
+.rv-text{margin:0;color:var(--ink-2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.rv-text.open{display:block}
+.rv-text p{margin:0}
+.rv-text p+p{margin-top:8px}
+.rv-more{align-self:flex-start;border:0;background:none;padding:6px 0;min-height:32px;font:inherit;font-weight:800;font-size:.875rem;color:var(--cobalt);cursor:pointer}
 .rv-empty{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:var(--r-md);background:var(--lemon-50);color:var(--ink-2)}
 .rv-empty[hidden]{display:none}
 .rv-empty .icon{width:28px;height:28px;color:#c9a800;flex:none}
 .rv-empty div{display:flex;flex-direction:column;gap:2px}
-.rv-card figcaption{display:flex;flex-direction:column;gap:2px}
-.rv-card figcaption a,.rv-card figcaption b{color:var(--cobalt);font-weight:800}
-.rv-card figcaption span{font-weight:600;font-size:.8125rem}
-.rv-card blockquote p+p{margin-top:8px}
-.reel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:36px 0 14px}
-.ev-h{margin:0;font-size:1.25rem;color:var(--ink)}
+.reel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:26px 0 10px}
+.ev-h{margin:0;font-size:1.125rem;color:var(--ink)}
 .reel-nav{display:flex;align-items:center;gap:8px}
+.reel-nav [hidden]{display:none}
 .reel-follow{font-weight:800;color:var(--cobalt);margin-right:6px}
-.reel-follow[hidden]{display:none}
-.reel-btn{width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line-2);color:var(--cobalt);display:grid;place-items:center;cursor:pointer}
+.reel-btn{width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line-2);color:var(--cobalt);display:grid;place-items:center;cursor:pointer;flex:none}
 .reel-btn:disabled{opacity:.35;cursor:default}
 .reel-btn .icon{width:18px;height:18px}
-.reel{list-style:none;margin:0 -16px;padding:4px 16px 12px;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.reel::-webkit-scrollbar{display:none}
-.reel:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px}
-.reel-item{position:relative;flex:0 0 clamp(220px,28vw,300px);aspect-ratio:9/16;border-radius:var(--r-lg);overflow:hidden;background:var(--ink);scroll-snap-align:start;box-shadow:var(--shadow-sm)}
+.reel{gap:10px}
+.reel-item{position:relative;flex:0 0 140px;aspect-ratio:9/16;border-radius:var(--r-md);overflow:hidden;background:var(--ink);scroll-snap-align:start;box-shadow:var(--shadow-sm)}
 .reel-item img,.reel-item video{width:100%;height:100%;object-fit:cover;display:block}
-.reel-ig{position:absolute;left:12px;bottom:12px;padding:8px 12px;border-radius:999px;background:rgba(16,23,58,.72);color:#fff;font-weight:700;font-size:.8125rem;text-decoration:none;min-height:36px;display:inline-flex;align-items:center}
-@media (max-width:640px){.reel-item{flex-basis:68vw}.reel-head{margin-top:28px}.reel-btn{display:none}}
+.reel-soon{background:var(--cobalt-50);border:1.5px dashed var(--cobalt-100);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.75rem;font-weight:700;text-align:center;padding:10px}
+.reel-soon .icon{width:22px;height:22px;color:var(--cobalt)}
+.reel-ig{position:absolute;left:8px;right:8px;bottom:8px;justify-content:center;padding:6px 8px;border-radius:999px;background:rgba(16,23,58,.72);color:#fff;font-weight:700;font-size:.75rem;text-decoration:none;min-height:32px;display:flex;align-items:center}
+@media (max-width:640px){.reel-item{flex-basis:116px}.reel-head{margin-top:22px}.reel-btn{display:none}.rv-pos{text-align:left;min-width:0}.rv-head{margin-bottom:12px}}
+@media (prefers-reduced-motion:reduce){.rv-card{transition:none}.rv-card:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -2063,13 +2077,21 @@ body.ready-view .wiz-bar{display:none!important}
   <!-- Reviews and photos from real parties. Fill REVIEWS / EVENT_PHOTOS in src/app.js: never invent a review. -->
   <section class="section reviews" id="reviews" aria-labelledby="reviews-h">
     <div class="wrap">
-      <div class="section-head"><div><p class="eyebrow">Parents and teams</p><h2 id="reviews-h">What families say about making squishies with us.</h2></div><a class="btn btn-ghost" id="google-reviews" href="#" target="_blank" rel="noopener" hidden>Read our Google reviews <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
-      <div class="rv-grid" id="rv-grid"></div>
+      <div class="rv-head">
+        <div><p class="eyebrow">Parents and teams</p><h2 id="reviews-h">What families say about making squishies with us.</h2></div>
+        <div class="rv-controls">
+          <a class="btn btn-ghost" id="google-reviews" href="#" target="_blank" rel="noopener" hidden>Read our Google reviews</a>
+          <span class="rv-pos" id="rv-pos" aria-live="polite"></span>
+          <button type="button" class="reel-btn" id="rv-prev" aria-label="Previous reviews"><svg class="icon" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+          <button type="button" class="reel-btn" id="rv-next" aria-label="Next reviews"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
+      </div>
+      <ul class="rv-track" id="rv-grid" aria-label="Customer reviews" tabindex="0"></ul>
       <div class="rv-empty" id="rv-empty" hidden><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><div><b>Reviews from our parties will appear here.</b><span>Had a squishy party with us? We’d love to hear how it went.</span></div></div>
       <div class="reel-head"><h3 class="ev-h" id="events-h">From our Instagram</h3>
         <div class="reel-nav"><a class="reel-follow" id="ig-follow" href="#" target="_blank" rel="noopener" hidden>Follow us</a>
-          <button type="button" class="reel-btn" id="reel-prev" aria-label="Previous"><svg class="icon" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
-          <button type="button" class="reel-btn" id="reel-next" aria-label="Next"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></div>
+          <button type="button" class="reel-btn" id="reel-prev" aria-label="Previous videos"><svg class="icon" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+          <button type="button" class="reel-btn" id="reel-next" aria-label="Next videos"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></div>
       <ul class="reel" id="reel" aria-labelledby="events-h" tabindex="0"></ul>
     </div>
   </section>
@@ -2988,25 +3010,45 @@ body.ready-view .wiz-bar{display:none!important}
   var GOOGLE_REVIEWS_URL = '';   // the outlet's Google reviews page, to show the "Read our Google reviews" button
   /* Swipeable reel of our Instagram posts. Each item: a video file (public/video/, .mp4, portrait 9:16, muted) with a
      poster image, or a photo; ig = the post's Instagram link. Only share what you're allowed to (children's faces need consent). */
-  var REEL = [
-    {img:'img/events/making-slime.webp', alt:'A child stretching glittery blue slime with pastel pearls', ig:''},
-    {img:'img/making/1.jpg', alt:'Pots of pastel pink, aqua blue and lavender slime bases', ig:''},
-    {img:'img/how/wax.jpg', alt:'Wax Cracking: a squishy coated in wax, ready to crack', ig:''},
-    {img:'img/making/5.jpg', alt:'Decorated take-home squishy capsules', ig:''}
-  ];
+  var REEL = [];                 // e.g. {video:'video/wax-crack.mp4', img:'img/events/wax-crack.jpg', alt:'Cracking the wax shell', ig:'https://www.instagram.com/p/...'}
   var INSTAGRAM_URL = '';        // your Instagram profile, for the "Follow us" link
+  // Horizontal catalogue: swipe on phones, arrows on computers; shows "1–2 of 5" so people know there's more.
+  function scroller(track, prev, next, pos){
+    function card(){ var c = track.firstElementChild; return c ? c.getBoundingClientRect().width + 14 : 300; }
+    function update(){
+      prev.disabled = track.scrollLeft < 8; next.disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8;
+      if (pos) { var n = track.children.length, w = card(), a = Math.min(n, Math.round(track.scrollLeft / w) + 1), b = Math.min(n, a + Math.max(1, Math.floor((track.clientWidth + 14) / w)) - 1); pos.textContent = n > 1 ? (a === b ? a : a + '–' + b) + ' of ' + n : ''; }
+      var hideNav = track.scrollWidth <= track.clientWidth + 8; prev.hidden = next.hidden = hideNav;
+    }
+    prev.addEventListener('click', function(){ track.scrollBy({left:-card(), behavior:'smooth'}); });
+    next.addEventListener('click', function(){ track.scrollBy({left:card(), behavior:'smooth'}); });
+    track.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
+    track.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); setTimeout(update, 300);
+  }
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
-    REVIEWS.forEach(function(r){
-      var c = el('figure','rv-card'), n = Math.max(0, Math.min(5, r.stars || 0));
-      if (n) { var st = el('p','rv-stars', '★★★★★'.slice(0, n)); st.setAttribute('aria-label', n + ' out of 5 stars'); c.appendChild(st); }
-      var q = el('blockquote'); r.text.split('\n').forEach(function(t){ q.appendChild(el('p', null, t)); }); c.appendChild(q);
-      var cap = el('figcaption'), who = r.url ? el('a', null, r.name) : el('b', null, r.name);
-      if (r.url) { who.href = r.url; who.target = '_blank'; who.rel = 'noopener'; who.setAttribute('aria-label', r.name + '’s review on Google (opens in a new tab)'); }
-      cap.appendChild(who); cap.appendChild(el('span', null, 'Google review' + (r.when ? ' · ' + r.when : '') + ' · at a Tom & Stefanie outlet'));
-      c.appendChild(cap); grid.appendChild(c);
+    REVIEWS.forEach(function(r, idx){
+      var li = el('li','rv-card'), n = Math.max(0, Math.min(5, r.stars || 0));
+      li.setAttribute('aria-label', 'Review ' + (idx + 1) + ' of ' + REVIEWS.length + ', by ' + r.name);
+      var top = el('div','rv-top'), av = el('span','rv-av', r.name.charAt(0)); av.setAttribute('aria-hidden','true');
+      var who = el('div','rv-who'), nm = r.url ? el('a','rv-name', r.name) : el('b','rv-name', r.name);
+      if (r.url) { nm.href = r.url; nm.target = '_blank'; nm.rel = 'noopener'; nm.setAttribute('aria-label', r.name + '’s review on Google (opens in a new tab)'); }
+      who.appendChild(nm); who.appendChild(el('span','rv-meta', (r.when ? r.when + ' · ' : '') + 'Tom & Stefanie outlet'));
+      var g = el('span','rv-g','G'); g.setAttribute('title','Google review'); g.setAttribute('aria-label','Google review');
+      top.appendChild(av); top.appendChild(who); top.appendChild(g); li.appendChild(top);
+      if (n) { var st = el('p','rv-stars', '★★★★★'.slice(0, n)); st.setAttribute('aria-label', n + ' out of 5 stars'); li.appendChild(st); }
+      var q = el('blockquote','rv-text'); r.text.split('\n').forEach(function(t){ q.appendChild(el('p', null, t)); }); li.appendChild(q);
+      grid.appendChild(li);
+      // Long reviews show 5 lines with "Read more"
+      requestAnimationFrame(function(){
+        if (q.scrollHeight <= q.clientHeight + 2) return;
+        var more = el('button','rv-more','Read more'); more.type = 'button'; more.setAttribute('aria-expanded','false');
+        more.addEventListener('click', function(){ var open = q.classList.toggle('open'); more.textContent = open ? 'Show less' : 'Read more'; more.setAttribute('aria-expanded', String(open)); });
+        li.appendChild(more);
+      });
     });
     grid.hidden = !REVIEWS.length; $('rv-empty').hidden = !!REVIEWS.length;
+    scroller(grid, $('rv-prev'), $('rv-next'), $('rv-pos'));
     if (GOOGLE_REVIEWS_URL) { $('google-reviews').href = GOOGLE_REVIEWS_URL; $('google-reviews').hidden = false; }
     if (INSTAGRAM_URL) { $('ig-follow').href = INSTAGRAM_URL; $('ig-follow').hidden = false; }
     // Videos play (muted) only while mostly on screen
@@ -3026,11 +3068,9 @@ body.ready-view .wiz-bar{display:none!important}
       if (it.ig) { var a = el('a','reel-ig','View on Instagram'); a.href = it.ig; a.target = '_blank'; a.rel = 'noopener'; li.appendChild(a); }
       track.appendChild(li);
     });
-    function step(d){ var w = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width + 12 : 300; track.scrollBy({left:d * w, behavior:'smooth'}); }
-    function ends(){ $('reel-prev').disabled = track.scrollLeft < 8; $('reel-next').disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8; }
-    $('reel-prev').addEventListener('click', function(){ step(-1); });
-    $('reel-next').addEventListener('click', function(){ step(1); });
-    track.addEventListener('scroll', ends, {passive:true}); window.addEventListener('resize', ends); setTimeout(ends, 300);
+    // Until the videos are added, small empty tiles hold their place
+    if (!REEL.length) for (var k = 0; k < 4; k++) { var ph = el('li','reel-item reel-soon'); ph.appendChild(icon('i-camera')); ph.appendChild(el('span', null, 'Video coming soon')); track.appendChild(ph); }
+    scroller(track, $('reel-prev'), $('reel-next'), null);
   }
   renderReviews();
   function makeStack(root, onStep){
