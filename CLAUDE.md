@@ -1,6 +1,6 @@
 # Confetti Club (by Tom & Stefanie): project rules
 
-Brand: **Confetti Club**, "Trending fun bonding activities for kids and kidults!". The activity is still called Squishy DIY.
+Brand: **Confetti Club**, "Trending activities for birthday parties & team bonding". The activity is still called Squishy DIY.
 
 Kids' (and company) squishy-making party planner. Live at https://squishyparty.vercel.app.
 Every push to `main` deploys to production on Vercel within about a minute. There is no staging step, so follow the workflow below.

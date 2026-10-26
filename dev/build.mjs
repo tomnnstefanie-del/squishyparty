@@ -21,7 +21,7 @@ const markup = src('markup.html');
 // <head> (meta, fonts, base styles) comes from base.html
 let head = base.slice(0, base.indexOf('</style>') + '</style>'.length);
 const TITLE = 'Confetti Club | Squishy-Making Birthday Parties &amp; Team Bonding in Singapore';
-const DESC = 'Trending fun bonding activities for kids and kidults! Squishy-making parties at your home, condo or venue in Singapore, from $16 per person.';
+const DESC = 'Trending activities for birthday parties and team bonding in Singapore. Hosted squishy-making at your home, office or venue, from $16 per person.';
 head = replaceAll(head, '<title>Squishy Party · Tom &amp; Stefanie</title>', '<title>' + TITLE + '</title>');
 head = head.replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="' + DESC + '">');
 if (!head.includes(DESC)) throw new Error('The meta description was not replaced');
@@ -31,7 +31,7 @@ const text = (h) => h.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s
 const faq = [...markup.matchAll(/<details class="acc"(?: open)?><summary>(.*?)<\/summary><div class="acc-body">(.*?)<\/div><\/details>/g)]
   .map((m) => ({ '@type': 'Question', name: text(m[1]), acceptedAnswer: { '@type': 'Answer', text: text(m[2]) } }));
 if (faq.length < 5) throw new Error('FAQ questions were not found for the structured data');
-const org = { '@type': 'Organization', '@id': SITE + '/#org', name: 'Confetti Club', alternateName: 'Confetti Club by Tom & Stefanie', slogan: 'Trending fun bonding activities for kids and kidults!', url: SITE + '/', logo: SITE + '/img/logo.webp' };
+const org = { '@type': 'Organization', '@id': SITE + '/#org', name: 'Confetti Club', alternateName: 'Confetti Club by Tom & Stefanie', slogan: 'Trending activities for birthday parties & team bonding', url: SITE + '/', logo: SITE + '/img/logo.webp' };
 const ld = { '@context': 'https://schema.org', '@graph': [
   org,
   { '@type': 'WebSite', '@id': SITE + '/#site', url: SITE + '/', name: 'Confetti Club', publisher: { '@id': org['@id'] }, inLanguage: 'en-SG' },
