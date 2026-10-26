@@ -103,7 +103,7 @@ PostHog runs **without cookies** (`persistence: 'memory'`) with session recordin
 
 | Event | Sent when | Properties |
 |---|---|---|
-| `planner_opened` | "I want a party" is pressed | none |
+| `planner_opened` | "Build my party" is pressed | none |
 | `step_viewed` | a planner step is shown | `step` (1–4; 5 = the "Get ready" page), `step_name` |
 | `planner_exited` | they leave the planner | `at_step`, `step_name` |
 | `home_tab_viewed` | a home tab is opened (How it works, On the day, Safety, FAQ) | `tab` |

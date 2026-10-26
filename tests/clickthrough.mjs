@@ -21,7 +21,7 @@ async function run(label, width, setup){
   if (width>1080){ await f.click('.nav a[data-tab-link=tab-faq]'); ok('nav link -> FAQ tab', await sel('#tab-faq')==='true'); await f.click('#tab-how'); }
   ok('reviews: swipeable catalogue of 2 Google reviews; Instagram tiles are empty placeholders', await vis('#reviews') && (await f.locator('#rv-grid .rv-card').count())===2 && !(await vis('#rv-empty')) && await f.evaluate(()=>getComputedStyle(document.getElementById('rv-grid')).overflowX==='auto') && (await f.locator('#reel .reel-soon').count())===4 && (await f.locator('#reel img').count())===0);
   ok('timeline has 3 steps and partner cards', await f.evaluate(()=>document.querySelectorAll('#how-tl .tl-step').length===3 && document.querySelectorAll('.tl-vcard').length>0));
-  await f.click(width>640 ? '.hero-actions a.btn-primary' : '.mobile-cta a'); ok('I want a party', await vis('#wstep-1'));
+  await f.click(width>640 ? '.hero-actions a.btn-primary' : '.mobile-cta a'); ok('Build my party', await vis('#wstep-1'));
   const c0=+(await f.inputValue('#participants')); await f.click('[data-step=participants][data-d="1"]'); ok('participants +', +(await f.inputValue('#participants'))===c0+1);
   await f.click('[data-step=participants][data-d="-1"]');
   await f.click('#wstep-1 details summary'); ok('when & where dropdown closes', !(await f.evaluate(()=>document.querySelector('#wstep-1 details').open))); await f.click('#wstep-1 details summary');
