@@ -1766,13 +1766,25 @@ body.ready-view .wiz-bar{display:none!important}
 .rv-empty[hidden]{display:none}
 .rv-empty .icon{width:28px;height:28px;color:#c9a800;flex:none}
 .rv-empty div{display:flex;flex-direction:column;gap:2px}
-.ev-h{margin:36px 0 14px;font-size:1.25rem;color:var(--ink)}
-.ev-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.ev-item{border-radius:var(--r-md);overflow:hidden;aspect-ratio:4/3;background:var(--cobalt-50)}
-.ev-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
-.ev-item:hover img{transform:scale(1.04)}
-@media (max-width:640px){.ev-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ev-h{margin-top:28px}}
-@media (prefers-reduced-motion:reduce){.ev-item img{transition:none}}
+.rv-card figcaption{display:flex;flex-direction:column;gap:2px}
+.rv-card figcaption a,.rv-card figcaption b{color:var(--cobalt);font-weight:800}
+.rv-card figcaption span{font-weight:600;font-size:.8125rem}
+.rv-card blockquote p+p{margin-top:8px}
+.reel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:36px 0 14px}
+.ev-h{margin:0;font-size:1.25rem;color:var(--ink)}
+.reel-nav{display:flex;align-items:center;gap:8px}
+.reel-follow{font-weight:800;color:var(--cobalt);margin-right:6px}
+.reel-follow[hidden]{display:none}
+.reel-btn{width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line-2);color:var(--cobalt);display:grid;place-items:center;cursor:pointer}
+.reel-btn:disabled{opacity:.35;cursor:default}
+.reel-btn .icon{width:18px;height:18px}
+.reel{list-style:none;margin:0 -16px;padding:4px 16px 12px;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.reel::-webkit-scrollbar{display:none}
+.reel:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px}
+.reel-item{position:relative;flex:0 0 clamp(220px,28vw,300px);aspect-ratio:9/16;border-radius:var(--r-lg);overflow:hidden;background:var(--ink);scroll-snap-align:start;box-shadow:var(--shadow-sm)}
+.reel-item img,.reel-item video{width:100%;height:100%;object-fit:cover;display:block}
+.reel-ig{position:absolute;left:12px;bottom:12px;padding:8px 12px;border-radius:999px;background:rgba(16,23,58,.72);color:#fff;font-weight:700;font-size:.8125rem;text-decoration:none;min-height:36px;display:inline-flex;align-items:center}
+@media (max-width:640px){.reel-item{flex-basis:68vw}.reel-head{margin-top:28px}.reel-btn{display:none}}
 </style>
 </head>
 <body>
@@ -2051,11 +2063,14 @@ body.ready-view .wiz-bar{display:none!important}
   <!-- Reviews and photos from real parties. Fill REVIEWS / EVENT_PHOTOS in src/app.js: never invent a review. -->
   <section class="section reviews" id="reviews" aria-labelledby="reviews-h">
     <div class="wrap">
-      <div class="section-head"><div><p class="eyebrow">Parents and teams</p><h2 id="reviews-h">What families say about their squishy party.</h2></div><a class="btn btn-ghost" id="google-reviews" href="#" target="_blank" rel="noopener" hidden>Read our Google reviews <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="section-head"><div><p class="eyebrow">Parents and teams</p><h2 id="reviews-h">What families say about making squishies with us.</h2></div><a class="btn btn-ghost" id="google-reviews" href="#" target="_blank" rel="noopener" hidden>Read our Google reviews <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
       <div class="rv-grid" id="rv-grid"></div>
       <div class="rv-empty" id="rv-empty" hidden><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><div><b>Reviews from our parties will appear here.</b><span>Had a squishy party with us? We’d love to hear how it went.</span></div></div>
-      <h3 class="ev-h" id="events-h">Photos from our parties</h3>
-      <ul class="ev-grid" id="ev-grid" aria-labelledby="events-h"></ul>
+      <div class="reel-head"><h3 class="ev-h" id="events-h">From our Instagram</h3>
+        <div class="reel-nav"><a class="reel-follow" id="ig-follow" href="#" target="_blank" rel="noopener" hidden>Follow us</a>
+          <button type="button" class="reel-btn" id="reel-prev" aria-label="Previous"><svg class="icon" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+          <button type="button" class="reel-btn" id="reel-next" aria-label="Next"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></div>
+      <ul class="reel" id="reel" aria-labelledby="events-h" tabindex="0"></ul>
     </div>
   </section>
 
@@ -2964,39 +2979,58 @@ body.ready-view .wiz-bar{display:none!important}
     WAX_STEP,
     {img:'img/making/5.jpg', title:'Decorate your capsule box', caption:'Rhinestone stickers, DIY, then it’s theirs to take home.'}
   ];
-  /* Reviews: copy real reviews word for word (with the customer's OK), e.g.
-     {name:'Sarah T.', text:'The kids loved it…', stars:5, when:'Oct 2026', source:'Google'}
-     Never write or edit a review. While the list is empty, an honest "reviews will appear here" note shows. */
-  var REVIEWS = [];
-  var GOOGLE_REVIEWS_URL = '';   // your Google Business profile link, to show the "Read our Google reviews" button
-  /* Photos from real events (landscape .jpg in public/img/events/, about 1200 x 900). Only use photos you're allowed to share,
-     and avoid children's faces unless parents agreed. */
-  var EVENT_PHOTOS = [
-    {img:'img/making/1.jpg', alt:'Pots of pastel pink, aqua blue and lavender slime bases'},
-    {img:'img/making/3.jpg', alt:'A squishy being made and customised'},
-    {img:'img/making/4.jpg', alt:'Squishing a finished squishy'},
-    {img:'img/how/wax.jpg', alt:'Wax Cracking: a squishy coated in wax, ready to crack'},
-    {img:'img/making/2.jpg', alt:'Toppings and charms laid out for the guests'},
-    {img:'img/making/5.jpg', alt:'Decorated take-home squishy capsules'}
+  /* Reviews: real Google reviews, copied word for word (never edited or invented). Our parties run from the
+     Tom & Stefanie outlets, so these are the outlets' Google reviews. url = the review's link on Google. */
+  var REVIEWS = [
+    {name:'Hazel Tan', stars:5, when:'Sep 2026', url:'', text:'I would like to give a special shout-out to the staff ( Kay Khine) who assisted me during my visit with my girls making squishy . She was incredibly friendly, helpful, and genuinely passionate about her job. Her warm attitude and willingness to assist made the whole shopping experience so pleasant and enjoyable.\nIt’s not often you come across someone who takes such pride in what they do. Her positive energy and excellent service really stood out, and she definitely deserves recognition for it. Thank you for making my visit such a wonderful experience!'},
+    {name:'Mich Lim', stars:5, when:'Sep 2026', url:'', text:'Very approachable and helpful staff! My girl thoroughly enjoyed the slime/squishy making activity. 😊'}
   ];
+  var GOOGLE_REVIEWS_URL = '';   // the outlet's Google reviews page, to show the "Read our Google reviews" button
+  /* Swipeable reel of our Instagram posts. Each item: a video file (public/video/, .mp4, portrait 9:16, muted) with a
+     poster image, or a photo; ig = the post's Instagram link. Only share what you're allowed to (children's faces need consent). */
+  var REEL = [
+    {img:'img/events/making-slime.webp', alt:'A child stretching glittery blue slime with pastel pearls', ig:''},
+    {img:'img/making/1.jpg', alt:'Pots of pastel pink, aqua blue and lavender slime bases', ig:''},
+    {img:'img/how/wax.jpg', alt:'Wax Cracking: a squishy coated in wax, ready to crack', ig:''},
+    {img:'img/making/5.jpg', alt:'Decorated take-home squishy capsules', ig:''}
+  ];
+  var INSTAGRAM_URL = '';        // your Instagram profile, for the "Follow us" link
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
     REVIEWS.forEach(function(r){
       var c = el('figure','rv-card'), n = Math.max(0, Math.min(5, r.stars || 0));
       if (n) { var st = el('p','rv-stars', '★★★★★'.slice(0, n)); st.setAttribute('aria-label', n + ' out of 5 stars'); c.appendChild(st); }
-      var q = el('blockquote'); q.appendChild(el('p', null, r.text)); c.appendChild(q);
-      c.appendChild(el('figcaption', null, r.name + (r.when ? ' · ' + r.when : '') + (r.source ? ' · ' + r.source : '')));
-      grid.appendChild(c);
+      var q = el('blockquote'); r.text.split('\n').forEach(function(t){ q.appendChild(el('p', null, t)); }); c.appendChild(q);
+      var cap = el('figcaption'), who = r.url ? el('a', null, r.name) : el('b', null, r.name);
+      if (r.url) { who.href = r.url; who.target = '_blank'; who.rel = 'noopener'; who.setAttribute('aria-label', r.name + '’s review on Google (opens in a new tab)'); }
+      cap.appendChild(who); cap.appendChild(el('span', null, 'Google review' + (r.when ? ' · ' + r.when : '') + ' · at a Tom & Stefanie outlet'));
+      c.appendChild(cap); grid.appendChild(c);
     });
     grid.hidden = !REVIEWS.length; $('rv-empty').hidden = !!REVIEWS.length;
     if (GOOGLE_REVIEWS_URL) { $('google-reviews').href = GOOGLE_REVIEWS_URL; $('google-reviews').hidden = false; }
-    var ev = $('ev-grid');
-    EVENT_PHOTOS.forEach(function(ph){
-      var li = el('li','ev-item'), im = document.createElement('img');
-      im.src = ph.img; im.alt = ph.alt; im.loading = 'lazy'; im.decoding = 'async'; im.width = 600; im.height = 450;
-      im.addEventListener('error', function(){ li.remove(); });
-      li.appendChild(im); ev.appendChild(li);
+    if (INSTAGRAM_URL) { $('ig-follow').href = INSTAGRAM_URL; $('ig-follow').hidden = false; }
+    // Videos play (muted) only while mostly on screen
+    var track = $('reel'), seen = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){
+      es.forEach(function(e){ var v = e.target; if (e.isIntersecting && e.intersectionRatio > .6) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } else v.pause(); });
+    }, {threshold:[0,.6,1]}) : null;
+    REEL.forEach(function(it, idx){
+      var li = el('li','reel-item'), m;
+      li.setAttribute('aria-label', (idx + 1) + ' of ' + REEL.length);
+      if (it.video) {
+        m = document.createElement('video'); m.src = it.video; if (it.img) m.poster = it.img;
+        m.muted = true; m.loop = true; m.playsInline = true; m.setAttribute('playsinline',''); m.preload = 'none'; m.controls = true;
+        m.setAttribute('aria-label', it.alt); if (seen) seen.observe(m);
+      } else { m = document.createElement('img'); m.src = it.img; m.alt = it.alt; m.loading = 'lazy'; m.decoding = 'async'; }
+      m.addEventListener('error', function(){ li.remove(); });
+      li.appendChild(m);
+      if (it.ig) { var a = el('a','reel-ig','View on Instagram'); a.href = it.ig; a.target = '_blank'; a.rel = 'noopener'; li.appendChild(a); }
+      track.appendChild(li);
     });
+    function step(d){ var w = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width + 12 : 300; track.scrollBy({left:d * w, behavior:'smooth'}); }
+    function ends(){ $('reel-prev').disabled = track.scrollLeft < 8; $('reel-next').disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8; }
+    $('reel-prev').addEventListener('click', function(){ step(-1); });
+    $('reel-next').addEventListener('click', function(){ step(1); });
+    track.addEventListener('scroll', ends, {passive:true}); window.addEventListener('resize', ends); setTimeout(ends, 300);
   }
   renderReviews();
   function makeStack(root, onStep){

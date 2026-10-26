@@ -239,11 +239,14 @@
   <!-- Reviews and photos from real parties. Fill REVIEWS / EVENT_PHOTOS in src/app.js: never invent a review. -->
   <section class="section reviews" id="reviews" aria-labelledby="reviews-h">
     <div class="wrap">
-      <div class="section-head"><div><p class="eyebrow">Parents and teams</p><h2 id="reviews-h">What families say about their squishy party.</h2></div><a class="btn btn-ghost" id="google-reviews" href="#" target="_blank" rel="noopener" hidden>Read our Google reviews <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      <div class="section-head"><div><p class="eyebrow">Parents and teams</p><h2 id="reviews-h">What families say about making squishies with us.</h2></div><a class="btn btn-ghost" id="google-reviews" href="#" target="_blank" rel="noopener" hidden>Read our Google reviews <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
       <div class="rv-grid" id="rv-grid"></div>
       <div class="rv-empty" id="rv-empty" hidden><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><div><b>Reviews from our parties will appear here.</b><span>Had a squishy party with us? We’d love to hear how it went.</span></div></div>
-      <h3 class="ev-h" id="events-h">Photos from our parties</h3>
-      <ul class="ev-grid" id="ev-grid" aria-labelledby="events-h"></ul>
+      <div class="reel-head"><h3 class="ev-h" id="events-h">From our Instagram</h3>
+        <div class="reel-nav"><a class="reel-follow" id="ig-follow" href="#" target="_blank" rel="noopener" hidden>Follow us</a>
+          <button type="button" class="reel-btn" id="reel-prev" aria-label="Previous"><svg class="icon" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+          <button type="button" class="reel-btn" id="reel-next" aria-label="Next"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></div>
+      <ul class="reel" id="reel" aria-labelledby="events-h" tabindex="0"></ul>
     </div>
   </section>
 

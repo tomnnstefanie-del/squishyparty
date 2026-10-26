@@ -19,7 +19,7 @@ async function run(label, width, setup){
   await f.click('#tab-faq'); ok('home tab FAQ', await vis('#panel-faq'));
   await f.click('#panel-faq details:nth-of-type(2) summary'); ok('FAQ dropdown opens', await f.evaluate(()=>document.querySelector('#panel-faq details:nth-of-type(2)').open));
   if (width>1080){ await f.click('.nav a[data-tab-link=tab-faq]'); ok('nav link -> FAQ tab', await sel('#tab-faq')==='true'); await f.click('#tab-how'); }
-  ok('reviews section: honest empty note (no made-up reviews) and event photos', await vis('#reviews') && await vis('#rv-empty') && (await f.locator('#rv-grid .rv-card').count())===0 && (await f.locator('#ev-grid img').count())>=4);
+  ok('reviews section: 2 real Google reviews and a swipeable reel', await vis('#reviews') && (await f.locator('#rv-grid .rv-card').count())===2 && !(await vis('#rv-empty')) && (await f.locator('#reel .reel-item').count())>=3 && await f.evaluate(()=>getComputedStyle(document.getElementById('reel')).overflowX==='auto'));
   ok('timeline has 3 steps and partner cards', await f.evaluate(()=>document.querySelectorAll('#how-tl .tl-step').length===3 && document.querySelectorAll('.tl-vcard').length>0));
   await f.click(width>640 ? '.hero-actions a.btn-primary' : '.mobile-cta a'); ok('I want a party', await vis('#wstep-1'));
   const c0=+(await f.inputValue('#participants')); await f.click('[data-step=participants][data-d="1"]'); ok('participants +', +(await f.inputValue('#participants'))===c0+1);

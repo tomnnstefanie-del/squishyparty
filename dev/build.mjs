@@ -81,8 +81,8 @@ if (process.argv.includes('--preview')) {
   let prev = out, n = 0;
   for (const sub of ['making', 'how', 'cakes', 'bloom', 'events']) {
     const dir = path.join(root, 'public/img', sub);
-    for (const f of fs.readdirSync(dir).filter((x) => /\.(jpg|png)$/.test(x)).sort()) {
-      const type = f.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    for (const f of fs.readdirSync(dir).filter((x) => /\.(jpg|png|webp)$/.test(x)).sort()) {
+      const type = f.endsWith('.png') ? 'image/png' : f.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
       prev = replaceAll(prev, `'img/${sub}/${f}'`, `'data:${type};base64,${b64(`public/img/${sub}/${f}`)}'`); n++;
     }
   }
