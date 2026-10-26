@@ -1181,7 +1181,7 @@ a.rv-name:hover{text-decoration:underline}
 .offer-steps li span{display:block;color:var(--muted);font-size:.9375rem}
 .offer-terms{font-size:.8125rem;color:var(--muted);margin:12px 0 0}
 @media (max-width:640px){.offer-card{flex-direction:column;gap:14px;padding:18px;margin:0 16px}.offer-tag{width:72px;height:72px}.offer-tag b{font-size:1.5rem}.offer-body .btn{width:100%;justify-content:center}}
-/* v33 The Confetti Club: tagline wraps under the name on phones */
+/* v33 Confetti Club: tagline wraps under the name on phones */
 @media (max-width:640px){.site-header .brand-by{white-space:normal;overflow:visible;text-overflow:clip;font-size:.6875rem;line-height:1.25;max-width:240px}}
 /* v34 Confetti Club logo replaces the star mark */
 .brand{gap:12px}
