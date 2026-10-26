@@ -1885,6 +1885,10 @@ footer .wrap{padding:44px var(--gut) 24px}
 @media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
 /* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
 .retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
+/* v39 Wax Cracking card: new photo with the heater and pot on show (wash only behind the text) */
+.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(90deg,#2234b8 0%,#2234b8 42%,rgba(34,52,184,.55) 50%,rgba(34,52,184,0) 62%),url('img/how/wax-card.jpg') right 20%/58% auto no-repeat,#2234b8}
+@media (min-width:641px){.addon[for="wax"] .addon-body{max-width:48%}.addon[for="wax"] .addon-ctl{margin-left:auto}}
+@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-bottom:120px;background:linear-gradient(180deg,#2234b8 0%,#2234b8 52%,rgba(34,52,184,.4) 64%,rgba(34,52,184,0) 76%),url('img/how/wax-card-phone.jpg') center bottom/100% auto no-repeat,#2234b8}}
 </style>
 </head>
 <body>
