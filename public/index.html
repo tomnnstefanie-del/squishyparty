@@ -1870,10 +1870,6 @@ footer .brand-logo{height:48px}
 /* v37 hero kicker in the sans font, tighter top; brighter in-store photo; footer directory */
 .hero{padding-top:clamp(20px,3vw,44px)}
 .h1-kicker{display:block;font-family:var(--sans);font-weight:700;font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin-bottom:12px;line-height:1.4}
-.retail-photo::before{background:linear-gradient(100deg,rgba(11,22,64,.78) 0%,rgba(11,22,64,.5) 34%,rgba(11,22,64,0) 62%)}
-@media (max-width:640px){.retail-photo::before{background:linear-gradient(180deg,rgba(11,22,64,.78) 0%,rgba(11,22,64,.4) 45%,rgba(11,22,64,0) 75%)}}
-.retail-photo .retail-bg{filter:saturate(1.15) brightness(1.05)}
-.retail-photo > .icon{background:var(--pink);color:#fff}
 #explore{padding-bottom:clamp(24px,3vw,40px)}
 footer .wrap{padding:44px var(--gut) 24px}
 .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:28px 32px}
@@ -1887,7 +1883,8 @@ footer .wrap{padding:44px var(--gut) 24px}
 .foot-base a{color:var(--ink)}
 @media (max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}}
 @media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
-@media (min-width:641px){.retail-photo > div{max-width:52%}}
+/* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
+.retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
 </style>
 </head>
 <body>
