@@ -1290,6 +1290,31 @@
 
   // The yellow 'offline preview' notice only applies to the offline file, not the live site.
   if (isWeb()) { var pn = $('preview-notice'); if (pn) pn.hidden = true; }
+
+  /* ---------- Referrals and where people came from ----------
+     ?ref=MIA-K7Q2 is a friend's referral link (the friend's family gets nothing; the new customer gets $20 off).
+     ?src=capsule says where the link was (capsule QR sticker, Instagram...). Both are remembered for 60 days on this
+     device and sent with the request. Analytics only learns that a code or source was present, never the code. */
+  var REF = (function(){
+    var KEY = 'sp-ref', saved = {}, q = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+    if (saved.at && Date.now() - saved.at > 60 * 864e5) saved = {};
+    try { new URLSearchParams(location.search).forEach(function(v, k){ q[k] = v; }); } catch (e) {}
+    var code = String(q.ref || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 16);
+    var src = String(q.src || q.utm_source || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 24);
+    if (code) { saved.code = code; saved.at = Date.now(); track('referral_link_opened', {}); }
+    if (src) { saved.source = src; saved.at = saved.at || Date.now(); track('arrived_from', {source:src}); }
+    try { if (code || src) localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    return saved;
+  })();
+  if (REF.code) { $('ref-banner').hidden = false; $('ref-code').value = REF.code; }
+  function refHint(){
+    var v = $('ref-code').value.trim(), ok = !v || /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v), h = $('ref-hint');
+    h.textContent = !v ? 'From a friend? New customers get $20 off their first Squishy Party.' : ok ? 'Thanks! We’ll take $20 off your quotation once we’ve checked the code.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
+    h.classList.toggle('err', !ok); $('ref-code').toggleAttribute('aria-invalid', !ok);
+  }
+  $('ref-code').addEventListener('input', refHint); refHint();
+
   initHow();
   buildCards();
   buildInvite();
@@ -1370,6 +1395,8 @@
   $('wiz-next-m').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); else if (cur === LAST) $('booking-submit').click(); });
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
+  // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */
   var bf = $('booking-form'), err = $('booking-error');
@@ -1472,6 +1499,7 @@
       contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
       bookingFor: isCompany() ? 'company' : 'family',
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';

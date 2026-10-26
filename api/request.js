@@ -5,7 +5,8 @@
 import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
 import { priceRequest } from '../lib/pricing.js';
-import { buildMessage, customerGreeting, sendTelegram, sendTelegramPhoto, whatsappLink } from '../lib/telegram.js';
+import { makeReferralCode } from '../lib/referral.js';
+import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, whatsappLink } from '../lib/telegram.js';
 import { addonName } from '../lib/pricing.js';
 import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpError } from '../lib/http.js';
 import { checkVerified } from '../lib/otp.js';
@@ -44,10 +45,13 @@ export default async function handler(req, res) {
     if (!checkVerified(data.contact.email, data.emailToken)) throw new HttpError(400, 'Please verify your email address first.', 'email');
     const contact = { ...data.contact, emailVerified: true };
 
-    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents });
+    const site = (process.env.SITE_URL || 'https://squishyparty.vercel.app').replace(/\/$/, '');
+    const shareCode = makeReferralCode(contact.parentName);
+    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
-      await sendTelegram({ token, chatId, text, buttonUrl, apiBase: process.env.TELEGRAM_API_BASE || undefined });
+      const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ contact, shareCode, site }));
+      await sendTelegram({ token, chatId, text, buttonUrl, afterUrl, apiBase: process.env.TELEGRAM_API_BASE || undefined });
     } catch (e) {
       console.error('[request] telegram send failed', ref, e.message); // no personal data in logs
       throw new HttpError(502, 'We couldn’t send your request just now. Please try again in a minute.');

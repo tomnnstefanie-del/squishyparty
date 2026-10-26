@@ -1161,3 +1161,10 @@ a.rv-name:hover{text-decoration:underline}
 .reel-ig{position:absolute;left:8px;right:8px;bottom:8px;justify-content:center;padding:6px 8px;border-radius:999px;background:rgba(16,23,58,.72);color:#fff;font-weight:700;font-size:.75rem;text-decoration:none;min-height:32px;display:flex;align-items:center}
 @media (max-width:640px){.reel-item{flex-basis:116px}.reel-head{margin-top:22px}.reel-btn{display:none}.rv-pos{text-align:left;min-width:0}.rv-head{margin-bottom:12px}}
 @media (prefers-reduced-motion:reduce){.rv-card{transition:none}.rv-card:hover{transform:none}}
+/* v31 referral banner and Request step fields */
+.ref-banner{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;padding:10px 16px;background:var(--lemon);color:var(--ink);font-size:.9375rem;text-align:left}
+.ref-banner[hidden]{display:none}
+.ref-banner .icon{width:20px;height:20px;flex:none;color:var(--cobalt)}
+#ref-code{text-transform:uppercase;letter-spacing:.06em}
+#ref-hint.err{color:var(--rose)}
+.consent.returning{grid-column:1/-1;margin-top:0}

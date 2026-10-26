@@ -115,4 +115,17 @@ t('moodboard images must be small JPEG/PNG, at most 3 per item', () => {
   assert.throws(() => validateRequest(withCustom(['bl-fabric-std'], { 'bl-fabric-std': { images: [JPG, JPG, JPG, JPG] } })), (e) => e.field === 'custom');
   assert.throws(() => validateRequest(withCustom(['bl-fabric-std'], { 'bl-fabric-std': { images: ['data:image/jpeg;base64,' + 'A'.repeat(470000)] } })), (e) => e.field === 'custom');
 });
+console.log('referrals (friend gets $20 off, no database)');
+{
+  const { makeReferralCode, readReferralCode, samePerson } = await import('../lib/referral.js');
+  const code = makeReferralCode('Mia Tan');
+  t('codes look like MIA-K7Q2 and check out as ours', () => { assert.match(code, /^MIA-[A-Z2-9]{4}$/); assert.ok(readReferralCode(code.toLowerCase()).valid); });
+  t('a made-up or mistyped code is flagged', () => { const bad = code.slice(0, -1) + (code.endsWith('A') ? 'B' : 'A'); assert.ok(!readReferralCode(bad).valid); assert.ok(!readReferralCode('HELLO').valid); });
+  t('same first name as the code is flagged as a possible self-referral', () => { assert.ok(samePerson(readReferralCode(code), 'mia lim')); assert.ok(!samePerson(readReferralCode(code), 'Sarah')); });
+  const g = dateOK(); g.referral = { code, source: 'capsule', returning: true }; const vr = validateRequest(g);
+  const m = buildMessage({ ref: 'SP-1', plan: vr.plan, contact: vr.contact, price: priceRequest(vr.plan), clientTotalCents: null, referral: vr.referral, shareCode: 'SARAH-AB23', site: 'https://example.sg' });
+  t('Telegram shows the referral, source, returning flag and their own link to share', () => { assert.match(m, /Referred by a friend/); assert.match(m, /capsule QR sticker/); assert.match(m, /booked with us before/); assert.match(m, /https:\/\/example\.sg\/\?ref=SARAH-AB23/); });
+  t('a bad source value is dropped', () => { const b = dateOK(); b.referral = { source: '<script>' }; assert.equal(validateRequest(b).referral.source, ''); });
+}
+
 console.log(`\n${passed} unit tests passed`);

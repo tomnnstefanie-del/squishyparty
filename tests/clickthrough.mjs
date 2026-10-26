@@ -69,6 +69,7 @@ async function run(label, width, setup){
   await f.click('#copy-caption'); await p.waitForTimeout(200); ok('copy caption responds', (await txt('#copy-status')).length>0);
   await f.click('#inv-download'); await p.waitForTimeout(400); ok('save image responds', (await txt('#copy-status')).length>0);
   await f.click('#wiz-back'); ok('Back from Get ready -> Request', await vis('#wstep-5'));
+  await f.fill('#ref-code','nope'); ok('referral code field checks the format', (await txt('#ref-hint')).startsWith('Codes look like')); await f.fill('#ref-code','MIA-K7Q2'); ok('a well-formed code is accepted', (await txt('#ref-hint')).startsWith('Thanks'));
   await f.click('#booking-submit'); ok('submit shows validation', (await txt('#booking-error')).startsWith('Please check'));
   await f.click('#stepper li:nth-child(1) a'); await f.fill('#date','2026-12-12'); await f.click('#stepper li:nth-child(4) a');
   await f.fill('[name=address]','1 Example Road'); await f.fill('[name=postalCode]','123456'); await f.fill('[name=parentName]','Test Parent'); await f.fill('[name=email]','parent@example.com'); await f.fill('[name=phone]','8123 4567'); await f.check('[name=consent]');
