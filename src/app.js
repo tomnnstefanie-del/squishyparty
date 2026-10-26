@@ -922,7 +922,7 @@
   function makeCaption(s){
     var e = EXP[s.experience], d = invData(s), sel = s.selected.map(function(id){ return BYID[id]; });
     var who = s.childName ? s.childName + '’s ' : 'a ';
-    var lines = ['🎉 You’re invited to ' + who + (s.childAge ? ordinal(s.childAge) + ' birthday ' : 'birthday ') + 'Squishy Party! 🎉', ''];
+    var lines = ['🎉 You’re invited to ' + who + (s.childAge ? ordinal(s.childAge) + ' birthday ' : 'birthday ') + 'squishy party! 🎉', ''];
     lines.push('📅 ' + d.dateLine); lines.push('⏰ ' + d.timeLine); lines.push('📍 ' + d.venue); lines.push('');
     var make = s.experience === 'both' ? 'their very own Jelly and Crunchy squishies' : 'their very own ' + e.name + ' squishy';
     lines.push('Every little guest gets to make ' + make + ' and decorate a take-home squishy capsule with rhinestone stickers ✨' + (s.wax ? ' Then we’ll crack open colourful wax shells to reveal them!' : ''));

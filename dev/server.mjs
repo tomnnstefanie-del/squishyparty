@@ -34,4 +34,4 @@ http.createServer(async (req, res) => {
   if (!file.startsWith(path.join(root, 'public')) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.statusCode = 404; return res.end('Not found'); }
   res.setHeader('Content-Type', TYPES[path.extname(file)] || 'application/octet-stream');
   fs.createReadStream(file).pipe(res);
-}).listen(PORT, () => console.log(`Squishy Party dev server on http://localhost:${PORT}`));
+}).listen(PORT, () => console.log(`Confetti Club dev server on http://localhost:${PORT}`));
