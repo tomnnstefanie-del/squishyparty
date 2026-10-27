@@ -12,7 +12,7 @@
       <span class="brand-text"><span class="brand-by">Trending activities for birthday parties &amp; team bonding</span></span>
     </a>
     <nav class="nav" aria-label="Explore">
-      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a><a href="#companies">For companies</a><a href="#reviews">Reviews</a>
+      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a><a href="#companies">For companies</a><a href="#reviews">Reviews</a><a href="#stores">Our stores</a>
     </nav>
     <a class="btn btn-primary header-cta" href="#plan-1">Build my party</a>
   </div>
@@ -218,7 +218,7 @@
         </div>
           <div class="retail retail-photo" style="margin-top:24px"><img class="retail-bg" src="img/store.jpg" alt="" aria-hidden="true" loading="lazy">
             <div><p class="eyebrow">Try the experience in store</p><p>Currently available exclusively at <strong>Tom &amp; Stefanie</strong> retail outlets.</p></div>
-            <svg class="icon" style="width:40px;height:40px;color:var(--lemon)" aria-hidden="true"><use href="#i-store"/></svg>
+            <a class="retail-btn" href="#stores"><svg class="icon" aria-hidden="true"><use href="#i-store"/></svg><span>Our stores</span></a>
           </div>
       </div>
     </div>
@@ -258,6 +258,14 @@
   </section>
 
   <!-- Reviews and photos from real parties. Fill REVIEWS / EVENT_PHOTOS in src/app.js: never invent a review. -->
+  <!-- Our stores: filled from STORE_LIST in src/app.js -->
+  <section class="section stores" id="stores" aria-labelledby="stores-h">
+    <div class="wrap">
+      <div class="section-head"><div><p class="eyebrow">Try it in store</p><h2 id="stores-h">Our stores.</h2><p class="lead">Make a squishy at the squishy bar in any of our Tom &amp; Stefanie stores, then bring the party home.</p></div></div>
+      <div class="store-list" id="store-list"></div>
+    </div>
+  </section>
+
   <section class="section reviews" id="reviews" aria-labelledby="reviews-h">
     <div class="wrap">
       <div class="rv-head">
@@ -310,6 +318,7 @@
         <a href="#explore" data-tab-link="tab-safety">Safety</a>
         <a href="#care">Squishy care</a>
         <a href="#reviews">Reviews</a>
+        <a href="#stores">Our stores</a>
       </nav>
       <div class="foot-col">
         <h2>Partners</h2>

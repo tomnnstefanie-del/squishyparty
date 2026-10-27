@@ -1885,10 +1885,31 @@ footer .wrap{padding:44px var(--gut) 24px}
 @media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
 /* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
 .retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
-/* v39 Wax Cracking card: new photo with the heater and pot on show (wash only behind the text) */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(90deg,#2234b8 0%,#2234b8 42%,rgba(34,52,184,.55) 50%,rgba(34,52,184,0) 62%),url('img/how/wax-card.jpg') right 20%/58% auto no-repeat,#2234b8}
-@media (min-width:641px){.addon[for="wax"] .addon-body{max-width:48%}.addon[for="wax"] .addon-ctl{margin-left:auto}}
-@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-bottom:120px;background:linear-gradient(180deg,#2234b8 0%,#2234b8 52%,rgba(34,52,184,.4) 64%,rgba(34,52,184,0) 76%),url('img/how/wax-card-phone.jpg') center bottom/100% auto no-repeat,#2234b8}}
+/* v40 Wax Cracking card: compact, same wash as the in-store card, the cracking hands in view */
+.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(100deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.7) 36%,rgba(24,32,140,.12) 66%,rgba(24,32,140,0) 100%),url('img/how/wax-full.jpg') 60% 72%/cover no-repeat,#2234b8}
+.addon[for="wax"] .addon-body{max-width:58%}
+.addon[for="wax"] .addon-copy{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.88) 0%,rgba(24,32,140,.6) 50%,rgba(24,32,140,.1) 100%),url('img/how/wax-full.jpg') 50% 75%/cover no-repeat,#2234b8}.addon[for="wax"] .addon-body{max-width:none}}
+/* In-store card: shop button bottom-right */
+.retail-photo{position:relative}
+.retail-btn{position:absolute;right:20px;bottom:20px;display:inline-flex;align-items:center;gap:10px;padding:10px 16px 10px 12px;border-radius:14px;background:rgba(30,42,170,.92);color:#fff;font-weight:700;text-decoration:none;min-height:48px;box-shadow:0 6px 18px rgba(10,14,60,.3);transition:transform .15s ease,background .15s ease}
+.retail-btn .icon{width:28px;height:28px;color:var(--lemon)}
+.retail-btn:hover{background:#2234b8;transform:translateY(-2px)}
+.retail-btn:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+/* Our stores */
+.store-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.store-card{border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column}
+.store-card-ph{aspect-ratio:4/3;background:var(--cobalt-50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.8125rem;font-weight:700}
+.store-card-ph .icon{width:32px;height:32px;color:var(--cobalt)}
+.store-card-ph img{width:100%;height:100%;object-fit:cover}
+.store-card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px}
+.store-card-body h3{margin:0;font-size:1.125rem}
+.store-addr,.store-hours{margin:0;color:var(--ink-2);font-size:.9375rem}
+.store-card-body .btn{margin-top:8px;align-self:flex-start}
+@media (max-width:760px){.store-list{grid-template-columns:1fr}}
+/* Footer: a darker band than the page */
+footer{background:#efece7;border-top:0}
+.foot-base{border-top-color:#ddd8d0}
 </style>
 </head>
 <body>
@@ -1940,7 +1961,7 @@ footer .wrap{padding:44px var(--gut) 24px}
       <span class="brand-text"><span class="brand-by">Trending activities for birthday parties &amp; team bonding</span></span>
     </a>
     <nav class="nav" aria-label="Explore">
-      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a><a href="#companies">For companies</a><a href="#reviews">Reviews</a>
+      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a><a href="#companies">For companies</a><a href="#reviews">Reviews</a><a href="#stores">Our stores</a>
     </nav>
     <a class="btn btn-primary header-cta" href="#plan-1">Build my party</a>
   </div>
@@ -2146,7 +2167,7 @@ footer .wrap{padding:44px var(--gut) 24px}
         </div>
           <div class="retail retail-photo" style="margin-top:24px"><img class="retail-bg" src="img/store.jpg" alt="" aria-hidden="true" loading="lazy">
             <div><p class="eyebrow">Try the experience in store</p><p>Currently available exclusively at <strong>Tom &amp; Stefanie</strong> retail outlets.</p></div>
-            <svg class="icon" style="width:40px;height:40px;color:var(--lemon)" aria-hidden="true"><use href="#i-store"/></svg>
+            <a class="retail-btn" href="#stores"><svg class="icon" aria-hidden="true"><use href="#i-store"/></svg><span>Our stores</span></a>
           </div>
       </div>
     </div>
@@ -2186,6 +2207,14 @@ footer .wrap{padding:44px var(--gut) 24px}
   </section>
 
   <!-- Reviews and photos from real parties. Fill REVIEWS / EVENT_PHOTOS in src/app.js: never invent a review. -->
+  <!-- Our stores: filled from STORE_LIST in src/app.js -->
+  <section class="section stores" id="stores" aria-labelledby="stores-h">
+    <div class="wrap">
+      <div class="section-head"><div><p class="eyebrow">Try it in store</p><h2 id="stores-h">Our stores.</h2><p class="lead">Make a squishy at the squishy bar in any of our Tom &amp; Stefanie stores, then bring the party home.</p></div></div>
+      <div class="store-list" id="store-list"></div>
+    </div>
+  </section>
+
   <section class="section reviews" id="reviews" aria-labelledby="reviews-h">
     <div class="wrap">
       <div class="rv-head">
@@ -2238,6 +2267,7 @@ footer .wrap{padding:44px var(--gut) 24px}
         <a href="#explore" data-tab-link="tab-safety">Safety</a>
         <a href="#care">Squishy care</a>
         <a href="#reviews">Reviews</a>
+        <a href="#stores">Our stores</a>
       </nav>
       <div class="foot-col">
         <h2>Partners</h2>
@@ -3177,6 +3207,27 @@ footer .wrap{padding:44px var(--gut) 24px}
     track.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
     track.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); setTimeout(update, 300);
   }
+  /* Our stores. Fill in each store's name, address, opening hours, photo and Google Maps link.
+     map: the "Share → Copy link" address from Google Maps. Placeholders show until the details are in. */
+  var STORE_LIST = [
+    {name:'Tom & Stefanie store 1', address:'', hours:'', img:'', map:''},
+    {name:'Tom & Stefanie store 2', address:'', hours:'', img:'', map:''},
+    {name:'Tom & Stefanie store 3', address:'', hours:'', img:'', map:''}
+  ];
+  (function(){
+    var box = $('store-list'); if (!box) return;
+    STORE_LIST.forEach(function(st){
+      var c = el('article','store-card'), ph = el('div','store-card-ph');
+      if (st.img) { var im = document.createElement('img'); im.src = st.img; im.alt = st.name; im.loading = 'lazy'; ph.appendChild(im); }
+      else { ph.appendChild(icon('i-store')); ph.appendChild(el('span', null, 'Store photo coming soon')); }
+      c.appendChild(ph);
+      var b = el('div','store-card-body'); b.appendChild(el('h3', null, st.name));
+      b.appendChild(el('p','store-addr', st.address || 'Address coming soon'));
+      if (st.hours) b.appendChild(el('p','store-hours', st.hours));
+      if (st.map) { var a = el('a','btn btn-ghost', 'Open in Google Maps'); a.href = st.map; a.target = '_blank'; a.rel = 'noopener'; b.appendChild(a); }
+      c.appendChild(b); box.appendChild(c);
+    });
+  })();
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
     REVIEWS.forEach(function(r, idx){

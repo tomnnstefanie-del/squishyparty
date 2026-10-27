@@ -609,6 +609,27 @@
     track.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
     track.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); setTimeout(update, 300);
   }
+  /* Our stores. Fill in each store's name, address, opening hours, photo and Google Maps link.
+     map: the "Share → Copy link" address from Google Maps. Placeholders show until the details are in. */
+  var STORE_LIST = [
+    {name:'Tom & Stefanie store 1', address:'', hours:'', img:'', map:''},
+    {name:'Tom & Stefanie store 2', address:'', hours:'', img:'', map:''},
+    {name:'Tom & Stefanie store 3', address:'', hours:'', img:'', map:''}
+  ];
+  (function(){
+    var box = $('store-list'); if (!box) return;
+    STORE_LIST.forEach(function(st){
+      var c = el('article','store-card'), ph = el('div','store-card-ph');
+      if (st.img) { var im = document.createElement('img'); im.src = st.img; im.alt = st.name; im.loading = 'lazy'; ph.appendChild(im); }
+      else { ph.appendChild(icon('i-store')); ph.appendChild(el('span', null, 'Store photo coming soon')); }
+      c.appendChild(ph);
+      var b = el('div','store-card-body'); b.appendChild(el('h3', null, st.name));
+      b.appendChild(el('p','store-addr', st.address || 'Address coming soon'));
+      if (st.hours) b.appendChild(el('p','store-hours', st.hours));
+      if (st.map) { var a = el('a','btn btn-ghost', 'Open in Google Maps'); a.href = st.map; a.target = '_blank'; a.rel = 'noopener'; b.appendChild(a); }
+      c.appendChild(b); box.appendChild(c);
+    });
+  })();
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
     REVIEWS.forEach(function(r, idx){
