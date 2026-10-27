@@ -15,14 +15,14 @@ if (fs.existsSync(envFile)) {
 }
 const ROUTES = {
   '/api/request': (await import('../api/request.js')).default,
-  '/api/otp': (await import('../api/otp.js')).default,
-  '/api/paid': (await import('../api/paid.js')).default,
-};
+  '/api/otp': (await import('../api/otp.js')).default,};
 const PORT = Number(process.env.PORT || 3000);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+  // Same short link as vercel.json: the QR sticker on the capsule lids points here
+  if (url.pathname === '/c') { res.writeHead(307, { Location: '/?src=capsule#offer' }); return res.end(); }
   const handler = ROUTES[url.pathname];
   if (handler) {
     res.status = (c) => { res.statusCode = c; return res; };
@@ -34,4 +34,4 @@ http.createServer(async (req, res) => {
   if (!file.startsWith(path.join(root, 'public')) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.statusCode = 404; return res.end('Not found'); }
   res.setHeader('Content-Type', TYPES[path.extname(file)] || 'application/octet-stream');
   fs.createReadStream(file).pipe(res);
-}).listen(PORT, () => console.log(`Squishy Party dev server on http://localhost:${PORT}`));
+}).listen(PORT, () => console.log(`Confetti Club dev server on http://localhost:${PORT}`));

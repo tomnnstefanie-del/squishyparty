@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outbox = path.join(root, 'dev/.outbox.json'), mailbox = path.join(root, 'dev/.mailbox.json');
 const PORT = 3100, MOCK = 8789, BASE = `http://localhost:${PORT}`;
-const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEGRAM_BOT_TOKEN: 'test:token', TELEGRAM_CHAT_ID: '4242', TELEGRAM_API_BASE: `http://localhost:${MOCK}`, MAIL_TRANSPORT: 'file', PAYNOW_UEN: '53123456X', PAYNOW_NAME: 'Tom & Stefanie' };
+const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEGRAM_BOT_TOKEN: 'test:token', TELEGRAM_CHAT_ID: '4242', TELEGRAM_API_BASE: `http://localhost:${MOCK}`, MAIL_TRANSPORT: 'file' };
 process.env.TELEGRAM_BOT_TOKEN = 'test:token'; // so the test can mint a verified-email token like the server does
 const { issueVerified } = await import('../lib/otp.js');
 const mails = () => (fs.existsSync(mailbox) ? JSON.parse(fs.readFileSync(mailbox, 'utf8')) : []);
@@ -33,9 +33,13 @@ try {
   console.log('customer flow');
   await page.goto(BASE);
   await page.click('.hero-actions a.btn-primary');
-  await page.fill('#children', '12'); await page.dispatchEvent('#children', 'change');
-  await page.fill('#adults', '8'); await page.dispatchEvent('#adults', 'change');
-  await page.fill('#budget', '1200');
+  assert.equal(await page.locator('#budget, #adults, #children').count(), 0);
+  ok('step 1 asks only for the number of participants (no budget, no children/adults split)');
+  assert.deepEqual(await page.$$eval('.exp-tile input', (xs) => xs.map((x) => x.value)), ['jelly', 'crunchy', 'both']);
+  assert.ok((await page.$$eval('.exp-tile', (xs) => xs[2].textContent)).includes('Best value'));
+  assert.deepEqual(await page.$$eval('#tl-exp b', (xs) => xs.map((x) => x.textContent)), ['Jelly', 'Crunchy', 'Duo']);
+  ok('Squishy DIY options are ordered Jelly, Crunchy, Duo, with Duo labelled Best value');
+  await page.fill('#participants', '12'); await page.dispatchEvent('#participants', 'change');
   await page.fill('#date', date); await page.fill('#time', '15:00');
   assert.equal(await page.inputValue('#end'), '17:00'); ok('a 3:00 pm start sets the end time to 5:00 pm (2 hours later)');
   await page.fill('#end', '16:30'); await page.fill('#time', '14:00');
@@ -48,8 +52,21 @@ try {
   await page.click('#wiz-next');
   await page.click('label.addon'); // wax duo deal
   await page.click('#wiz-next');
-  await page.click('#use-rec');
-  await page.click('#wiz-next'); await page.click('#wiz-next');
+  assert.equal(await page.locator('.rec-acc, #use-rec').count(), 0); ok('step 3 has no "Your plan so far" box: the add-on tabs come straight after the intro');
+  // Bloom: personalise the Standard fabric backdrop
+  await page.click('#tab-a-styling'); await page.click('#panel-a-styling .store'); await page.waitForTimeout(300);
+  await page.click('.ss-item >> nth=0 >> .ss-name'); await page.waitForTimeout(300);
+  assert.equal(await page.locator('.ss-chip').count(), 10);
+  await page.click('.ss-chip[aria-label=Pink]'); await page.click('.ss-chip[aria-label=Sage]');
+  assert.ok((await txt('.ss-c-chosen')).includes('Pink, Sage')); assert.ok(await page.isVisible('.ss-chip[aria-label=Pink] .ss-chip-name'));
+  await page.fill('#ss-c-text', 'Mia turns 7'); await page.fill('#ss-c-notes', 'Pastel rainbow, like the photo');
+  await page.setInputFiles('#ss-mood-file', { name: 'mood.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64') });
+  await page.waitForSelector('.ss-mood-th img');
+  await page.click('#ss-opt-add'); await page.click('.ss-foot .btn'); await page.waitForTimeout(300);
+  ok('Bloom backdrop: choose colours (names appear), type vinyl text and inspiration, add a moodboard image');
+  await page.click('#wiz-next');
+  assert.ok(await page.isVisible('#wstep-5')); assert.equal(await txt('#wiz-count'), 'Step 4 of 4');
+  ok('Add-ons goes straight to Request (step 4 of 4), with the itemised plan to check');
   assert.equal(await page.inputValue('#req-date'), date);
   assert.equal(await page.inputValue('#req-time'), '14:00');
   assert.equal(await page.inputValue('#req-end'), '16:30');
@@ -60,7 +77,8 @@ try {
   await page.fill('#req-address', 'Block B, 1 Example Road'); await page.waitForTimeout(100);
   assert.equal(await page.inputValue('#venue'), 'Block B, 1 Example Road');
   ok('editing the address in step 5 updates the plan');
-  const pageHold = await txt('#hold-amount'), pageTotal = (await txt('#total-price')).replace('+', '');
+  const pageTotal = (await txt('#total-price')).replace('+', '');
+  assert.ok(!/deposit|PayNow/i.test(await txt('#wstep-5'))); ok('the request step has no deposit or PayNow');
   await page.fill('[name=parentName]', 'Sarah Tan');
   await page.fill('[name=phone]', '8123 4567');
   await page.fill('#req-email', 'sarah@example.com');
@@ -84,53 +102,74 @@ try {
   const ref = await txt('#sent-ref');
   assert.match(ref, /^SP-\d{6}-[0-9A-F]{4}$/);
   ok(`customer sees "Request received!" with reference ${ref}`);
-  await page.waitForSelector('#pay-qr svg');
-  assert.equal(await txt('#pay-amount'), pageHold); assert.equal(await txt('#pay-ref'), ref);
-  ok(`PayNow QR shows for the ${pageHold} holding deposit with reference ${ref}`);
+  assert.ok(await page.isVisible('#sent-family')); assert.ok((await txt('#sent-family')).includes('nothing to pay now'));
+  ok('after sending, the customer is told there’s nothing to pay now');
   const conf = mails().at(-1);
   assert.equal(conf.to, 'sarah@example.com'); assert.ok(conf.subject.includes(ref));
-  assert.ok(conf.text.includes('currently being verified by our team') && conf.text.includes('WhatsApp') && conf.text.includes(pageHold));
-  assert.deepEqual(conf.attachments, [`PayNow-${ref}.png`]);
-  ok('customer is emailed: being verified, we’ll WhatsApp you, plus the PayNow QR');
+  assert.ok(conf.text.includes('currently being verified by our team') && conf.text.includes('WhatsApp') && conf.text.includes('Nothing to pay now') && conf.text.includes('Participants: 12'));
+  assert.deepEqual(conf.attachments, []);
+  ok('customer is emailed: being verified, we’ll WhatsApp you, nothing to pay now');
 
   const msgs = sent();
   assert.equal(msgs.length, 1);
   const m = msgs[0];
   assert.equal(m.token, 'test:token'); assert.equal(m.chat_id, '4242'); assert.equal(m.parse_mode, 'HTML');
-  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', `10% holding deposit <b>${pageHold}</b>`, '2:00 pm–4:30 pm', '12 children', '8 adults', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
+  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
     assert.ok(m.text.includes(s), 'message missing: ' + s);
   ok('owner gets one Telegram message with contact, date/time, venue, address, guests, order and notes');
   assert.ok(m.text.includes(`Estimated total: ${pageTotal}`), `server total should match page total ${pageTotal}`);
 
-  assert.ok(!m.text.includes('⚠️'));
-  ok(`server-calculated total (${pageTotal}) and holding deposit (${pageHold}) match the page`);
+  assert.ok(!m.text.includes('⚠️')); assert.ok(!/deposit|budget|PayNow/i.test(m.text));
+  ok(`server-calculated total (${pageTotal}) matches the page, with no deposit or budget lines`);
+  for (const s of ['Fabric backdrop · Standard', '🎨 Colours: Pink, Sage', 'Vinyl text: “Mia turns 7”', 'Inspiration: Pastel rainbow, like the photo', '1 moodboard image below']) assert.ok(m.text.includes(s), 'message missing: ' + s);
+  const photos = JSON.parse(fs.readFileSync(path.join(root, 'dev/.photos.json'), 'utf8'));
+  assert.equal(photos.length, 1); assert.ok(photos[0].caption.includes(ref) && photos[0].caption.includes('Fabric backdrop') && photos[0].jpeg);
+  assert.ok((await txt('#review-list')).includes('Pink, Sage'));
+  ok('owner gets the colours, vinyl text and inspiration in the message, and the moodboard as a photo');
   const btn = m.reply_markup.inline_keyboard[0][0];
   assert.ok(btn.url.startsWith('https://wa.me/6581234567?text=Hi%20Sarah'));
   ok('message has a "WhatsApp the customer" button with a ready greeting');
   console.log('\n----- Telegram message preview -----\n' + m.text.replace(/<[^>]+>/g, '') + '\n[ ' + btn.text + ' ]\n------------------------------------\n');
 
-  await page.click('#pay-done');
-  await page.waitForFunction(() => /Thank you/.test(document.getElementById('pay-status').textContent));
-  const paidMsg = sent().at(-1).text; assert.ok(paidMsg.includes('Deposit marked as paid') && paidMsg.includes(ref) && paidMsg.includes(pageHold));
-  ok('“I’ve paid” sends you a Telegram note to check the bank for the reference');
-  const forged = await page.evaluate(async (ref) => (await fetch('/api/paid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref, cents: 1, sig: 'x' }) })).status, ref);
-  assert.equal(forged, 400); ok('a forged “paid” call is refused');
+  const gone = await page.evaluate(async () => (await fetch('/api/paid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status);
+  assert.equal(gone, 404); ok('the old “I’ve paid” endpoint no longer exists');
+  assert.equal(await page.locator('.ns-card').count(), 3);
   await page.click('#sent-todo');
-  assert.ok(await page.isVisible('#panel-p-check'));
+  assert.ok(await page.isVisible('#wstep-4') && await page.isVisible('#panel-p-check')); assert.equal(await txt('#wiz-count'), 'Next steps');
   assert.ok((await txt('#todo-list')).includes('Request availability'));
   ok('to-do list now shows "Request availability" as done');
+  await page.click('#tab-p-inv'); await page.click('[data-tpl=disco]');
+  const [gifDl] = await Promise.all([page.waitForEvent('download', { timeout: 60000 }), page.click('#inv-gif')]);
+  const gifBytes = fs.readFileSync(await gifDl.path());
+  let gifFrames = 0; for (let i = 0; i < gifBytes.length - 2; i++) if (gifBytes[i] === 0x21 && gifBytes[i + 1] === 0xF9 && gifBytes[i + 2] === 4) gifFrames++;
+  assert.equal(gifBytes.slice(0, 6).toString(), 'GIF89a'); assert.ok(gifFrames >= 10, 'frames ' + gifFrames); assert.ok(gifBytes.length < 2_000_000);
+  assert.ok((await page.inputValue('#inv-caption')).includes('What the kids will be doing'));
+  ok(`invitation saves as a moving GIF (${gifFrames} frames, ${Math.round(gifBytes.length / 1024)} KB) and the caption carries the kids’ schedule`);
   assert.deepEqual(errors, []);
+
+  console.log('for companies');
+  const cp = await browser.newPage({ viewport: { width: 1280, height: 900 } }); const cErrors = []; cp.on('pageerror', (e) => cErrors.push(e.message));
+  await cp.goto(BASE); await cp.click('.hero-corp a');
+  assert.ok(await cp.isVisible('#companies'));
+  const rates = await cp.$eval('#rate-list', (e) => e.textContent); for (const s of ['Jelly', '$16', 'Crunchy', '$18', 'Duo', '$26', 'Best value', '+$2']) assert.ok(rates.includes(s), 'rate card missing ' + s);
+  assert.ok((await cp.$eval('#rate-example', (e) => e.textContent)).includes('Duo for 30 people = $990'));
+  ok('“For companies” shows outcome copy and a rate card priced from the catalogue (Duo for 30 = $990)');
+  assert.equal(await cp.locator('#corp-form').count(), 0);
+  await cp.click('[data-company]');
+  assert.ok(await cp.isVisible('#wstep-1')); assert.ok(await cp.isChecked('input[name=bookingFor][value=company]'));
+  ok('“Plan your company event” opens the planner with “A company” already chosen (no separate unverified form)');
+  assert.deepEqual(cErrors, []); await cp.close();
 
   console.log('failure handling');
   fs.writeFileSync(outbox + '.fail', '1');
   const p2 = await browser.newPage(); await p2.goto(BASE);
-  const r = await p2.evaluate(async ([date, tok]) => { const res = await fetch('/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '10.0.0.2' }, body: JSON.stringify({ v: 1, plan: { children: 10, adults: 5, experience: 'jelly', wax: false, addons: [], date, start: '10:00', end: '12:00', budgetCents: null }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', emailToken: tok }) }); return { s: res.status, b: await res.json() }; }, [date, issueVerified('a@example.com')]);
+  const r = await p2.evaluate(async ([date, tok]) => { const res = await fetch('/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '10.0.0.2' }, body: JSON.stringify({ v: 1, plan: { participants: 10, experience: 'jelly', wax: false, addons: [], date, start: '10:00', end: '12:00' }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', emailToken: tok }) }); return { s: res.status, b: await res.json() }; }, [date, issueVerified('a@example.com')]);
   assert.equal(r.s, 502); assert.equal(r.b.ok, false);
   fs.rmSync(outbox + '.fail');
   ok('if Telegram is down, the customer is told it was NOT sent (no fake confirmation)');
 
   const api = (body, headers = {}) => p2.evaluate(async ([body, headers]) => { const res = await fetch('/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) }); return { s: res.status, b: await res.json().catch(() => ({})) }; }, [body, headers]);
-  const base = { v: 1, plan: { children: 10, adults: 5, experience: 'both', wax: true, addons: [], date, start: '10:00', end: '12:00', budgetCents: null }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', client: { totalCents: 1 }, emailToken: issueVerified('a@example.com') };
+  const base = { v: 1, plan: { participants: 10, experience: 'both', wax: true, addons: [], date, start: '10:00', end: '12:00' }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', client: { totalCents: 1 }, emailToken: issueVerified('a@example.com') };
 
   console.log('security');
   let x = await api({ ...base, plan: { ...base.plan, addons: ['free-unicorn'] } }, { 'X-Forwarded-For': '10.0.0.3' });
@@ -146,9 +185,9 @@ try {
   x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
   assert.equal(x.s, 400); ok('a verified token for a different email is refused');
   x = await api({ ...base, bookingFor: 'company', contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
-  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.paynow, null);
+  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 48000);
   assert.ok(sent().at(-1).text.includes('Company booking') && mails().at(-1).text.includes('nothing to pay now') && mails().at(-1).attachments.length === 0);
-  ok('company booking: same price, no PayNow QR, invoice requested on Telegram and in the email');
+  ok('company booking: same price, invoice requested on Telegram and in the email');
   x = await api({ ...base, website: 'http://spam' }, { 'X-Forwarded-For': '10.0.0.5' });
   assert.equal(x.s, 200); assert.equal(sent().length, before + 2); // the $480 request and the company booking, nothing from the bot
   ok('honeypot (bot) submissions are dropped silently');
@@ -167,8 +206,7 @@ try {
   const env2 = { ...env, PORT: '3101' }; delete env2.TELEGRAM_BOT_TOKEN;
   await start('dev/server.mjs', env2);
   const nc = await fetch('http://localhost:3101/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(base) });
-  assert.equal(nc.status, 503); ok('without the bot token set, requests are refused (503), never "sent"');
-  const env3 = { ...env, PORT: '3102' }; delete env3.MAIL_TRANSPORT;
+  assert.equal(nc.status, 503); ok('without the bot token set, requests are refused (503), never "sent"');  const env3 = { ...env, PORT: '3102' }; delete env3.MAIL_TRANSPORT;
   await start('dev/server.mjs', env3);
   const nm = await fetch('http://localhost:3102/api/otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'send', email: 'a@example.com' }) });
   const nr = await fetch('http://localhost:3102/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(base) });

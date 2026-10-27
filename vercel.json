@@ -20,14 +20,17 @@
           "value": "camera=(), microphone=(), geolocation=()"
         },
         {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://us-assets.i.posthog.com https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://thebutterstudio.com https://cdn.foodline.sg; connect-src 'self' https://us.i.posthog.com https://eu.i.posthog.com https://us-assets.i.posthog.com https://eu-assets.i.posthog.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/c",
+      "destination": "/?src=capsule#offer",
+      "permanent": false
     }
   ]
 }
