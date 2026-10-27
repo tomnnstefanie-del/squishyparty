@@ -92,7 +92,7 @@ fs.writeFileSync(path.join(root, 'public/stores.html'), stores);
 if (process.argv.includes('--preview')) {
   // Offline preview: embed the photos from public/img too (the live site loads them as files).
   let prev = out, n = 0;
-  for (const sub of ['making', 'how', 'cakes', 'bloom', 'events', 'partypainters']) {
+  for (const sub of ['making', 'how', 'cakes', 'bloom', 'events', 'partypainters', 'jsquare']) {
     const dir = path.join(root, 'public/img', sub);
     for (const f of fs.readdirSync(dir).filter((x) => /\.(jpg|png|webp)$/.test(x)).sort()) {
       const type = f.endsWith('.png') ? 'image/png' : f.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
