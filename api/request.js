@@ -5,6 +5,7 @@
 import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
 import { priceRequest } from '../lib/pricing.js';
+import { CATALOGUE } from '../lib/catalogue.js';
 import { makeReferralCode, readReferralCode, samePerson } from '../lib/referral.js';
 import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
 import { quotePdf, referralDiscount } from '../lib/quote-pdf.js';
@@ -13,10 +14,11 @@ import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpErro
 import { checkVerified } from '../lib/otp.js';
 import { mailConfigured, sendMail } from '../lib/mail.js';
 import { confirmationEmail } from '../lib/emails.js';
-import { recordRequest, statsConfigured } from '../lib/stats.js';
+import { recordRequest, statsConfigured, vendorsOf } from '../lib/stats.js';
 import { statusLink } from '../lib/status-link.js';
 
 const rateLimited = limiter(5, 10 * 60 * 1000); // best-effort, per server instance
+const EXP_NAMES = Object.fromEntries(Object.entries(CATALOGUE.EXP).map(([k, e]) => [k, e.name]));
 
 function makeRef(date) {
   return 'SP-' + date.slice(2).replace(/-/g, '') + '-' + crypto.randomBytes(2).toString('hex').toUpperCase();
@@ -54,8 +56,9 @@ export default async function handler(req, res) {
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
       const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, shareCode, site }));
-      // With the dashboard connected, two buttons record when we got back to them and when they confirmed
-      const statusUrls = statsConfigured() ? { contacted: statusLink(site, ref, 'contacted'), confirmed: statusLink(site, ref, 'confirmed') } : null;
+      // With the dashboard connected, buttons record when we got back to them, confirmed, got paid, and each partner confirmed
+      const statusUrls = statsConfigured() ? { contacted: statusLink(site, ref, 'contacted'), confirmed: statusLink(site, ref, 'confirmed'), paid: statusLink(site, ref, 'paid'),
+        vendors: vendorsOf(price).slice(0, 10).map((v, i) => ({ name: v.name, url: statusLink(site, ref, 'v' + i) })) } : null;
       await sendTelegram({ token, chatId, text, buttonUrl, afterUrl, statusUrls, apiBase: process.env.TELEGRAM_API_BASE || undefined });
     } catch (e) {
       console.error('[request] telegram send failed', ref, e.message); // no personal data in logs
@@ -66,7 +69,7 @@ export default async function handler(req, res) {
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
     const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
-    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode });
+    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience] });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {

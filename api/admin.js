@@ -1,11 +1,11 @@
 // /api/admin  (Authorization: Bearer <ADMIN_PASSWORD>): the private dashboard at /admin.html.
 //   GET                                          -> the numbers
-//   POST { action: 'mark', ref, status }        -> record contacted / confirmed / lost for a request
+//   POST { action: 'mark' | 'undo', ref, status } -> record (or clear) contacted / confirmed / lost / paid / vendor n
 // ADMIN_PASSWORD is a Vercel environment variable (12+ characters); without it the dashboard stays locked.
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
 import { clientIp, limiter, fail, HttpError, readJson, assertSameOrigin } from '../lib/http.js';
-import { readStats, markStatus, tooManyFailures, STATUSES } from '../lib/stats.js';
+import { readStats, markStatus, tooManyFailures, validStatus } from '../lib/stats.js';
 
 const rateLimited = limiter(30, 10 * 60 * 1000); // per instance, on top of the shared lockout
 const REF = /^SP-\d{6}-[0-9A-F]{4}$/;
@@ -29,10 +29,10 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       assertSameOrigin(req);
       const b = await readJson(req, 1024);
-      if (b.action !== 'mark' || !REF.test(String(b.ref || '')) || !STATUSES.includes(b.status)) throw new HttpError(400, 'Please refresh and try again.');
-      const life = await markStatus(b.ref, b.status);
-      if (!life) throw new HttpError(404, 'That request isn’t in the dashboard.');
-      return res.status(200).json({ ok: true, life });
+      if (!['mark', 'undo'].includes(b.action) || !REF.test(String(b.ref || '')) || !validStatus(b.status)) throw new HttpError(400, 'Please refresh and try again.');
+      const r = await markStatus(b.ref, b.status, b.action === 'undo');
+      if (!r) throw new HttpError(404, 'That request isn’t in the dashboard.');
+      return res.status(200).json({ ok: true, life: r.life });
     }
     return res.status(200).json({ ok: true, ...(await readStats()) });
   } catch (e) { return fail(res, e, 'admin'); }

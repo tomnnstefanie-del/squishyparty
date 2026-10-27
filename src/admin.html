@@ -8,7 +8,7 @@ __HEADER__
   <section class="section ad-wrap">
     <div class="wrap">
       <p class="eyebrow">Private</p>
-      <h1 class="ad-h1">Referral dashboard</h1>
+      <h1 class="ad-h1">Bookings &amp; referrals</h1>
 
       <form class="ad-login" id="ad-login">
         <label class="field">Dashboard password<input type="password" id="ad-pass" autocomplete="current-password" required></label>
@@ -19,6 +19,24 @@ __HEADER__
       <div id="ad-body" hidden>
         <div class="ad-bar"><p class="ad-note" id="ad-note"></p><button class="btn btn-ghost" type="button" id="ad-refresh">Refresh</button></div>
 
+        <h2 class="ad-h2 ad-first">Bookings</h2>
+        <div class="ad-book-top">
+          <div class="ad-cal-box">
+            <div class="ad-cal-head"><button type="button" class="ad-cal-nav" id="cal-prev" aria-label="Previous month">‹</button><b id="cal-title"></b><button type="button" class="ad-cal-nav" id="cal-next" aria-label="Next month">›</button></div>
+            <div class="ad-cal" id="ad-cal"></div>
+            <p class="ad-legend"><span class="k k-ok"></span>Confirmed <span class="k k-pend"></span>Waiting to confirm</p>
+          </div>
+          <div class="ad-todo-box">
+            <h3>Still to do <span class="ad-count" id="todo-count">0</span></h3>
+            <ul class="ad-todo" id="ad-todo"></ul>
+          </div>
+        </div>
+        <div class="ad-filter" role="group" aria-label="Show bookings">
+          <button type="button" class="chip on" data-b="upcoming">Upcoming</button><button type="button" class="chip" data-b="pending">Waiting to confirm</button><button type="button" class="chip" data-b="unpaid">Not paid</button><button type="button" class="chip" data-b="past">Past</button><button type="button" class="chip" data-b="all">All</button>
+        </div>
+        <div class="ad-books" id="ad-books"></div>
+
+        <h2 class="ad-h2">Referrals</h2>
         <div class="ad-compare">
           <article class="ad-src ad-capsule">
             <h2>Capsule QR sticker</h2>
@@ -62,7 +80,7 @@ __HEADER__
 
         <h2 class="ad-h2">Activity</h2>
         <div class="ad-filter" role="group" aria-label="Show">
-          <button type="button" class="chip on" data-f="">All</button><button type="button" class="chip" data-f="scan">QR scans</button><button type="button" class="chip" data-f="open">Links opened</button><button type="button" class="chip" data-f="request">Requests</button><button type="button" class="chip" data-f="status">Contacted / confirmed</button>
+          <button type="button" class="chip on" data-f="">All</button><button type="button" class="chip" data-f="scan">QR scans</button><button type="button" class="chip" data-f="open">Links opened</button><button type="button" class="chip" data-f="request">Requests</button><button type="button" class="chip" data-f="status">Contacted, confirmed, paid</button>
         </div>
         <ol class="ad-events" id="ad-events"></ol>
       </div>
@@ -85,23 +103,23 @@ __FOOTER__
   var dur = function(h){ if (h == null) return '–'; if (h < 1) return Math.max(1, Math.round(h * 60)) + ' min'; if (h < 48) return (Math.round(h * 10) / 10) + ' h'; return (Math.round(h / 24 * 10) / 10) + ' days'; };
   var since = function(a, b){ return a && b ? dur((new Date(b) - new Date(a)) / 36e5) : ''; };
   var when = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
-  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Confirmed', 'k-ok'], lost:['Didn’t book', 'k-lost'] };
+  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Confirmed', 'k-ok'], lost:['Didn’t book', 'k-lost'], paid:['Paid', 'k-ok'], vendor:['Vendor confirmed', 'k-ok'], undo:['Undone', 'k-lost'] };
   var last = null, filter = '';
   function events(){
     var ol = $('ad-events'); ol.textContent = '';
-    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost/.test(e.type) : e.type === filter); });
+    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost|paid|vendor|undo/.test(e.type) : e.type === filter); });
     if (!list.length) { ol.appendChild(el('li', 'ad-empty', 'Nothing yet.')); return; }
     list.slice(0, 120).forEach(function(e){
       var li = el('li'), k = EV[e.type] || [e.type, '']; li.appendChild(el('span', 'k ' + k[1]));
       li.appendChild(el('time', null, when(e.at))); li.appendChild(el('b', null, k[0]));
-      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
+      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') + (e.vendor ? ' · ' + e.vendor : '') + (e.what ? ' · ' + e.what : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
       ol.appendChild(li);
     });
   }
   document.querySelectorAll('.ad-filter .chip').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('.ad-filter .chip').forEach(function(x){ x.classList.toggle('on', x === b); }); filter = b.dataset.f; if (last) events(); }); });
-  function mark(ref, status, btn){
+  function mark(ref, status, btn, undo){
     btn.disabled = true;
-    fetch('/api/admin', { method:'POST', headers:{ Authorization:'Bearer ' + pass, 'Content-Type':'application/json' }, body: JSON.stringify({action:'mark', ref:ref, status:status}) })
+    fetch('/api/admin', { method:'POST', headers:{ Authorization:'Bearer ' + pass, 'Content-Type':'application/json' }, body: JSON.stringify({action:undo ? 'undo' : 'mark', ref:ref, status:status}) })
       .then(function(r){ return r.json(); }).then(function(j){ if (j.ok) load(); else { btn.disabled = false; alert(j.error || 'Something went wrong.'); } })
       .catch(function(){ btn.disabled = false; });
   }
@@ -129,7 +147,7 @@ __FOOTER__
     $('l-rate').textContent = L.requests ? Math.round(L.confirmed / L.requests * 100) + '%' : '–';
     $('l-rate-s').textContent = L.requests ? L.confirmed + ' of ' + L.requests + ' requests' + (L.lost ? ' · ' + L.lost + ' didn’t book' : '') : 'No data yet';
     $('l-wait').textContent = L.waiting || 0; $('l-wait-tile').classList.toggle('on', !!L.waiting);
-    events();
+    events(); bookings();
 
     var rb = $('ad-referrers'); rb.textContent = '';
     if (!d.referrers.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'No friend links opened yet.', 'ad-empty'); td0.colSpan = 5; rb.appendChild(tr0); }
@@ -161,6 +179,84 @@ __FOOTER__
       rc.appendChild(tr);
     });
   }
+
+  /* ---------- Bookings: calendar, to-dos and one card per party ---------- */
+  var calMonth = null, bookFilter = 'upcoming';
+  var longDay = function(d){ return new Date(d + 'T00:00').toLocaleDateString('en-SG', {weekday:'short', day:'numeric', month:'short', year:'numeric'}); };
+  var clock = function(t){ if (!t) return ''; var h = +t.slice(0, 2); return (h % 12 || 12) + ':' + t.slice(3) + (h < 12 ? ' am' : ' pm'); };
+  var who = function(b){ return b.companyName ? b.companyName + ' (' + b.first + ')' : b.first; };
+  function bookings(){
+    var all = (last.bookings || []).filter(function(b){ return b.state !== 'lost' || bookFilter === 'all'; }), today = last.today;
+    // To-do list: open steps for every party that isn't lost, soonest party first
+    var tl = $('ad-todo'), n = 0; tl.textContent = '';
+    all.filter(function(b){ return b.todos.length && (b.date >= today || b.todos.some(function(t){ return /Payment/.test(t); })); }).forEach(function(b){
+      b.todos.forEach(function(t){ n++; var li = el('li'), a = el('a', null, ''); a.href = '#bk-' + b.ref; a.appendChild(el('b', null, t)); a.appendChild(el('small', null, who(b) + ' · ' + longDay(b.date) + ' · ' + b.ref)); li.appendChild(a); tl.appendChild(li); });
+    });
+    if (!n) tl.appendChild(el('li', 'ad-empty', 'Nothing waiting. 🎉'));
+    $('todo-count').textContent = n; $('todo-count').classList.toggle('on', n > 0);
+    // Month calendar
+    if (!calMonth) calMonth = today.slice(0, 7);
+    var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7) - 1, first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+    $('cal-title').textContent = first.toLocaleDateString('en-SG', {month:'long', year:'numeric'});
+    var cal = $('ad-cal'); cal.textContent = '';
+    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d){ cal.appendChild(el('span', 'ad-cal-dow', d)); });
+    for (var i = 0; i < (first.getDay() + 6) % 7; i++) cal.appendChild(el('span', 'ad-cal-day blank'));
+    for (var d = 1; d <= days; d++) {
+      var iso = calMonth + '-' + (d < 10 ? '0' : '') + d, cell = el('div', 'ad-cal-day' + (iso === today ? ' today' : '') + (iso < today ? ' past' : ''));
+      cell.appendChild(el('span', 'ad-cal-n', String(d)));
+      all.filter(function(b){ return b.date === iso && b.state !== 'lost'; }).forEach(function(b){
+        var a = el('a', 'ad-cal-ev ' + b.state, clock(b.start).replace(':00', '') + ' ' + b.first); a.href = '#bk-' + b.ref; a.title = who(b) + ', ' + b.participants + ' people, ' + clock(b.start) + '–' + clock(b.end); cell.appendChild(a);
+      });
+      cal.appendChild(cell);
+    }
+    // Cards
+    var list = (last.bookings || []).filter(function(b){
+      if (bookFilter === 'all') return true; if (b.state === 'lost') return false;
+      if (bookFilter === 'upcoming') return b.date >= today; if (bookFilter === 'past') return b.date < today;
+      if (bookFilter === 'pending') return b.state === 'pending'; if (bookFilter === 'unpaid') return b.state === 'confirmed' && !b.paid; return true;
+    });
+    if (bookFilter === 'past') list.reverse();
+    var box = $('ad-books'); box.textContent = '';
+    if (!list.length) { box.appendChild(el('p', 'ad-empty ad-book-empty', 'No bookings here yet.')); return; }
+    list.forEach(function(b){
+      var c = el('article', 'ad-book ' + b.state); c.id = 'bk-' + b.ref;
+      var head = el('div', 'ad-book-head');
+      var when = el('div', 'ad-book-when'); when.appendChild(el('b', null, longDay(b.date))); when.appendChild(el('span', null, clock(b.start) + ' – ' + clock(b.end))); head.appendChild(when);
+      var tags = el('div', 'ad-book-tags');
+      tags.appendChild(el('span', 'tag ' + (b.state === 'confirmed' ? 'ok' : b.state === 'lost' ? 'lost' : 'pend'), b.state === 'confirmed' ? 'Confirmed' : b.state === 'lost' ? 'Didn’t book' : 'Waiting to confirm'));
+      if (b.state === 'confirmed') tags.appendChild(el('span', 'tag ' + (b.paid ? 'ok' : 'pend'), b.paid ? 'Paid ✓' : 'Not paid'));
+      head.appendChild(tags); c.appendChild(head);
+      var info = el('p', 'ad-book-info');
+      info.appendChild(el('b', null, who(b))); info.appendChild(document.createTextNode(' · ' + b.participants + ' people · ' + b.experience + (b.wax ? ' + Wax Cracking' : '') + ' · ' + money(b.totalCents) + (b.onQuote && b.onQuote.length ? ' + quote items' : '')));
+      c.appendChild(info);
+      c.appendChild(el('p', 'ad-book-where', (b.venue ? b.venue + ' · ' : '') + (b.area ? 'Postal area ' + b.area : '') + ' · ' + b.ref + ' · ' + (b.addons ? b.addons + ' add-on' + (b.addons > 1 ? 's' : '') : 'no add-ons')));
+      if (b.vendors.length || (b.inHouse || []).length) {
+        var vs = el('div', 'ad-vendors');
+        b.vendors.forEach(function(v){
+          var row = el('div', 'ad-vendor ' + (v.ok ? 'ok' : 'pend'));
+          var t = el('div'); t.appendChild(el('b', null, (v.ok ? '✓ ' : '… ') + v.name)); t.appendChild(el('small', null, v.items.join(', ') + (v.ok ? ' · confirmed ' + when2(v.ok) : ' · waiting for the vendor'))); row.appendChild(t);
+          var btn = el('button', 'mini', v.ok ? 'Undo' : 'Vendor confirmed'); btn.type = 'button'; btn.addEventListener('click', function(){ mark(b.ref, 'v' + v.i, btn, !!v.ok); }); row.appendChild(btn);
+          vs.appendChild(row);
+        });
+        if ((b.inHouse || []).length) vs.appendChild(el('p', 'ad-fine', 'Our own: ' + b.inHouse.join(', ')));
+        c.appendChild(vs);
+      }
+      if (b.todos.length) { var td = el('ul', 'ad-book-todo'); b.todos.forEach(function(t){ td.appendChild(el('li', null, t)); }); c.appendChild(td); }
+      var acts = el('div', 'ad-book-acts'), L = b.life || {};
+      [['contacted', 'Contacted'], ['confirmed', 'Confirmed'], ['paid', 'Paid'], ['lost', 'Didn’t book']].forEach(function(s){
+        if (s[0] === 'paid' && b.state !== 'confirmed') return;
+        var on = !!L[s[0]], btn = el('button', 'mini' + (on ? ' on' : ''), (on ? '✓ ' : '') + s[1]); btn.type = 'button';
+        btn.title = on ? 'Recorded ' + when2(L[s[0]]) + '. Click to undo.' : 'Mark as ' + s[1].toLowerCase();
+        btn.addEventListener('click', function(){ if (!on || confirm('Undo “' + s[1] + '” for ' + b.ref + '?')) mark(b.ref, s[0], btn, on); });
+        acts.appendChild(btn);
+      });
+      c.appendChild(acts); box.appendChild(c);
+    });
+  }
+  var when2 = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
+  $('cal-prev').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7) - 2; if (m < 0) { m = 11; y--; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });
+  $('cal-next').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7); if (m > 11) { m = 0; y++; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });
+  document.querySelectorAll('[data-b]').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on', x === b); }); bookFilter = b.dataset.b; if (last) bookings(); }); });
 
   function load(){
     var err = $('ad-error'); err.hidden = true;

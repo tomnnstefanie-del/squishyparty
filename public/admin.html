@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#fffefc">
 <meta name="description" content="Private dashboard.">
-<title>Referral dashboard | Confetti Club</title>
+<title>Dashboard | Confetti Club</title>
 <link rel="canonical" href="https://confetticlub.vercel.app/admin.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Confetti Club">
@@ -2089,6 +2089,65 @@ footer{background:#efece7;border-top:0}
 .ad-status .mini:hover{border-color:var(--cobalt)}
 .ad-table{min-width:1080px}
 @media (max-width:900px){.ad-life{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* v58 Header: five items (Experiences menu, How it works, For companies, FAQ, Build my party), no tagline */
+.nav{gap:28px}
+.nav-menu{position:relative}
+.nav-menu summary{list-style:none;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--ink-2);white-space:nowrap;min-height:44px}
+.nav-menu summary::-webkit-details-marker{display:none}
+.nav-menu summary .icon{width:16px;height:16px;transition:transform .15s ease}
+.nav-menu[open] summary .icon{transform:rotate(180deg)}
+.nav-menu summary:hover,.nav-menu[open] summary{color:var(--cobalt)}
+.nav-drop{position:absolute;top:calc(100% + 6px);left:-14px;z-index:60;width:290px;padding:8px;border-radius:16px;background:#fff;box-shadow:0 18px 50px rgba(19,35,95,.18),0 0 0 1px var(--line)}
+.nav .nav-drop a{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;white-space:normal}
+.nav .nav-drop a:hover{background:var(--cobalt-50)}
+.nav-drop b{color:var(--ink);font-weight:700}
+.nav-drop small{color:var(--muted);font-weight:500;font-size:.8125rem}
+/* v59 Dashboard: bookings calendar, to-dos, booking cards */
+.ad-first{margin-top:8px}
+.ad-book-top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-bottom:16px}
+.ad-cal-box,.ad-todo-box{padding:16px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line)}
+.ad-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ad-cal-nav{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font-size:1.25rem;cursor:pointer;color:var(--ink)}
+.ad-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.ad-cal-dow{font-size:.6875rem;font-weight:700;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em}
+.ad-cal-day{min-height:72px;padding:4px;border-radius:8px;background:#faf9f6;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ad-cal-day.blank{background:none}
+.ad-cal-day.past{opacity:.55}
+.ad-cal-day.today{box-shadow:inset 0 0 0 2px var(--cobalt)}
+.ad-cal-n{font-size:.75rem;font-weight:700;color:var(--ink-2)}
+.ad-cal-ev{display:block;font-size:.6875rem;font-weight:700;line-height:1.3;padding:2px 4px;border-radius:5px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-cal-ev.confirmed{background:#e3f5ea;color:#0f6a40}.ad-cal-ev.pending{background:#fff3d6;color:#7a5600}
+.k-pend{background:#f5b800}
+.ad-todo-box h3{margin:0 0 10px;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.ad-count{min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#eef0f6;color:var(--ink-2);font-size:.75rem;display:inline-grid;place-items:center}
+.ad-count.on{background:#e2335a;color:#fff}
+.ad-todo{list-style:none;margin:0;padding:0;max-height:330px;overflow-y:auto}
+.ad-todo li{border-bottom:1px solid var(--line)}.ad-todo li:last-child{border-bottom:0}
+.ad-todo a{display:flex;flex-direction:column;gap:2px;padding:9px 4px;text-decoration:none;color:var(--ink)}
+.ad-todo a:hover{background:var(--cobalt-50)}
+.ad-todo b{font-size:.875rem}.ad-todo small{font-size:.75rem;color:var(--muted)}
+.ad-books{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.ad-book{padding:16px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);border-left:5px solid #f5b800;display:flex;flex-direction:column;gap:8px;scroll-margin-top:90px}
+.ad-book.confirmed{border-left-color:#1f9d5c}.ad-book.lost{border-left-color:#c9ccd8;opacity:.7}
+.ad-book:target{box-shadow:0 0 0 3px var(--cobalt)}
+.ad-book-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.ad-book-when{display:flex;flex-direction:column}.ad-book-when b{font-size:1rem}.ad-book-when span{font-size:.8125rem;color:var(--muted);font-weight:600}
+.ad-book-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.ad-book .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:#fff3d6;color:#7a5600}
+.ad-book .tag.ok{background:#e9f7ef;color:#0f7a4a}.ad-book .tag.lost{background:#f0f0f3;color:#6b6f8f}
+.ad-book-info{margin:0;font-size:.875rem;color:var(--ink-2)}
+.ad-book-where{margin:0;font-size:.75rem;color:var(--muted)}
+.ad-vendors{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:#faf9f6}
+.ad-vendor{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ad-vendor b{display:block;font-size:.8125rem}.ad-vendor small{display:block;font-size:.75rem;color:var(--muted)}
+.ad-vendor.ok b{color:#0f7a4a}.ad-vendor.pend b{color:#7a5600}
+.ad-book-todo{margin:0;padding-left:18px;font-size:.8125rem;color:#c0254a;font-weight:600}
+.ad-book-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.ad-book .mini,.ad-vendor .mini{min-height:32px;padding:4px 12px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font:inherit;font-size:.75rem;font-weight:700;color:var(--ink);cursor:pointer;white-space:nowrap}
+.ad-book .mini.on{background:#e9f7ef;border-color:#bfe5cf;color:#0f7a4a}
+.ad-book .mini:hover,.ad-vendor .mini:hover{border-color:var(--cobalt)}
+.ad-book-empty{padding:16px}
+@media (max-width:900px){.ad-book-top{grid-template-columns:1fr}.ad-cal-day{min-height:54px}.ad-books{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -2125,6 +2184,7 @@ footer{background:#efece7;border-top:0}
   <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M7 2v4a5 5 0 0 0 10 0V2M7 22v-4a5 5 0 0 1 10 0v4"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
 </svg>
 
@@ -2135,10 +2195,16 @@ footer{background:#efece7;border-top:0}
   <div class="wrap header-row">
     <a class="brand" href="./" data-home aria-label="Confetti Club home">
       <img class="brand-logo" src="img/logo.webp" alt="Confetti Club" width="609" height="240">
-      <span class="brand-text"><span class="brand-by">Trending activities for birthday parties &amp; team bonding</span></span>
     </a>
     <nav class="nav" aria-label="Explore">
-      <a href="./#tab-how">How it works</a><a href="./#tab-day">On the day</a><a href="./#tab-safety">Safety</a><a href="./#tab-faq">FAQ</a><a href="./#companies">For companies</a><a href="./#reviews">Reviews</a><a href="stores.html">Our stores</a>
+      <details class="nav-menu" id="nav-exp"><summary>Experiences <svg class="icon" aria-hidden="true"><use href="./#i-chevron"/></svg></summary>
+        <div class="nav-drop">
+          <a href="./#tab-how"><b>Squishy DIY parties</b><small>Hosted at your home, office or venue</small></a>
+          <a href="./#partners"><b>Party partners</b><small>Cakes, decor, photos and more, in one quote</small></a>
+          <a href="stores.html"><b>Try it in store</b><small>Our squishy bars in Woodlands, PLQ and Eastpoint</small></a>
+          <a href="./#reviews"><b>Reviews</b><small>What families say</small></a>
+        </div>
+      </details><a href="./#tab-how">How it works</a><a href="./#companies">For companies</a><a href="./#tab-faq">FAQ</a>
     </nav>
     <a class="btn btn-primary header-cta" href="./#plan-1">Build my party</a>
   </div>
@@ -2148,7 +2214,7 @@ footer{background:#efece7;border-top:0}
   <section class="section ad-wrap">
     <div class="wrap">
       <p class="eyebrow">Private</p>
-      <h1 class="ad-h1">Referral dashboard</h1>
+      <h1 class="ad-h1">Bookings &amp; referrals</h1>
 
       <form class="ad-login" id="ad-login">
         <label class="field">Dashboard password<input type="password" id="ad-pass" autocomplete="current-password" required></label>
@@ -2159,6 +2225,24 @@ footer{background:#efece7;border-top:0}
       <div id="ad-body" hidden>
         <div class="ad-bar"><p class="ad-note" id="ad-note"></p><button class="btn btn-ghost" type="button" id="ad-refresh">Refresh</button></div>
 
+        <h2 class="ad-h2 ad-first">Bookings</h2>
+        <div class="ad-book-top">
+          <div class="ad-cal-box">
+            <div class="ad-cal-head"><button type="button" class="ad-cal-nav" id="cal-prev" aria-label="Previous month">‹</button><b id="cal-title"></b><button type="button" class="ad-cal-nav" id="cal-next" aria-label="Next month">›</button></div>
+            <div class="ad-cal" id="ad-cal"></div>
+            <p class="ad-legend"><span class="k k-ok"></span>Confirmed <span class="k k-pend"></span>Waiting to confirm</p>
+          </div>
+          <div class="ad-todo-box">
+            <h3>Still to do <span class="ad-count" id="todo-count">0</span></h3>
+            <ul class="ad-todo" id="ad-todo"></ul>
+          </div>
+        </div>
+        <div class="ad-filter" role="group" aria-label="Show bookings">
+          <button type="button" class="chip on" data-b="upcoming">Upcoming</button><button type="button" class="chip" data-b="pending">Waiting to confirm</button><button type="button" class="chip" data-b="unpaid">Not paid</button><button type="button" class="chip" data-b="past">Past</button><button type="button" class="chip" data-b="all">All</button>
+        </div>
+        <div class="ad-books" id="ad-books"></div>
+
+        <h2 class="ad-h2">Referrals</h2>
         <div class="ad-compare">
           <article class="ad-src ad-capsule">
             <h2>Capsule QR sticker</h2>
@@ -2202,7 +2286,7 @@ footer{background:#efece7;border-top:0}
 
         <h2 class="ad-h2">Activity</h2>
         <div class="ad-filter" role="group" aria-label="Show">
-          <button type="button" class="chip on" data-f="">All</button><button type="button" class="chip" data-f="scan">QR scans</button><button type="button" class="chip" data-f="open">Links opened</button><button type="button" class="chip" data-f="request">Requests</button><button type="button" class="chip" data-f="status">Contacted / confirmed</button>
+          <button type="button" class="chip on" data-f="">All</button><button type="button" class="chip" data-f="scan">QR scans</button><button type="button" class="chip" data-f="open">Links opened</button><button type="button" class="chip" data-f="request">Requests</button><button type="button" class="chip" data-f="status">Contacted, confirmed, paid</button>
         </div>
         <ol class="ad-events" id="ad-events"></ol>
       </div>
@@ -2256,23 +2340,23 @@ footer{background:#efece7;border-top:0}
   var dur = function(h){ if (h == null) return '–'; if (h < 1) return Math.max(1, Math.round(h * 60)) + ' min'; if (h < 48) return (Math.round(h * 10) / 10) + ' h'; return (Math.round(h / 24 * 10) / 10) + ' days'; };
   var since = function(a, b){ return a && b ? dur((new Date(b) - new Date(a)) / 36e5) : ''; };
   var when = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
-  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Confirmed', 'k-ok'], lost:['Didn’t book', 'k-lost'] };
+  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Confirmed', 'k-ok'], lost:['Didn’t book', 'k-lost'], paid:['Paid', 'k-ok'], vendor:['Vendor confirmed', 'k-ok'], undo:['Undone', 'k-lost'] };
   var last = null, filter = '';
   function events(){
     var ol = $('ad-events'); ol.textContent = '';
-    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost/.test(e.type) : e.type === filter); });
+    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost|paid|vendor|undo/.test(e.type) : e.type === filter); });
     if (!list.length) { ol.appendChild(el('li', 'ad-empty', 'Nothing yet.')); return; }
     list.slice(0, 120).forEach(function(e){
       var li = el('li'), k = EV[e.type] || [e.type, '']; li.appendChild(el('span', 'k ' + k[1]));
       li.appendChild(el('time', null, when(e.at))); li.appendChild(el('b', null, k[0]));
-      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
+      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') + (e.vendor ? ' · ' + e.vendor : '') + (e.what ? ' · ' + e.what : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
       ol.appendChild(li);
     });
   }
   document.querySelectorAll('.ad-filter .chip').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('.ad-filter .chip').forEach(function(x){ x.classList.toggle('on', x === b); }); filter = b.dataset.f; if (last) events(); }); });
-  function mark(ref, status, btn){
+  function mark(ref, status, btn, undo){
     btn.disabled = true;
-    fetch('/api/admin', { method:'POST', headers:{ Authorization:'Bearer ' + pass, 'Content-Type':'application/json' }, body: JSON.stringify({action:'mark', ref:ref, status:status}) })
+    fetch('/api/admin', { method:'POST', headers:{ Authorization:'Bearer ' + pass, 'Content-Type':'application/json' }, body: JSON.stringify({action:undo ? 'undo' : 'mark', ref:ref, status:status}) })
       .then(function(r){ return r.json(); }).then(function(j){ if (j.ok) load(); else { btn.disabled = false; alert(j.error || 'Something went wrong.'); } })
       .catch(function(){ btn.disabled = false; });
   }
@@ -2300,7 +2384,7 @@ footer{background:#efece7;border-top:0}
     $('l-rate').textContent = L.requests ? Math.round(L.confirmed / L.requests * 100) + '%' : '–';
     $('l-rate-s').textContent = L.requests ? L.confirmed + ' of ' + L.requests + ' requests' + (L.lost ? ' · ' + L.lost + ' didn’t book' : '') : 'No data yet';
     $('l-wait').textContent = L.waiting || 0; $('l-wait-tile').classList.toggle('on', !!L.waiting);
-    events();
+    events(); bookings();
 
     var rb = $('ad-referrers'); rb.textContent = '';
     if (!d.referrers.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'No friend links opened yet.', 'ad-empty'); td0.colSpan = 5; rb.appendChild(tr0); }
@@ -2332,6 +2416,84 @@ footer{background:#efece7;border-top:0}
       rc.appendChild(tr);
     });
   }
+
+  /* ---------- Bookings: calendar, to-dos and one card per party ---------- */
+  var calMonth = null, bookFilter = 'upcoming';
+  var longDay = function(d){ return new Date(d + 'T00:00').toLocaleDateString('en-SG', {weekday:'short', day:'numeric', month:'short', year:'numeric'}); };
+  var clock = function(t){ if (!t) return ''; var h = +t.slice(0, 2); return (h % 12 || 12) + ':' + t.slice(3) + (h < 12 ? ' am' : ' pm'); };
+  var who = function(b){ return b.companyName ? b.companyName + ' (' + b.first + ')' : b.first; };
+  function bookings(){
+    var all = (last.bookings || []).filter(function(b){ return b.state !== 'lost' || bookFilter === 'all'; }), today = last.today;
+    // To-do list: open steps for every party that isn't lost, soonest party first
+    var tl = $('ad-todo'), n = 0; tl.textContent = '';
+    all.filter(function(b){ return b.todos.length && (b.date >= today || b.todos.some(function(t){ return /Payment/.test(t); })); }).forEach(function(b){
+      b.todos.forEach(function(t){ n++; var li = el('li'), a = el('a', null, ''); a.href = '#bk-' + b.ref; a.appendChild(el('b', null, t)); a.appendChild(el('small', null, who(b) + ' · ' + longDay(b.date) + ' · ' + b.ref)); li.appendChild(a); tl.appendChild(li); });
+    });
+    if (!n) tl.appendChild(el('li', 'ad-empty', 'Nothing waiting. 🎉'));
+    $('todo-count').textContent = n; $('todo-count').classList.toggle('on', n > 0);
+    // Month calendar
+    if (!calMonth) calMonth = today.slice(0, 7);
+    var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7) - 1, first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+    $('cal-title').textContent = first.toLocaleDateString('en-SG', {month:'long', year:'numeric'});
+    var cal = $('ad-cal'); cal.textContent = '';
+    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d){ cal.appendChild(el('span', 'ad-cal-dow', d)); });
+    for (var i = 0; i < (first.getDay() + 6) % 7; i++) cal.appendChild(el('span', 'ad-cal-day blank'));
+    for (var d = 1; d <= days; d++) {
+      var iso = calMonth + '-' + (d < 10 ? '0' : '') + d, cell = el('div', 'ad-cal-day' + (iso === today ? ' today' : '') + (iso < today ? ' past' : ''));
+      cell.appendChild(el('span', 'ad-cal-n', String(d)));
+      all.filter(function(b){ return b.date === iso && b.state !== 'lost'; }).forEach(function(b){
+        var a = el('a', 'ad-cal-ev ' + b.state, clock(b.start).replace(':00', '') + ' ' + b.first); a.href = '#bk-' + b.ref; a.title = who(b) + ', ' + b.participants + ' people, ' + clock(b.start) + '–' + clock(b.end); cell.appendChild(a);
+      });
+      cal.appendChild(cell);
+    }
+    // Cards
+    var list = (last.bookings || []).filter(function(b){
+      if (bookFilter === 'all') return true; if (b.state === 'lost') return false;
+      if (bookFilter === 'upcoming') return b.date >= today; if (bookFilter === 'past') return b.date < today;
+      if (bookFilter === 'pending') return b.state === 'pending'; if (bookFilter === 'unpaid') return b.state === 'confirmed' && !b.paid; return true;
+    });
+    if (bookFilter === 'past') list.reverse();
+    var box = $('ad-books'); box.textContent = '';
+    if (!list.length) { box.appendChild(el('p', 'ad-empty ad-book-empty', 'No bookings here yet.')); return; }
+    list.forEach(function(b){
+      var c = el('article', 'ad-book ' + b.state); c.id = 'bk-' + b.ref;
+      var head = el('div', 'ad-book-head');
+      var when = el('div', 'ad-book-when'); when.appendChild(el('b', null, longDay(b.date))); when.appendChild(el('span', null, clock(b.start) + ' – ' + clock(b.end))); head.appendChild(when);
+      var tags = el('div', 'ad-book-tags');
+      tags.appendChild(el('span', 'tag ' + (b.state === 'confirmed' ? 'ok' : b.state === 'lost' ? 'lost' : 'pend'), b.state === 'confirmed' ? 'Confirmed' : b.state === 'lost' ? 'Didn’t book' : 'Waiting to confirm'));
+      if (b.state === 'confirmed') tags.appendChild(el('span', 'tag ' + (b.paid ? 'ok' : 'pend'), b.paid ? 'Paid ✓' : 'Not paid'));
+      head.appendChild(tags); c.appendChild(head);
+      var info = el('p', 'ad-book-info');
+      info.appendChild(el('b', null, who(b))); info.appendChild(document.createTextNode(' · ' + b.participants + ' people · ' + b.experience + (b.wax ? ' + Wax Cracking' : '') + ' · ' + money(b.totalCents) + (b.onQuote && b.onQuote.length ? ' + quote items' : '')));
+      c.appendChild(info);
+      c.appendChild(el('p', 'ad-book-where', (b.venue ? b.venue + ' · ' : '') + (b.area ? 'Postal area ' + b.area : '') + ' · ' + b.ref + ' · ' + (b.addons ? b.addons + ' add-on' + (b.addons > 1 ? 's' : '') : 'no add-ons')));
+      if (b.vendors.length || (b.inHouse || []).length) {
+        var vs = el('div', 'ad-vendors');
+        b.vendors.forEach(function(v){
+          var row = el('div', 'ad-vendor ' + (v.ok ? 'ok' : 'pend'));
+          var t = el('div'); t.appendChild(el('b', null, (v.ok ? '✓ ' : '… ') + v.name)); t.appendChild(el('small', null, v.items.join(', ') + (v.ok ? ' · confirmed ' + when2(v.ok) : ' · waiting for the vendor'))); row.appendChild(t);
+          var btn = el('button', 'mini', v.ok ? 'Undo' : 'Vendor confirmed'); btn.type = 'button'; btn.addEventListener('click', function(){ mark(b.ref, 'v' + v.i, btn, !!v.ok); }); row.appendChild(btn);
+          vs.appendChild(row);
+        });
+        if ((b.inHouse || []).length) vs.appendChild(el('p', 'ad-fine', 'Our own: ' + b.inHouse.join(', ')));
+        c.appendChild(vs);
+      }
+      if (b.todos.length) { var td = el('ul', 'ad-book-todo'); b.todos.forEach(function(t){ td.appendChild(el('li', null, t)); }); c.appendChild(td); }
+      var acts = el('div', 'ad-book-acts'), L = b.life || {};
+      [['contacted', 'Contacted'], ['confirmed', 'Confirmed'], ['paid', 'Paid'], ['lost', 'Didn’t book']].forEach(function(s){
+        if (s[0] === 'paid' && b.state !== 'confirmed') return;
+        var on = !!L[s[0]], btn = el('button', 'mini' + (on ? ' on' : ''), (on ? '✓ ' : '') + s[1]); btn.type = 'button';
+        btn.title = on ? 'Recorded ' + when2(L[s[0]]) + '. Click to undo.' : 'Mark as ' + s[1].toLowerCase();
+        btn.addEventListener('click', function(){ if (!on || confirm('Undo “' + s[1] + '” for ' + b.ref + '?')) mark(b.ref, s[0], btn, on); });
+        acts.appendChild(btn);
+      });
+      c.appendChild(acts); box.appendChild(c);
+    });
+  }
+  var when2 = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
+  $('cal-prev').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7) - 2; if (m < 0) { m = 11; y--; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });
+  $('cal-next').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7); if (m > 11) { m = 0; y++; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });
+  document.querySelectorAll('[data-b]').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on', x === b); }); bookFilter = b.dataset.b; if (last) bookings(); }); });
 
   function load(){
     var err = $('ad-error'); err.hidden = true;

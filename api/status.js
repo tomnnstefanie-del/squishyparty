@@ -1,10 +1,11 @@
-// GET /api/status?ref=SP-…&s=contacted|confirmed&t=…  (the buttons on the Telegram request message)
-// Records when we got back to the customer or confirmed the party, for the dashboard's response times.
+// GET /api/status?ref=SP-…&s=contacted|confirmed|paid|v0-v9&t=…  (the buttons on the Telegram request message)
+// Records when we got back to the customer, confirmed the party, got paid, or a partner vendor confirmed.
 import { checkStatusToken } from '../lib/status-link.js';
 import { markStatus, statsConfigured } from '../lib/stats.js';
 
 const REF = /^SP-\d{6}-[0-9A-F]{4}$/;
-const LABEL = { contacted: 'contacted', confirmed: 'confirmed' };
+const LABEL = { contacted: 'contacted', confirmed: 'confirmed', paid: 'paid' };
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const sgTime = (iso) => new Date(iso).toLocaleString('en-SG', { timeZone: 'Asia/Singapore', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 
 function page(res, status, title, text) {
@@ -21,11 +22,12 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') { res.statusCode = 405; res.setHeader('Allow', 'GET'); return res.end(); }
   const url = new URL(req.url, 'http://x');
   const ref = url.searchParams.get('ref') || '', s = url.searchParams.get('s') || '', t = url.searchParams.get('t') || '';
-  if (!REF.test(ref) || !LABEL[s] || !checkStatusToken(ref, s, t)) return page(res, 400, 'That link isn’t valid', 'Please use the button on the Telegram message.');
+  if (!REF.test(ref) || !(LABEL[s] || /^v\d$/.test(s)) || !checkStatusToken(ref, s, t)) return page(res, 400, 'That link isn’t valid', 'Please use the button on the Telegram message.');
   if (!statsConfigured()) return page(res, 503, 'Dashboard not connected', 'Connect the database in Vercel to record response times.');
   try {
-    const life = await markStatus(ref, s);
-    if (!life) return page(res, 404, 'Request not found', `${ref} was sent before the dashboard was connected.`);
-    return page(res, 200, `${ref} marked ${LABEL[s]}`, `Recorded at ${sgTime(life[s])} (Singapore time).`);
+    const r = await markStatus(ref, s);
+    if (!r) return page(res, 404, 'Request not found', `${ref} was sent before the dashboard was connected.`);
+    if (r.vendor) return page(res, 200, `${esc(r.vendor.name)} confirmed for ${ref}`, `Recorded at ${sgTime(r.life.vendors[r.vendor.name])} (Singapore time).`);
+    return page(res, 200, `${ref} marked ${LABEL[s]}`, `Recorded at ${sgTime(r.life[s])} (Singapore time).`);
   } catch (e) { console.error('[status]', e.message); return page(res, 500, 'Something went wrong', 'Please try again.'); }
 }

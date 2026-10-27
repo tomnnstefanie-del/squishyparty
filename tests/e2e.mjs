@@ -252,6 +252,38 @@ try {
   assert.equal(mk, 200); ok('a request can be marked from the dashboard');
   const lock = await p2.evaluate(async () => { let s = 0; for (let i = 0; i < 12; i++) { const r = await fetch('/api/admin', { headers: { Authorization: 'Bearer nope-nope-nope', 'X-Forwarded-For': '10.9.9.9' } }); s = r.status; } return s; });
   assert.equal(lock, 429); ok('after 10 wrong passwords the dashboard locks that address for 15 minutes');
+
+  // The whole booking process: a party with add-ons from two partner vendors and one of our own
+  console.log('booking process');
+  x = await api({ ...base, plan: { ...base.plan, addons: ['bl-arch', 'js-photo-1', 's-favours'] }, contact: { ...base.contact, venueName: 'Clubhouse B' } }, { 'X-Forwarded-For': '10.0.3.1' });
+  assert.equal(x.s, 200); const bref = x.b.ref;
+  const bk = sent().at(-1).reply_markup.inline_keyboard.flat(), tgBtn = (t) => bk.find((b) => b.text.includes(t));
+  assert.ok(tgBtn('Paid') && tgBtn('Bloom confirmed') && tgBtn('J Square Photography confirmed') && !tgBtn('Tom & Stefanie'));
+  ok('Telegram has Contacted, Confirmed, Paid and one “confirmed” button per partner vendor (not for our own add-ons)');
+  const book = async () => (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === bref);
+  let b1 = await book();
+  assert.ok(b1 && b1.state === 'pending' && b1.date === base.plan.date && b1.start === '10:00' && b1.venue === 'Clubhouse B' && b1.addons === 3);
+  assert.deepEqual(b1.vendors.map((v) => v.name), ['Bloom', 'J Square Photography']);
+  for (const tdo of ['Reply to the customer', 'Confirm with Bloom', 'Confirm with J Square Photography']) assert.ok(b1.todos.includes(tdo), tdo);
+  ok('the dashboard lists the booking with its date, time, venue, add-ons, both vendors waiting and what we still need to do');
+  assert.equal((await fetch(local(tgBtn('Bloom confirmed').url))).status, 200);
+  b1 = await book(); assert.ok(b1.vendors[0].ok && !b1.vendors[1].ok && !b1.todos.includes('Confirm with Bloom') && b1.todos.includes('Confirm with J Square Photography'));
+  ok('tapping “Bloom confirmed” in Telegram ticks Bloom off; J Square is still waiting');
+  await fetch(local(tgBtn('J Square Photography confirmed').url)); await fetch(local(tgBtn('🎉 Confirmed').url));
+  b1 = await book(); assert.ok(b1.state === 'confirmed' && !b1.paid && b1.todos.length === 1 && b1.todos[0] === 'Collect payment');
+  ok('once both vendors and the party are confirmed, the only thing left is “Collect payment”');
+  assert.ok((await (await fetch(local(tgBtn('Paid').url))).text()).includes('marked paid'));
+  b1 = await book(); assert.ok(b1.paid && b1.todos.length === 0);
+  ok('tapping “💰 Paid” in Telegram marks it paid and clears the to-do list');
+  const un = await p2.evaluate(async (ref) => (await fetch('/api/admin', { method: 'POST', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'undo', ref, status: 'paid' }) })).status, bref);
+  assert.equal(un, 200); b1 = await book(); assert.ok(!b1.paid && b1.todos.includes('Collect payment'));
+  ok('a mistaken tick can be undone from the dashboard');
+  const bp = await browser.newPage(); await bp.goto(BASE + '/admin.html'); await bp.fill('#ad-pass', 'test-dashboard-pass'); await bp.click('#ad-login button');
+  await bp.waitForSelector('#ad-body:not([hidden])');
+  assert.ok((await bp.textContent('#ad-books')).includes(bref)); assert.ok((await bp.textContent('#ad-todo')).includes('Collect payment'));
+  await bp.goto(BASE + '/admin.html'); await bp.waitForSelector('#ad-body:not([hidden])'); // the password is remembered for this tab
+  await bp.close();
+  ok('the dashboard page shows the booking card and the to-do list');
   const cross = await fetch(`${BASE}/api/request`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' }, body: JSON.stringify(base) });
   assert.equal(cross.status, 403); ok('cross-site posts are refused (403)');
   let codes = [];

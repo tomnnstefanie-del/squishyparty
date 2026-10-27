@@ -1351,6 +1351,13 @@
   }
   $('ref-code').addEventListener('input', function(){ refHint(); render(false); }); refHint();
 
+
+  // Header "Experiences" menu: closes after choosing a link, on a click elsewhere, or with Escape
+  (function(){ var m = $('nav-exp'); if (!m) return;
+    m.addEventListener('click', function(e){ if (e.target.closest('a')) m.open = false; });
+    document.addEventListener('click', function(e){ if (m.open && !m.contains(e.target)) m.open = false; });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && m.open) { m.open = false; m.querySelector('summary').focus(); } });
+  })();
   initHow();
   buildCards();
   buildInvite();
