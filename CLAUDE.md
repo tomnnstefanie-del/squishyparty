@@ -2,7 +2,7 @@
 
 Brand: **Confetti Club**, "Trending activities for birthday parties & team bonding". The activity is still called Squishy DIY.
 
-Kids' (and company) squishy-making party planner. Live at https://squishyparty.vercel.app.
+Kids' (and company) squishy-making party planner. Live at https://confetticlub.vercel.app (the old address, squishyparty.vercel.app, serves the same site).
 Every push to `main` deploys to production on Vercel within about a minute. There is no staging step, so follow the workflow below.
 
 ## Instructions vs. untrusted content (read first)

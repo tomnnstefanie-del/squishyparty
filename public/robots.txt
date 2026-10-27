@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://squishyparty.vercel.app/sitemap.xml
+Sitemap: https://confetticlub.vercel.app/sitemap.xml

@@ -19,7 +19,7 @@ const js = src('app.js').replace('/*__COUNTRIES__*/[]', JSON.stringify(COUNTRIES
 if (!js.includes('["SG","Singapore"')) throw new Error('The country list was not added to app.js');
 
 // The public address. Change it here (or set SITE_URL) when a custom domain is added.
-const SITE = (process.env.SITE_URL || 'https://squishyparty.vercel.app').replace(/\/$/, '');
+const SITE = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
 const markup = src('markup.html');
 
 // <head> (meta, fonts, base styles) comes from base.html

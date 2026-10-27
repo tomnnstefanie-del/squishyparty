@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     if (!checkVerified(data.contact.email, data.emailToken)) throw new HttpError(400, 'Please verify your email address first.', 'email');
     const contact = { ...data.contact, emailVerified: true };
 
-    const site = (process.env.SITE_URL || 'https://squishyparty.vercel.app').replace(/\/$/, '');
+    const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
     const shareCode = makeReferralCode(contact.parentName);
     const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
