@@ -57,7 +57,7 @@ head = replaceAll(head, '</title>', '</title>\n' + [
 
 // robots.txt and sitemap.xml follow the same address
 fs.writeFileSync(path.join(root, 'public/robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
-fs.writeFileSync(path.join(root, 'public/sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE}/</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>\n</urlset>\n`);
+fs.writeFileSync(path.join(root, 'public/sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE}/</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>\n  <url><loc>${SITE}/stores.html</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>\n</urlset>\n`);
 
 // Component styles and the icon sprite from base-v2.html, plus the "x" icon
 const v2style = v2.slice(0, v2.indexOf('</style>') + 8);
@@ -76,6 +76,19 @@ if (out.includes('__EXP_') || out.includes('__IMG__')) throw new Error('An image
 fs.writeFileSync(path.join(root, 'public/index.html'), out);
 console.log('built public/index.html', (out.length / 1024).toFixed(0) + ' KB');
 
+// Our stores: a separate page. Header and footer come from markup.html, with in-page links pointed back at the main page.
+const toMain = (h) => h.replace(/<a href="#explore" data-tab-link="(tab-\w+)"/g, '<a href="./#$1"').replace(/href="#top"/g, 'href="./"').replace(/href="#/g, 'href="./#');
+const header = toMain(markup.slice(markup.indexOf('<header class="site-header"'), markup.indexOf('</header>') + 9));
+const footer = toMain(markup.slice(markup.indexOf('<footer>'), markup.indexOf('</footer>') + 9));
+let storesHead = head.replace(/<title>[^<]*<\/title>/, '<title>Our Stores | Confetti Club by Tom &amp; Stefanie</title>')
+  .replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="Try squishy-making at the Tom &amp; Stefanie squishy bar: Woodlands Civic Centre, Paya Lebar Quarter (PLQ) and Eastpoint Mall, Singapore. Addresses, phone numbers and opening hours.">')
+  .replace(`<link rel="canonical" href="${SITE}/">`, `<link rel="canonical" href="${SITE}/stores.html">`).replace(`<meta property="og:url" content="${SITE}/">`, `<meta property="og:url" content="${SITE}/stores.html">`)
+  .replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="Our Stores | Confetti Club">')
+  .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '');
+const stores = storesHead + '\n' + v2style + '\n<style>\n' + src('styles.css') + '</style>\n</head>\n' + sprite + '\n' + v2sprite + '\n' + src('stores.html').replace('__HEADER__', header).replace('__FOOTER__', footer) + '\n</body>\n</html>\n';
+if (stores.includes('__HEADER__') || stores.includes('__FOOTER__')) throw new Error('stores.html header or footer was not filled in');
+fs.writeFileSync(path.join(root, 'public/stores.html'), stores);
+
 if (process.argv.includes('--preview')) {
   // Offline preview: embed the photos from public/img too (the live site loads them as files).
   let prev = out, n = 0;
@@ -92,5 +105,9 @@ if (process.argv.includes('--preview')) {
   fs.mkdirSync(path.join(root, '.preview'), { recursive: true });
   fs.writeFileSync(path.join(root, '.preview/index.html'), prev);
   fs.writeFileSync(path.join(root, 'tools/mobile-studio/site.html'), prev);
+  let prevStores = replaceAll(stores, 'src="img/logo.webp"', `src="data:image/webp;base64,${b64('public/img/logo.webp')}"`);
+  prevStores = replaceAll(prevStores, 'href="img/icon.png"', `href="data:image/png;base64,${b64('public/img/icon.png')}"`);
+  prevStores = prevStores.replace(/href="\.\/(#[^"]*)?"/g, (m, h) => `href="index.html${h || ''}"`);
+  fs.writeFileSync(path.join(root, '.preview/stores.html'), prevStores);
   console.log(`preview: .preview/index.html and tools/mobile-studio/site.html (${n} photos embedded)`);
 }

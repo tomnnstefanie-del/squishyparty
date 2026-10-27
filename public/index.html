@@ -1903,23 +1903,26 @@ footer a:focus-visible{outline:2px solid var(--teal-700);outline-offset:2px;bord
 .retail-photo .retail-icon{align-self:flex-end;display:inline-flex;background:rgba(30,42,170,.88);border-radius:14px;padding:8px;line-height:0;transition:transform .15s ease}
 .retail-photo .retail-icon:hover{transform:translateY(-2px)}
 .retail-photo .retail-icon:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
-/* Our stores */
-.store-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.store-card{border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column}
-.store-card-ph{aspect-ratio:4/3;background:var(--cobalt-50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.8125rem;font-weight:700}
-.store-card-ph .icon{width:32px;height:32px;color:var(--cobalt)}
-.store-card-ph img{width:100%;height:100%;object-fit:cover}
-.store-card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px}
-.store-card-body h3{margin:0;font-size:1.125rem}
-.store-addr,.store-hours{margin:0;color:var(--ink-2);font-size:.9375rem}
-.store-card-body .btn{margin-top:8px;align-self:flex-start}
-@media (max-width:760px){.store-list{grid-template-columns:1fr}}
 /* Footer: a darker band than the page */
 footer{background:#efece7;border-top:0}
 .foot-base{border-top-color:#ddd8d0}
-.store-line{margin:0;display:flex;gap:8px;align-items:flex-start;color:var(--ink-2);font-size:.9375rem}
-.store-line .icon{width:18px;height:18px;flex:none;margin-top:3px;color:var(--teal-700)}
-.store-line a{color:var(--ink);font-weight:600}
+/* v43 Our stores page (stores.html) */
+.shops-hero{padding-bottom:8px}
+.shops-back{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--ink);text-decoration:none;margin-bottom:18px;min-height:44px}
+.shops-back .icon{width:16px;height:16px}
+.shops-hero h1{margin:6px 0 10px;font-size:clamp(2.2rem,1.6rem + 2.4vw,3.4rem)}
+.shops-hero .lead{max-width:560px}
+.shop-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.shop-card{border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);padding:22px;display:flex;flex-direction:column;gap:10px}
+.shop-card h2{margin:0 0 4px;font-size:1.25rem}
+.shop-line{margin:0;display:flex;gap:10px;align-items:flex-start;color:var(--ink-2);font-size:.9375rem}
+.shop-line .icon{width:18px;height:18px;flex:none;margin-top:3px;color:var(--teal-700)}
+.shop-line a{color:var(--ink);font-weight:600}
+.shop-card .btn{margin-top:auto;align-self:flex-start}
+@media (max-width:860px){.shop-list{grid-template-columns:1fr}}
+/* v44 header stays on one line with the extra Our stores link */
+.nav a,.header-cta{white-space:nowrap}
+@media (max-width:1380px){.site-header .brand-by{display:none}.nav{gap:22px}}
 </style>
 </head>
 <body>
@@ -1972,7 +1975,7 @@ footer{background:#efece7;border-top:0}
       <span class="brand-text"><span class="brand-by">Trending activities for birthday parties &amp; team bonding</span></span>
     </a>
     <nav class="nav" aria-label="Explore">
-      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a><a href="#companies">For companies</a><a href="#reviews">Reviews</a><a href="#stores">Our stores</a>
+      <a href="#explore" data-tab-link="tab-how">How it works</a><a href="#explore" data-tab-link="tab-day">On the day</a><a href="#explore" data-tab-link="tab-safety">Safety</a><a href="#explore" data-tab-link="tab-faq">FAQ</a><a href="#companies">For companies</a><a href="#reviews">Reviews</a><a href="stores.html">Our stores</a>
     </nav>
     <a class="btn btn-primary header-cta" href="#plan-1">Build my party</a>
   </div>
@@ -2179,7 +2182,7 @@ footer{background:#efece7;border-top:0}
         </div>
           <div class="retail retail-photo" style="margin-top:24px"><img class="retail-bg" src="img/store.jpg" alt="" aria-hidden="true" loading="lazy">
             <div><p class="eyebrow">Try the experience in store</p><p>Currently available exclusively at <strong>Tom &amp; Stefanie</strong> retail outlets.</p></div>
-            <a class="retail-icon" href="#stores" aria-label="Our stores"><svg class="icon" style="width:40px;height:40px;color:var(--lemon)" aria-hidden="true"><use href="#i-store"/></svg></a>
+            <a class="retail-icon" href="stores.html" aria-label="Our stores"><svg class="icon" style="width:40px;height:40px;color:var(--lemon)" aria-hidden="true"><use href="#i-store"/></svg></a>
           </div>
       </div>
     </div>
@@ -2219,14 +2222,6 @@ footer{background:#efece7;border-top:0}
   </section>
 
   <!-- Reviews and photos from real parties. Fill REVIEWS / EVENT_PHOTOS in src/app.js: never invent a review. -->
-  <!-- Our stores: filled from STORE_LIST in src/app.js -->
-  <section class="section stores" id="stores" aria-labelledby="stores-h">
-    <div class="wrap">
-      <div class="section-head"><div><p class="eyebrow">Try it in store</p><h2 id="stores-h">Our stores.</h2><p class="lead">Make a squishy at the squishy bar in any of our Tom &amp; Stefanie stores, then bring the party home.</p></div></div>
-      <div class="store-list" id="store-list"></div>
-    </div>
-  </section>
-
   <section class="section reviews" id="reviews" aria-labelledby="reviews-h">
     <div class="wrap">
       <div class="rv-head">
@@ -2277,7 +2272,7 @@ footer{background:#efece7;border-top:0}
         <a href="#explore" data-tab-link="tab-faq">FAQs</a>
         <a href="#explore" data-tab-link="tab-safety">Safety &amp; Care</a>
         <a href="#reviews">Reviews</a>
-        <a href="#stores">Our Stores</a>
+        <a href="stores.html">Our Stores</a>
       </nav>
     </div>
     <div class="foot-partners">
@@ -3214,29 +3209,6 @@ footer{background:#efece7;border-top:0}
     track.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
     track.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); setTimeout(update, 300);
   }
-  /* Our stores. Fill in each store's name, address, opening hours, photo and Google Maps link.
-     map: the "Share → Copy link" address from Google Maps. Placeholders show until the details are in. */
-  var STORE_LIST = [
-    {name:'Woodlands Civic Centre', address:'900 South Woodlands Drive, #02-03, Singapore 730900', phone:'+65 6892 8001', hours:'10:30am – 9:30pm', img:'', map:'https://share.google/GASsr4JTdJEc89xxD'},
-    {name:'Paya Lebar Quarter (PLQ) Mall', address:'10 Paya Lebar Road, #03-18, Singapore 409057', phone:'+65 6970 1978', hours:'10:45am – 9:30pm', img:'', map:'https://share.google/xehyNG3mHnl0qXWgf'},
-    {name:'Eastpoint Mall', address:'3 Simei Street 6, #02-25, Singapore 528833', phone:'+65 6694 8591', hours:'10:45am – 9:30pm', img:'', map:'https://share.google/rbMSE33OX9pkknX7G'}
-  ];
-  (function(){
-    var box = $('store-list'); if (!box) return;
-    STORE_LIST.forEach(function(st){
-      var c = el('article','store-card'), ph = el('div','store-card-ph');
-      if (st.img) { var im = document.createElement('img'); im.src = st.img; im.alt = st.name; im.loading = 'lazy'; ph.appendChild(im); }
-      else { ph.appendChild(icon('i-store')); ph.appendChild(el('span', null, 'Store photo coming soon')); }
-      c.appendChild(ph);
-      var b = el('div','store-card-body'); b.appendChild(el('h3', null, st.name));
-      var line = function(ic, text, href){ var p = el('p','store-line'), t = href ? el('a', null, text) : el('span', null, text); if (href) t.href = href; p.appendChild(icon(ic)); p.appendChild(t); b.appendChild(p); };
-      line('i-pin', st.address || 'Address coming soon');
-      if (st.phone) line('i-phone', st.phone, 'tel:' + st.phone.replace(/\s+/g, ''));
-      if (st.hours) line('i-clock', st.hours);
-      if (st.map) { var a = el('a','btn btn-ghost', 'Open in Google Maps'); a.href = st.map; a.target = '_blank'; a.rel = 'noopener'; b.appendChild(a); }
-      c.appendChild(b); box.appendChild(c);
-    });
-  })();
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
     REVIEWS.forEach(function(r, idx){
@@ -4040,7 +4012,9 @@ footer{background:#efece7;border-top:0}
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
   // #care and #privacy open that FAQ answer
   document.querySelectorAll('a[href="#care"],a[href="#privacy"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); $('tab-faq').click(); var d = $(a.getAttribute('href').slice(1)); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
-  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
+  // Arriving from another page (e.g. stores.html) with #tab-faq / #tab-safety / #tab-day / #tab-how opens that tab
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} var t = /^#(tab-(how|day|safety|faq))$/.exec(h); if (!t) return; selectTab($(t[1]), false); setTimeout(function(){ $('explore').scrollIntoView({block:'start'}); }, 50); })();
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care' && h !== '#privacy') return; h = h.slice(1); $('tab-faq').click(); var d = $(h); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */
   var bf = $('booking-form'), err = $('booking-error');

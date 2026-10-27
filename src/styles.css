@@ -1261,20 +1261,23 @@ footer a:focus-visible{outline:2px solid var(--teal-700);outline-offset:2px;bord
 .retail-photo .retail-icon{align-self:flex-end;display:inline-flex;background:rgba(30,42,170,.88);border-radius:14px;padding:8px;line-height:0;transition:transform .15s ease}
 .retail-photo .retail-icon:hover{transform:translateY(-2px)}
 .retail-photo .retail-icon:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
-/* Our stores */
-.store-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.store-card{border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column}
-.store-card-ph{aspect-ratio:4/3;background:var(--cobalt-50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.8125rem;font-weight:700}
-.store-card-ph .icon{width:32px;height:32px;color:var(--cobalt)}
-.store-card-ph img{width:100%;height:100%;object-fit:cover}
-.store-card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px}
-.store-card-body h3{margin:0;font-size:1.125rem}
-.store-addr,.store-hours{margin:0;color:var(--ink-2);font-size:.9375rem}
-.store-card-body .btn{margin-top:8px;align-self:flex-start}
-@media (max-width:760px){.store-list{grid-template-columns:1fr}}
 /* Footer: a darker band than the page */
 footer{background:#efece7;border-top:0}
 .foot-base{border-top-color:#ddd8d0}
-.store-line{margin:0;display:flex;gap:8px;align-items:flex-start;color:var(--ink-2);font-size:.9375rem}
-.store-line .icon{width:18px;height:18px;flex:none;margin-top:3px;color:var(--teal-700)}
-.store-line a{color:var(--ink);font-weight:600}
+/* v43 Our stores page (stores.html) */
+.shops-hero{padding-bottom:8px}
+.shops-back{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--ink);text-decoration:none;margin-bottom:18px;min-height:44px}
+.shops-back .icon{width:16px;height:16px}
+.shops-hero h1{margin:6px 0 10px;font-size:clamp(2.2rem,1.6rem + 2.4vw,3.4rem)}
+.shops-hero .lead{max-width:560px}
+.shop-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.shop-card{border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);padding:22px;display:flex;flex-direction:column;gap:10px}
+.shop-card h2{margin:0 0 4px;font-size:1.25rem}
+.shop-line{margin:0;display:flex;gap:10px;align-items:flex-start;color:var(--ink-2);font-size:.9375rem}
+.shop-line .icon{width:18px;height:18px;flex:none;margin-top:3px;color:var(--teal-700)}
+.shop-line a{color:var(--ink);font-weight:600}
+.shop-card .btn{margin-top:auto;align-self:flex-start}
+@media (max-width:860px){.shop-list{grid-template-columns:1fr}}
+/* v44 header stays on one line with the extra Our stores link */
+.nav a,.header-cta{white-space:nowrap}
+@media (max-width:1380px){.site-header .brand-by{display:none}.nav{gap:22px}}

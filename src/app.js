@@ -609,29 +609,6 @@
     track.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); } });
     track.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); setTimeout(update, 300);
   }
-  /* Our stores. Fill in each store's name, address, opening hours, photo and Google Maps link.
-     map: the "Share → Copy link" address from Google Maps. Placeholders show until the details are in. */
-  var STORE_LIST = [
-    {name:'Woodlands Civic Centre', address:'900 South Woodlands Drive, #02-03, Singapore 730900', phone:'+65 6892 8001', hours:'10:30am – 9:30pm', img:'', map:'https://share.google/GASsr4JTdJEc89xxD'},
-    {name:'Paya Lebar Quarter (PLQ) Mall', address:'10 Paya Lebar Road, #03-18, Singapore 409057', phone:'+65 6970 1978', hours:'10:45am – 9:30pm', img:'', map:'https://share.google/xehyNG3mHnl0qXWgf'},
-    {name:'Eastpoint Mall', address:'3 Simei Street 6, #02-25, Singapore 528833', phone:'+65 6694 8591', hours:'10:45am – 9:30pm', img:'', map:'https://share.google/rbMSE33OX9pkknX7G'}
-  ];
-  (function(){
-    var box = $('store-list'); if (!box) return;
-    STORE_LIST.forEach(function(st){
-      var c = el('article','store-card'), ph = el('div','store-card-ph');
-      if (st.img) { var im = document.createElement('img'); im.src = st.img; im.alt = st.name; im.loading = 'lazy'; ph.appendChild(im); }
-      else { ph.appendChild(icon('i-store')); ph.appendChild(el('span', null, 'Store photo coming soon')); }
-      c.appendChild(ph);
-      var b = el('div','store-card-body'); b.appendChild(el('h3', null, st.name));
-      var line = function(ic, text, href){ var p = el('p','store-line'), t = href ? el('a', null, text) : el('span', null, text); if (href) t.href = href; p.appendChild(icon(ic)); p.appendChild(t); b.appendChild(p); };
-      line('i-pin', st.address || 'Address coming soon');
-      if (st.phone) line('i-phone', st.phone, 'tel:' + st.phone.replace(/\s+/g, ''));
-      if (st.hours) line('i-clock', st.hours);
-      if (st.map) { var a = el('a','btn btn-ghost', 'Open in Google Maps'); a.href = st.map; a.target = '_blank'; a.rel = 'noopener'; b.appendChild(a); }
-      c.appendChild(b); box.appendChild(c);
-    });
-  })();
   function renderReviews(){
     var grid = $('rv-grid'); if (!grid) return;
     REVIEWS.forEach(function(r, idx){
@@ -1435,7 +1412,9 @@
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
   // #care and #privacy open that FAQ answer
   document.querySelectorAll('a[href="#care"],a[href="#privacy"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); $('tab-faq').click(); var d = $(a.getAttribute('href').slice(1)); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
-  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
+  // Arriving from another page (e.g. stores.html) with #tab-faq / #tab-safety / #tab-day / #tab-how opens that tab
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} var t = /^#(tab-(how|day|safety|faq))$/.exec(h); if (!t) return; selectTab($(t[1]), false); setTimeout(function(){ $('explore').scrollIntoView({block:'start'}); }, 50); })();
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care' && h !== '#privacy') return; h = h.slice(1); $('tab-faq').click(); var d = $(h); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */
   var bf = $('booking-form'), err = $('booking-error');
