@@ -16,11 +16,11 @@ http.createServer((req, res) => {
   req.on('end', () => {
     const raw = Buffer.concat(chunks), body = raw.toString('utf8');
     res.setHeader('Content-Type', 'application/json');
-    const ph = /^\/bot([^/]+)\/sendPhoto$/.exec(req.url);
-    if (ph) {
+    const ph = /^\/bot([^/]+)\/send(Photo|Document)$/.exec(req.url);
+    if (ph) { // sendPhoto (moodboard images) and sendDocument (PDF quotations) are both recorded in .photos.json
       const caption = (/name="caption"\r\n\r\n([^\r]*)/.exec(body) || [])[1] || '';
       const list = JSON.parse(fs.readFileSync(photos, 'utf8'));
-      list.push({ token: ph[1], caption, bytes: raw.length, jpeg: raw.includes(Buffer.from([0xFF, 0xD8, 0xFF])), png: raw.includes(Buffer.from('PNG')) });
+      list.push({ token: ph[1], kind: ph[2], caption, bytes: raw.length, pdf: raw.includes(Buffer.from('%PDF-')), jpeg: raw.includes(Buffer.from([0xFF, 0xD8, 0xFF])), png: raw.includes(Buffer.from('PNG')) });
       fs.writeFileSync(photos, JSON.stringify(list, null, 2));
       return res.end(JSON.stringify({ ok: true, result: { message_id: list.length } }));
     }

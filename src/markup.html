@@ -570,6 +570,7 @@
               <label class="consent returning"><input type="checkbox" name="returning" id="ref-returning"><span>I’ve booked a party with Confetti Club before</span></label>
             </div>
             <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+            <label class="consent quote-opt"><input type="checkbox" name="wantQuote" id="want-quote"><span><b>Email me an itemised PDF quotation</b><small id="want-quote-hint">Sent straight away with your confirmation. Nothing to pay.</small></span></label>
             <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted on WhatsApp and email about this request.</span></label>
             <p class="privacy">We use these details only to arrange your party and reply to your request.</p>
             <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
@@ -582,8 +583,8 @@
         <div class="sent-card" id="sent-card" tabindex="-1" hidden>
           <span class="sent-icon" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
           <h3>Request received!</h3>
-          <p>Your reference is <strong id="sent-ref">SP-0000</strong>. Your request is being verified by our team, and we’ll reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
-          <p class="dep-sub" id="sent-mail">We’ve emailed a copy to <span id="sent-email"></span>.</p>
+          <p>Your reference is <strong id="sent-ref">SP-0000</strong>. We’ll check availability and reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
+          <p class="dep-sub" id="sent-mail"><span id="sent-mail-what">We’ve emailed a copy</span> to <span id="sent-email"></span>.</p>
           <p class="dep-sub" id="sent-family">There’s nothing to pay now. Once we confirm availability, we’ll send you one quotation.</p>
           <p class="dep-sub" id="sent-company" hidden>As a company booking, there’s nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to <b id="sent-bill"></b>.</p>
           <div class="next-steps">

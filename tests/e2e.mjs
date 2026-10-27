@@ -106,9 +106,9 @@ try {
   ok('after sending, the customer is told there’s nothing to pay now');
   const conf = mails().at(-1);
   assert.equal(conf.to, 'sarah@example.com'); assert.ok(conf.subject.includes(ref));
-  assert.ok(conf.text.includes('currently being verified by our team') && conf.text.includes('WhatsApp') && conf.text.includes('Nothing to pay now') && conf.text.includes('Participants: 12'));
+  assert.ok(conf.text.includes('reach out on WhatsApp') && conf.text.includes('nothing to pay at this stage') && conf.text.includes('Participants: 12'));
   assert.deepEqual(conf.attachments, []);
-  ok('customer is emailed: being verified, we’ll WhatsApp you, nothing to pay now');
+  ok('customer is emailed: we’ll WhatsApp you to confirm, nothing to pay (no PDF unless asked)');
 
   const msgs = sent();
   assert.equal(msgs.length, 1);
@@ -180,16 +180,21 @@ try {
   const last = sent().at(-1).text;
   assert.ok(last.includes('Page showed $0.01'));
   ok('a fake $0.01 total from the browser is ignored; server prices it at $480 and flags the mismatch');
+  x = await api({ ...base, wantQuote: true }, { 'X-Forwarded-For': '10.0.0.5' });
+  assert.equal(x.s, 200); assert.equal(x.b.quoted, true);
+  const qm = mails().at(-1); assert.ok(qm.subject.startsWith('Your Confetti Club Quotation | Q-SP-')); assert.deepEqual(qm.attachments, [`Confetti-Club-Quotation-Q-${x.b.ref}.pdf`]);
+  const qd = JSON.parse(fs.readFileSync(path.join(root, 'dev/.photos.json'), 'utf8')).at(-1); assert.ok(qd.kind === 'Document' && qd.pdf && qd.caption.includes(x.b.ref));
+  ok('ticking “Email me a PDF quotation” attaches the PDF to the email and posts a copy to Telegram');
   x = await api({ ...base, emailToken: '' }, { 'X-Forwarded-For': '10.0.0.6' });
   assert.equal(x.s, 400); assert.equal(x.b.field, 'email'); ok('a request without a verified email is refused (400)');
   x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
   assert.equal(x.s, 400); ok('a verified token for a different email is refused');
-  x = await api({ ...base, bookingFor: 'company', contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
+  x = await api({ ...base, bookingFor: 'company', wantQuote: true, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
   assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 48000);
-  assert.ok(sent().at(-1).text.includes('Company booking') && mails().at(-1).text.includes('nothing to pay now') && mails().at(-1).attachments.length === 0);
+  assert.ok(sent().at(-1).text.includes('Company booking') && mails().at(-1).text.includes('nothing to pay at this stage') && mails().at(-1).attachments.length === 1 && mails().at(-1).subject.includes('Quotation'));
   ok('company booking: same price, invoice requested on Telegram and in the email');
   x = await api({ ...base, website: 'http://spam' }, { 'X-Forwarded-For': '10.0.0.5' });
-  assert.equal(x.s, 200); assert.equal(sent().length, before + 2); // the $480 request and the company booking, nothing from the bot
+  assert.equal(x.s, 200); assert.equal(sent().length, before + 3); // the $480 request, the quotation request and the company booking, nothing from the bot
   ok('honeypot (bot) submissions are dropped silently');
   const g = await p2.evaluate(async () => (await fetch('/api/request')).status);
   assert.equal(g, 405); ok('GET is refused (405)');

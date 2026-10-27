@@ -6,6 +6,8 @@ import { buildMessage, whatsappLink, customerGreeting } from '../lib/telegram.js
 process.env.TELEGRAM_BOT_TOKEN = 'unit:token';
 const otp = await import('../lib/otp.js');
 const { confirmationEmail } = await import('../lib/emails.js');
+const { quotePdf, referralDiscount } = await import('../lib/quote-pdf.js');
+const Ref = await import('../lib/referral.js');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
@@ -70,9 +72,10 @@ t('includes contact, date, venue, address, postal', () => { for (const s of ['Sa
 t('lists participants, squishy lines and every add-on, with no deposit or budget', () => { assert.ok(!/deposit|budget|PayNow/i.test(msg)); for (const s of ['10 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Custom cake', 'Butter Studio', 'on quote', 'Party favour bags ×10', 'Face painting']) assert.ok(msg.includes(s), s); });
 t('escapes HTML in customer text', () => assert.ok(msg.includes('Lift &lt;b&gt;B&lt;/b&gt;, level 2')));
 t('flags when the page total differs from the server total', () => assert.ok(msg.includes('server price above is the one to quote')));
-t('confirmation email says it’s being verified and we’ll WhatsApp them', () => {
+t('confirmation email: we’ll WhatsApp them to confirm availability, nothing to pay', () => {
   const e = confirmationEmail({ ref: 'SP-TEST-0001', plan: v.plan, contact: v.contact, price });
-  for (const s of ['SP-TEST-0001', 'currently being verified by our team', 'WhatsApp', '+65 8123 4567', 'Participants: 10', 'Nothing to pay now', 'one quotation', '15 minutes before']) assert.ok(e.text.includes(s), s);
+  for (const s of ['SP-TEST-0001', 'reach out on WhatsApp at +65 8123 4567', 'Participants: 10', 'nothing to pay at this stage', 'one quotation', '15 minutes before']) assert.ok(e.text.includes(s), s);
+  assert.ok(!/verified by our team|The Confetti Club/.test(e.text + e.html));
   assert.ok(!/deposit|PayNow/i.test(e.text + e.html)); assert.equal(e.attachments.length, 0);
   assert.ok(!e.html.includes('<b>B</b>'));
 });
@@ -90,8 +93,32 @@ t('company booking: Telegram asks for an invoice; email says nothing to pay now'
   const m = buildMessage({ ref: 'SP-1', plan: c.plan, contact: c.contact, price: pr, clientTotalCents: null });
   assert.ok(m.includes('Acme Pte Ltd') && m.includes('Invoice to finance@acme.sg') && m.includes('send a quotation and invoice')); assert.ok(!m.includes('holding deposit'));
   const e = confirmationEmail({ ref: 'SP-1', plan: c.plan, contact: c.contact, price: pr });
-  assert.ok(e.text.includes('nothing to pay now') && e.text.includes('finance@acme.sg') && e.text.includes('same as shown')); assert.ok(!e.text.includes('holding deposit'));
+  assert.ok(e.text.includes('nothing to pay at this stage') && e.text.includes('finance@acme.sg')); assert.ok(!e.text.includes('holding deposit'));
   assert.equal(validateRequest(dateOK()).bookingFor, 'family');
+});
+t('PDF quotation is a valid PDF with every object where the index says', () => {
+  const pdf = quotePdf({ ref: 'SP-1', issued: new Date('2026-10-27'), plan: v.plan, contact: v.contact, price, bookingFor: 'family', discountCents: 0, contactEmail: 'hi@example.com', site: 'https://example.com' });
+  const s = pdf.toString('latin1');
+  assert.ok(s.startsWith('%PDF-1.4') && s.trimEnd().endsWith('%%EOF'));
+  const xref = Number(/startxref\n(\d+)/.exec(s)[1]); assert.ok(s.slice(xref).startsWith('xref'));
+  const offs = [...s.slice(xref).matchAll(/^(\d{10}) 00000 n $/gm)].map((m) => +m[1]);
+  offs.forEach((o, i) => assert.ok(s.slice(o).startsWith(`${i + 1} 0 obj`), `object ${i + 1}`));
+  assert.ok(s.includes('/DCTDecode') && s.includes('/Helvetica-Bold'));
+});
+t('quotation email attaches the PDF, with a quotation subject', () => {
+  const e = confirmationEmail({ ref: 'SP-2', plan: v.plan, contact: v.contact, price, quote: { pdf: Buffer.from('%PDF-1.4'), filename: 'Confetti-Club-Quotation-Q-SP-2.pdf', totalCents: price.totalCents - 1000, discountCents: 1000 } });
+  assert.equal(e.subject, 'Your Confetti Club Quotation | Q-SP-2');
+  assert.equal(e.attachments.length, 1); assert.equal(e.attachments[0].contentType, 'application/pdf');
+  for (const s of ['itemised PDF quotation is attached', 'not yet confirmed', 'Confetti Club', 'with your $10 friend referral']) assert.ok((e.text + e.html).includes(s), s);
+});
+t('$10 referral on the quotation: valid code or capsule, not their own, first party only', () => {
+  const { makeReferralCode, readReferralCode, samePerson } = Ref; const code = makeReferralCode('Mia Tan');
+  assert.equal(referralDiscount({ code }, readReferralCode, samePerson, 'Sarah Lim'), 1000);
+  assert.equal(referralDiscount({ code }, readReferralCode, samePerson, 'Mia Lee'), 0); // same first name: the team checks
+  assert.equal(referralDiscount({ code, returning: true }, readReferralCode, samePerson, 'Sarah Lim'), 0);
+  assert.equal(referralDiscount({ code: 'MIA-ZZZZ' }, readReferralCode, samePerson, 'Sarah Lim'), 0);
+  assert.equal(referralDiscount({ source: 'capsule' }, readReferralCode, samePerson, 'Sarah Lim'), 1000);
+  assert.equal(referralDiscount({}, readReferralCode, samePerson, 'Sarah Lim'), 0);
 });
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));

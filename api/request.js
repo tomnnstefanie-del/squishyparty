@@ -5,8 +5,9 @@
 import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
 import { priceRequest } from '../lib/pricing.js';
-import { makeReferralCode } from '../lib/referral.js';
-import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, whatsappLink } from '../lib/telegram.js';
+import { makeReferralCode, readReferralCode, samePerson } from '../lib/referral.js';
+import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
+import { quotePdf, referralDiscount } from '../lib/quote-pdf.js';
 import { addonName } from '../lib/pricing.js';
 import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpError } from '../lib/http.js';
 import { checkVerified } from '../lib/otp.js';
@@ -65,11 +66,24 @@ export default async function handler(req, res) {
       catch (e) { console.error('[request] moodboard photo failed', ref, e.message); }
     }
 
+    // Itemised PDF quotation (ticked by default for companies), from the same server pricing. A copy goes to Telegram
+    // so you have exactly what the customer received, even if prices change later.
+    let quote = null;
+    if (data.wantQuote) {
+      try {
+        const discountCents = referralDiscount(data.referral, readReferralCode, samePerson, contact.parentName);
+        const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents,
+          contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
+        quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents };
+        await sendTelegramDocument({ token, chatId, data: pdf, filename: quote.filename, caption: `${ref} · PDF quotation emailed to the customer${discountCents ? ' (includes $10 referral discount)' : ''}`, apiBase: process.env.TELEGRAM_API_BASE || undefined });
+      } catch (e) { console.error('[request] quotation copy failed', ref, e.message); }
+    }
+
     // The confirmation email is a courtesy: if it fails, the request has still reached you.
     let emailed = true;
-    try { await sendMail({ to: contact.email, ...confirmationEmail({ ref, plan: data.plan, contact, price }) }); }
+    try { await sendMail({ to: contact.email, ...confirmationEmail({ ref, plan: data.plan, contact, price, quote }) }); }
     catch (e) { emailed = false; console.error('[request] confirmation email failed', ref, e.message); }
 
-    return res.status(200).json({ ok: true, ref, emailed, bookingFor: data.bookingFor, totalCents: price.totalCents });
+    return res.status(200).json({ ok: true, ref, emailed, quoted: !!(quote && emailed), bookingFor: data.bookingFor, totalCents: price.totalCents });
   } catch (e) { return fail(res, e, 'request'); }
 }

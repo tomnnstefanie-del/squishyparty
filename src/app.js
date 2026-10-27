@@ -1564,7 +1564,11 @@
     var co = isCompany();
     $('company-fields').hidden = !co; $('company-name').required = co;
     $('note-family').hidden = co; $('note-company').hidden = !co;
+    // PDF quotation: ticked for companies (handy for approval), optional for families, unless they've chosen themselves
+    var wq = $('want-quote'); if (!wq.dataset.touched) wq.checked = co;
+    put('want-quote-hint', co ? 'Handy for your manager or finance team. Sent straight away, nothing to pay.' : 'Sent straight away with your confirmation. Nothing to pay.');
   }
+  $('want-quote').addEventListener('change', function(e){ e.target.dataset.touched = '1'; track('quote_option', {on:e.target.checked}); });
   bf.querySelectorAll('input[name="bookingFor"]').forEach(function(r){ r.addEventListener('change', function(){ syncBookingFor(); track('booking_for_selected', {booking_for:r.value}); }); });
   syncBookingFor();
 
@@ -1629,7 +1633,7 @@
       plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
-      bookingFor: isCompany() ? 'company' : 'family',
+      bookingFor: isCompany() ? 'company' : 'family', wantQuote: $('want-quote').checked,
       referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked, sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
@@ -1646,6 +1650,7 @@
           put('sent-ref', res.body.ref); put('sent-phone', checkPhone(payload.contact.phoneCountry, payload.contact.phone).pretty || payload.contact.phone);
           put('sent-date', new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}));
           put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
+          put('sent-mail-what', res.body.quoted ? 'We’ve emailed your PDF quotation' : 'We’ve emailed a copy');
           showSent(res.body);
           $('request-panel').hidden = true; $('sent-card').hidden = false; document.body.classList.add('req-sent'); $('sent-card').focus();
           render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. We’ll send a quotation once we confirm.'));

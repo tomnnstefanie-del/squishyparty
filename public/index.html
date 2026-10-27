@@ -1990,6 +1990,11 @@ footer{background:#efece7;border-top:0}
 @font-face{font-family:"Flags";src:url("fonts/flags.woff2") format("woff2");unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E007F;font-display:swap}
 .tel-cc-face,.tel-cc select,.tel-cc option{font-family:"Flags",var(--sans)}
 .tel-cc-face{font-size:1rem}
+/* v53 PDF quotation option */
+.quote-opt{padding:12px 14px;border-radius:var(--r-sm);background:var(--cobalt-50)}
+.quote-opt span{display:flex;flex-direction:column;gap:2px}
+.quote-opt small{font-size:.8125rem;color:var(--muted);font-weight:500}
+.quote-opt + .consent{margin-top:16px}
 </style>
 </head>
 <body>
@@ -2600,6 +2605,7 @@ footer{background:#efece7;border-top:0}
               <label class="consent returning"><input type="checkbox" name="returning" id="ref-returning"><span>I’ve booked a party with Confetti Club before</span></label>
             </div>
             <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+            <label class="consent quote-opt"><input type="checkbox" name="wantQuote" id="want-quote"><span><b>Email me an itemised PDF quotation</b><small id="want-quote-hint">Sent straight away with your confirmation. Nothing to pay.</small></span></label>
             <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted on WhatsApp and email about this request.</span></label>
             <p class="privacy">We use these details only to arrange your party and reply to your request.</p>
             <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
@@ -2612,8 +2618,8 @@ footer{background:#efece7;border-top:0}
         <div class="sent-card" id="sent-card" tabindex="-1" hidden>
           <span class="sent-icon" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
           <h3>Request received!</h3>
-          <p>Your reference is <strong id="sent-ref">SP-0000</strong>. Your request is being verified by our team, and we’ll reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
-          <p class="dep-sub" id="sent-mail">We’ve emailed a copy to <span id="sent-email"></span>.</p>
+          <p>Your reference is <strong id="sent-ref">SP-0000</strong>. We’ll check availability and reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
+          <p class="dep-sub" id="sent-mail"><span id="sent-mail-what">We’ve emailed a copy</span> to <span id="sent-email"></span>.</p>
           <p class="dep-sub" id="sent-family">There’s nothing to pay now. Once we confirm availability, we’ll send you one quotation.</p>
           <p class="dep-sub" id="sent-company" hidden>As a company booking, there’s nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to <b id="sent-bill"></b>.</p>
           <div class="next-steps">
@@ -4236,7 +4242,11 @@ footer{background:#efece7;border-top:0}
     var co = isCompany();
     $('company-fields').hidden = !co; $('company-name').required = co;
     $('note-family').hidden = co; $('note-company').hidden = !co;
+    // PDF quotation: ticked for companies (handy for approval), optional for families, unless they've chosen themselves
+    var wq = $('want-quote'); if (!wq.dataset.touched) wq.checked = co;
+    put('want-quote-hint', co ? 'Handy for your manager or finance team. Sent straight away, nothing to pay.' : 'Sent straight away with your confirmation. Nothing to pay.');
   }
+  $('want-quote').addEventListener('change', function(e){ e.target.dataset.touched = '1'; track('quote_option', {on:e.target.checked}); });
   bf.querySelectorAll('input[name="bookingFor"]').forEach(function(r){ r.addEventListener('change', function(){ syncBookingFor(); track('booking_for_selected', {booking_for:r.value}); }); });
   syncBookingFor();
 
@@ -4301,7 +4311,7 @@ footer{background:#efece7;border-top:0}
       plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
-      bookingFor: isCompany() ? 'company' : 'family',
+      bookingFor: isCompany() ? 'company' : 'family', wantQuote: $('want-quote').checked,
       referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked, sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
@@ -4318,6 +4328,7 @@ footer{background:#efece7;border-top:0}
           put('sent-ref', res.body.ref); put('sent-phone', checkPhone(payload.contact.phoneCountry, payload.contact.phone).pretty || payload.contact.phone);
           put('sent-date', new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}));
           put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
+          put('sent-mail-what', res.body.quoted ? 'We’ve emailed your PDF quotation' : 'We’ve emailed a copy');
           showSent(res.body);
           $('request-panel').hidden = true; $('sent-card').hidden = false; document.body.classList.add('req-sent'); $('sent-card').focus();
           render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. We’ll send a quotation once we confirm.'));
