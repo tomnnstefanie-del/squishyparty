@@ -1277,9 +1277,13 @@ footer{background:#efece7;border-top:0}
 /* v44 header stays on one line with the extra Our stores link */
 .nav a,.header-cta{white-space:nowrap}
 @media (max-width:1380px){.site-header .brand-by{display:none}.nav{gap:22px}}
-/* v46 Wax Cracking card: photo mirrored so the turquoise heater sits on the right, clear of the wash behind the text */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(100deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.7) 36%,rgba(24,32,140,.12) 58%,rgba(24,32,140,0) 70%),url('img/how/wax-full.jpg') right 30%/64% auto no-repeat,#2234b8}
-@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-bottom:190px;background:linear-gradient(180deg,#2234b8 0%,rgba(24,32,140,.92) 40%,rgba(24,32,140,.25) 56%,rgba(24,32,140,0) 64%),url('img/how/wax-full.jpg') center bottom/100% auto no-repeat,#2234b8}}
 /* v47 in-store card: top-to-bottom wash at every size (as on phones), shop icon bottom-right */
 .retail-photo::before{background:linear-gradient(180deg,rgba(24,32,140,.88) 0%,rgba(24,32,140,.55) 45%,rgba(24,32,140,.08) 100%)}
 .retail-photo .retail-icon{margin-left:auto;align-self:flex-end}
+/* v48 Wax Cracking card: just the photo, slightly darkened for the white text. Text sits where it doesn't cover the heater or the wax ball */
+.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(rgba(12,16,40,.4),rgba(12,16,40,.4)),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}
+.addon[for="wax"] .addon-icon{background:rgba(12,16,40,.55)}
+.addon[for="wax"] .addon-title,.addon[for="wax"] .addon-copy,.addon[for="wax"] .addon-qty{text-shadow:0 1px 10px rgba(0,0,0,.6)}
+@media (min-width:641px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:270px;padding-left:44%;align-items:center;background-position:0% 42%}}
+.addon[for="wax"] .addon-icon{display:none}
+@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:470px;align-content:flex-end;align-items:flex-end;padding-top:250px;background:linear-gradient(rgba(12,16,40,.38),rgba(12,16,40,.38)),url('img/how/wax-full.jpg') 40% 0/cover no-repeat,#1b1f3a}}
