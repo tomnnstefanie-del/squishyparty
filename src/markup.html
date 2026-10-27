@@ -222,7 +222,7 @@
             <details class="acc"><summary>Do you have a referral offer?</summary><div class="acc-body"><p>Yes. Scan the QR code on a Confetti Club capsule, or use a link or code a friend shares with you, and you get $10 off your first hosted party. We take it off your quotation. It’s for new customers, once per family, and can’t be combined with other offers.</p></div></details>
             <details class="acc" id="care"><summary>How do I look after my squishy?</summary><div class="acc-body"><p>Keep it in its capsule with the lid closed when you’re not playing, so it stays soft. Keep it out of direct sun and away from heat. Play with clean, dry hands, away from clothes, carpets and hair.</p></div></details>
             <details class="acc" id="privacy"><summary>How do you use my details?</summary><div class="acc-body"><p>We use your details only to arrange your party and reply to your request. Our website analytics never receive your name, phone number, email or address.</p></div></details>
-            <details class="acc"><summary>When do I pay?</summary><div class="acc-body"><p>Nothing is paid when you send your request. We confirm availability on WhatsApp, then send you one quotation with everything in it.</p></div></details>
+            <details class="acc"><summary>When do I pay?</summary><div class="acc-body"><p>Nothing is paid when you send your request. Your quotation is emailed straight away. We then confirm availability on WhatsApp, and ask for a deposit to secure your date.</p></div></details>
           </div>
         </div>
           <div class="retail retail-photo" style="margin-top:24px"><img class="retail-bg" src="img/store.jpg" alt="" aria-hidden="true" loading="lazy">
@@ -526,7 +526,7 @@
       <!-- STEP 4: REQUEST (section id kept as wstep-5) -->
       <section class="wstep" id="wstep-5" aria-labelledby="ws5-h" hidden>
         <p class="eyebrow">Step 4</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
-        <p class="wlead">Tell us how to reach you and verify your email. There’s nothing to pay now: we confirm availability on WhatsApp, then send you one quotation.</p>
+        <p class="wlead">Tell us how to reach you and verify your email. There’s nothing to pay now: we email your quotation straight away, then confirm availability on WhatsApp.</p>
         <details class="acc acc-card plan-review" open hidden>
           <summary>Your plan <span class="acc-meta" id="recap-total">$0.00</span></summary>
           <div class="acc-body">
@@ -552,7 +552,7 @@
               <fieldset class="field full booking-for">
                 <legend>Who is this booking for?</legend>
                 <div class="bf-opts">
-                  <label class="bf-opt"><input type="radio" name="bookingFor" value="family" checked><span><b>Me or my family</b><small>We’ll send a quotation once we confirm</small></span></label>
+                  <label class="bf-opt"><input type="radio" name="bookingFor" value="family" checked><span><b>Me or my family</b><small>One package price, emailed straight away</small></span></label>
                   <label class="bf-opt"><input type="radio" name="bookingFor" value="company"><span><b>A company</b><small>Same prices, invoiced after we confirm</small></span></label>
                 </div>
               </fieldset>
@@ -560,6 +560,18 @@
                 <label class="field full">Company name<input name="companyName" id="company-name" autocomplete="organization" maxlength="120" placeholder="For the quotation and invoice"></label>
                 <label class="field"><span>UEN <span class="opt-tag">(optional)</span></span><input name="companyUen" id="company-uen" maxlength="10" placeholder="e.g. 201912345K" autocapitalize="characters"></label>
                 <label class="field"><span>Billing email <span class="opt-tag">(optional)</span></span><input name="billingEmail" id="billing-email" type="email" maxlength="254" placeholder="If different from yours"></label>
+                <div class="corp-prefs full">
+                  <p class="corp-prefs-h">Corporate booking &amp; billing preferences</p>
+                  <p class="corp-prefs-p">Planning a company event? We can help prepare quotations and supporting documents for internal approval and procurement.</p>
+                  <label class="consent corp-opt"><input type="checkbox" name="corpPackage" id="corp-package" checked><span><b>Request a corporate-friendly quotation</b><small>One consolidated package line, suitable for internal budget approval and company reimbursement. Untick for a full breakdown.</small></span></label>
+                  <label class="consent corp-opt"><input type="checkbox" name="corpProcurement" id="corp-procurement"><span><b>I require vendor registration / procurement support</b><small>For companies that need supplier onboarding, purchase orders or supporting business documents.</small></span></label>
+                  <p class="corp-note" id="corp-procurement-note" hidden>Our team will assist with the necessary procurement documentation, subject to your company’s requirements. We’ll contact you about them.</p>
+                  <div class="grid2">
+                    <label class="field"><span>Billing contact name <span class="opt-tag">(optional)</span></span><input name="billingContact" id="billing-contact" maxlength="100" autocomplete="off" placeholder="If not you"></label>
+                    <label class="field"><span>PO reference <span class="opt-tag">(optional)</span></span><input name="poRef" id="po-ref" maxlength="40" autocomplete="off" placeholder="e.g. PO-2026-0142"></label>
+                    <label class="field full"><span>Additional billing instructions <span class="opt-tag">(optional)</span></span><textarea name="billingNotes" id="billing-notes" rows="2" maxlength="500" placeholder="e.g. invoice in two parts, cost centre code"></textarea></label>
+                  </div>
+                </div>
               </div>
               <label class="field full">Your name<input name="parentName" autocomplete="name" maxlength="100" required></label>
               <div class="field"><label for="req-phone">WhatsApp number</label>
@@ -577,13 +589,11 @@
               <label class="field" id="sticker-field" hidden><span>Whose squishy did you see? <span class="opt-tag">(optional)</span></span><input name="stickerName" id="sticker-name" maxlength="40" autocomplete="off" placeholder="The name after “Made by” on the sticker"><span class="hint">Your $10 off is already added.</span></label>
             </div>
             <div class="bot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
-            <label class="consent quote-opt"><input type="checkbox" name="wantQuote" id="want-quote"><span><b>Email me an itemised PDF quotation</b><small id="want-quote-hint">Sent straight away with your confirmation. Nothing to pay.</small></span></label>
-            <label class="consent"><input type="checkbox" name="consent" required><span>I agree to be contacted on WhatsApp and email about this request.</span></label>
-            <p class="privacy">We use these details only to arrange your party and reply to your request.</p>
+            <p class="hint consent-note">By sending this request, you agree we may contact you on WhatsApp and email about it. We use these details only to arrange your party, and we’ll email your quotation (PDF) straight away.</p>
             <div id="booking-error" class="form-error" role="alert" tabindex="-1" hidden></div>
             <button type="button" class="btn btn-primary" id="booking-submit">Send my request</button>
-            <p class="submit-note" id="note-family">Nothing to pay now. Once we confirm availability, we’ll send you one quotation.</p>
-            <p class="submit-note" id="note-company" hidden>Nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to your company, at the same prices shown.</p>
+            <p class="submit-note" id="note-family">Nothing to pay now. Your quotation is emailed straight away, then we confirm availability on WhatsApp.</p>
+            <p class="submit-note" id="note-company" hidden>Nothing to pay now. Your quotation is emailed straight away; once we confirm availability, we invoice your company at the same prices shown.</p>
             <a class="ready-link" href="#plan-ready" id="ready-early"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Want a head start? See your to-do list, schedule and invitation</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </form>
         </div>
@@ -592,7 +602,8 @@
           <h3>Request received!</h3>
           <p>Your reference is <strong id="sent-ref">SP-0000</strong>. We’ll check availability and reach out on WhatsApp at <strong id="sent-phone"></strong> about <span id="sent-date"></span>.</p>
           <p class="dep-sub" id="sent-mail"><span id="sent-mail-what">We’ve emailed a copy</span> to <span id="sent-email"></span>.</p>
-          <p class="dep-sub" id="sent-family">There’s nothing to pay now. Once we confirm availability, we’ll send you one quotation.</p>
+          <p class="dep-sub" id="sent-family">There’s nothing to pay now. Your quotation is in your email; we’ll confirm availability on WhatsApp.</p>
+          <p class="dep-sub" id="sent-procurement" hidden>Our team will assist with the necessary procurement documentation, subject to your company’s requirements.</p>
           <p class="dep-sub" id="sent-company" hidden>As a company booking, there’s nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to <b id="sent-bill"></b>.</p>
           <div class="next-steps">
             <p class="eyebrow">While we confirm, get ready</p>

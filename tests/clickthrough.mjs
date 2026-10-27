@@ -73,7 +73,7 @@ async function run(label, width, setup){
   await f.fill('#ref-code','nope'); ok('referral code field checks the format', (await txt('#ref-hint')).startsWith('Codes look like')); await f.fill('#ref-code','MIA-K7Q2'); ok('a well-formed code is accepted', (await txt('#ref-hint')).startsWith('Thanks'));
   await f.click('#booking-submit'); ok('submit shows validation', (await txt('#booking-error')).startsWith('Please check'));
   await f.click('#stepper li:nth-child(1) a'); await f.fill('#date','2026-12-12'); await f.click('#stepper li:nth-child(4) a');
-  await f.fill('[name=address]','1 Example Road'); await f.fill('[name=postalCode]','123456'); await f.fill('[name=parentName]','Test Parent'); await f.fill('[name=email]','parent@example.com'); await f.fill('[name=phone]','8123 4567'); await f.check('[name=consent]');
+  await f.fill('[name=address]','1 Example Road'); await f.fill('[name=postalCode]','123456'); await f.fill('[name=parentName]','Test Parent'); await f.fill('[name=email]','parent@example.com'); await f.fill('[name=phone]','8123 4567');
   await f.click(width>900 ? '#booking-submit' : '#wiz-next-m'); ok('valid request -> honest offline message', (await txt('#booking-error')).startsWith('This is an offline'));
   await f.click('#wiz-back'); ok('Back -> step 3', await vis('#wstep-3'));
   await f.click('#stepper li:nth-child(2) a'); ok('stepper link -> step 2', await vis('#wstep-2'));

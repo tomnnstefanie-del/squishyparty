@@ -52,7 +52,7 @@ export default async function handler(req, res) {
 
     const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
     const shareCode = makeReferralCode(contact.parentName);
-    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site });
+    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site, corporate: data.corporate });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
       const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, shareCode, site }));
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
     const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
-    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience] });
+    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {
@@ -78,13 +78,15 @@ export default async function handler(req, res) {
       catch (e) { console.error('[request] moodboard photo failed', ref, e.message); }
     }
 
-    // Itemised PDF quotation (ticked by default for companies), from the same server pricing. A copy goes to Telegram
+    // PDF quotation for every request (a package price for families; companies choose package or breakdown), from the
+    // same server pricing. A copy goes to Telegram
     // so you have exactly what the customer received, even if prices change later.
     let quote = null;
-    if (data.wantQuote) {
+    {
       try {
         const discountCents = referralDiscount(data.referral, readReferralCode, samePerson, contact.parentName);
         const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents,
+          detailed: !!data.corporate?.detailed, experienceName: EXP_NAMES[data.plan.experience],
           contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
         quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents };
         await sendTelegramDocument({ token, chatId, data: pdf, filename: quote.filename, caption: `${ref} · PDF quotation emailed to the customer${discountCents ? ' (includes $10 referral discount)' : ''}`, apiBase: process.env.TELEGRAM_API_BASE || undefined });
@@ -93,7 +95,7 @@ export default async function handler(req, res) {
 
     // The confirmation email is a courtesy: if it fails, the request has still reached you.
     let emailed = true;
-    try { await sendMail({ to: contact.email, ...confirmationEmail({ ref, plan: data.plan, contact, price, quote }) }); }
+    try { await sendMail({ to: contact.email, ...confirmationEmail({ ref, plan: data.plan, contact, price, quote, corporate: data.corporate }) }); }
     catch (e) { emailed = false; console.error('[request] confirmation email failed', ref, e.message); }
 
     return res.status(200).json({ ok: true, ref, emailed, quoted: !!(quote && emailed), bookingFor: data.bookingFor, totalCents: price.totalCents });

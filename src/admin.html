@@ -247,8 +247,10 @@ __FOOTER__
       if (b.todos.length) { next.appendChild(el('span', 'tb-next-k', 'Next')); next.appendChild(document.createTextNode(b.todos[0] + (b.todos.length > 1 ? '  +' + (b.todos.length - 1) + ' more' : ''))); }
       else next.textContent = b.state === 'lost' ? 'Didn’t book' : '✓ Nothing pending';
       c.appendChild(next);
-      if (b.vendors.length) {
+      if (b.vendors.length || b.procurement || b.poRef) {
         var chips = el('div', 'tb-chips');
+        if (b.procurement) chips.appendChild(el('span', 'tb-chip proc', '📑 Procurement'));
+        if (b.poRef) chips.appendChild(el('span', 'tb-chip po', 'PO ' + b.poRef));
         b.vendors.forEach(function(v){ chips.appendChild(el('span', 'tb-chip ' + (v.ok ? 'ok' : 'wait'), (v.ok ? '✓ ' : '… ') + v.name)); });
         c.appendChild(chips);
       }

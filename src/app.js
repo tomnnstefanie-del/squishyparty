@@ -1221,7 +1221,7 @@
       {id:'cake', auto:!!cake, done:!!cake || !!S.done.cake, t:cake ? 'Cake chosen: ' + cake.vendor : 'Choose a cake', sub:cake ? cake.name + '. Size and flavour confirmed in your quote.' : 'Add one from our partner bakeries, or tick if you’re bringing your own', act:cake ? null : ['Browse cakes', 3, 'tab-a-cake']},
       {id:'food', auto:!!food, done:!!food || !!S.done.food, t:food ? 'Food chosen' : 'Sort out party food', sub:food ? food.name : 'Add catering from our partners, or tick if you’re arranging it', act:food ? null : ['Browse food', 3, 'tab-a-food']},
       {id:'invite', t:'Send invitations', sub:'Pick a design and share it on WhatsApp with the ready-made caption', act:['Make invitation', 'ready', 'tab-p-inv']},
-      {id:'request', auto:true, done:!!S.requested, t:'Request availability', sub:'We confirm every partner and send you one quotation', act:['Go to request', 4]},
+      {id:'request', auto:true, done:!!S.requested, t:'Request availability', sub:'We email your quotation and confirm every partner', act:['Go to request', 4]},
       {id:'tables', t:'Arrange tables and chairs', sub:'Your coordinator confirms how many for ' + s.participants + ' participants'},
       {id:'headcount', t:'Confirm the final headcount', sub:'About ' + s.participants + ' participants so far'},
       {id:'diet', t:'Share dietary needs', sub:'Tell your coordinator once you’ve requested availability'}
@@ -1648,17 +1648,15 @@
     var co = isCompany();
     $('company-fields').hidden = !co; $('company-name').required = co;
     $('note-family').hidden = co; $('note-company').hidden = !co;
-    // PDF quotation: ticked for companies (handy for approval), optional for families, unless they've chosen themselves
-    var wq = $('want-quote'); if (!wq.dataset.touched) wq.checked = co;
-    put('want-quote-hint', co ? 'Handy for your manager or finance team. Sent straight away, nothing to pay.' : 'Sent straight away with your confirmation. Nothing to pay.');
   }
-  $('want-quote').addEventListener('change', function(e){ e.target.dataset.touched = '1'; track('quote_option', {on:e.target.checked}); });
+  $('corp-procurement').addEventListener('change', function(e){ $('corp-procurement-note').hidden = !e.target.checked; });
   bf.querySelectorAll('input[name="bookingFor"]').forEach(function(r){ r.addEventListener('change', function(){ syncBookingFor(); track('booking_for_selected', {booking_for:r.value}); }); });
   syncBookingFor();
 
   /* ---------- after sending: what happens next ---------- */
   function showSent(b){
     var co = b.bookingFor === 'company'; $('sent-company').hidden = !co; $('sent-family').hidden = co;
+    $('sent-procurement').hidden = !(co && $('corp-procurement').checked);
     if (co) put('sent-bill', ($('billing-email').value || $('req-email').value).trim());
     var nm = $('wiz-next-m'); if (nm) nm.hidden = true; $('wiz-again').hidden = false;
     var rs = document.querySelector('#stepper .ready-step'); if (rs) rs.className = 'ready-step open';
@@ -1708,16 +1706,17 @@
     var em = $('req-email'); if (isWebProto() && bad.indexOf(em) < 0 && !(OTP.verified && OTP.email === normEmail(em.value))) { bad.push(em); em.setAttribute('aria-invalid','true'); otpStatus('Please verify your email: tap “Send code”, then enter the code we email you.', 'err'); }
     err.hidden = false;
     track(bad.length ? 'request_invalid' : 'request_submitted', bad.length ? {fields:bad.map(function(i){ return i.name; }).join(',')} : {});
-    if (bad.length) { err.textContent = 'Please check the highlighted details' + (bf.consent.checked ? '.' : ', and tick the contact consent box.'); (bad[0].classList.contains('tp-native') ? bad[0].previousSibling : bad[0]).focus(); return; }
+    if (bad.length) { err.textContent = 'Please check the highlighted details.'; (bad[0].classList.contains('tp-native') ? bad[0].previousSibling : bad[0]).focus(); return; }
     var proto = ''; try { proto = location.protocol; } catch (e) {}
     if (proto !== 'http:' && proto !== 'https:') { err.textContent = 'This is an offline preview, so no request has been sent. Requests are sent from the live website.'; err.focus(); return; }
     var d = new FormData(bf), T = totals(S);
     var payload = {
       v: 1,
       plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
-      contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
-      consent: !!bf.consent.checked, website: d.get('website') || '',
-      bookingFor: isCompany() ? 'company' : 'family', wantQuote: $('want-quote').checked,
+      contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', billingContact:isCompany() ? (d.get('billingContact') || '').trim() : '', poRef:isCompany() ? (d.get('poRef') || '').trim() : '', billingNotes:isCompany() ? (d.get('billingNotes') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
+      consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
+      bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
+      corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked } : null,
       referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
@@ -1737,7 +1736,7 @@
           put('sent-mail-what', res.body.quoted ? 'We’ve emailed your PDF quotation' : 'We’ve emailed a copy');
           showSent(res.body);
           $('request-panel').hidden = true; $('sent-card').hidden = false; document.body.classList.add('req-sent'); $('sent-card').focus();
-          render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. We’ll send a quotation once we confirm.'));
+          render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. Your quotation is in your email; we’ll invoice your company once we confirm.' : '. Your quotation is in your email.'));
           return;
         }
         if (res.body && res.body.field === 'email') { OTP.verified = ''; otpUI(); }

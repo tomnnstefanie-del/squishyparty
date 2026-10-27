@@ -2214,6 +2214,23 @@ footer{background:#efece7;border-top:0}
 .ad-tile-b .mini.on{background:#e9f7ef;border-color:#bfe5cf;color:#0f7a4a}
 .ad-tile-b .mini:hover{border-color:var(--cobalt)}
 .ad-bar-btns{display:flex;flex-wrap:wrap;gap:8px}
+/* v65 Less space between "For companies" and the reviews */
+#companies{padding-bottom:clamp(20px,2.5vw,36px)}
+#companies + #reviews{padding-top:clamp(20px,2.5vw,36px)}
+/* PDF-quotation option lines up with the consent checkbox below it */
+.quote-opt{padding:0;background:none;border-radius:0}
+.quote-opt small{margin-top:2px}
+/* v66 Corporate booking & billing preferences */
+.corp-prefs{display:flex;flex-direction:column;gap:10px;margin-top:6px;padding:16px;border-radius:var(--r-sm);background:var(--cobalt-50)}
+.corp-prefs-h{margin:0;font-weight:800;color:var(--ink)}
+.corp-prefs-p{margin:0;font-size:.875rem;color:var(--ink-2)}
+.corp-prefs .consent{margin-top:4px}
+.corp-opt span{display:flex;flex-direction:column;gap:2px}
+.corp-opt small{font-size:.8125rem;color:var(--muted);font-weight:500}
+.corp-note{margin:0;padding:10px 12px;border-radius:10px;background:#fff;font-size:.8125rem;font-weight:600;color:var(--cobalt)}
+.corp-prefs .grid2{margin-top:4px}
+.tb-chip.proc{background:#ede4ff;color:#5b2bb8}.tb-chip.po{background:#eef0f6;color:var(--ink-2)}
+.consent-note{display:block;margin-top:18px}
 </style>
 </head>
 <body>

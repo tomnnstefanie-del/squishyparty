@@ -97,7 +97,6 @@ try {
   await page.waitForFunction(() => document.getElementById('otp-field').classList.contains('verified'));
   ok('the emailed 6-digit code verifies the address');
   await page.fill('[name=notes]', 'Lift lobby B, level 2');
-  await page.check('[name=consent]');
   await page.click('#booking-submit');
   await page.waitForSelector('#sent-card:not([hidden])', { timeout: 10000 });
   const ref = await txt('#sent-ref');
@@ -108,8 +107,8 @@ try {
   const conf = mails().at(-1);
   assert.equal(conf.to, 'sarah@example.com'); assert.ok(conf.subject.includes(ref));
   assert.ok(conf.text.includes('reach out on WhatsApp') && conf.text.includes('nothing to pay at this stage') && conf.text.includes('Participants: 12'));
-  assert.deepEqual(conf.attachments, []);
-  ok('customer is emailed: we’ll WhatsApp you to confirm, nothing to pay (no PDF unless asked)');
+  assert.equal(conf.attachments.length, 1); assert.ok(conf.subject.startsWith('Your Confetti Club Quotation'));
+  ok('customer is emailed their PDF quotation: we’ll WhatsApp you to confirm, nothing to pay');
 
   const msgs = sent();
   assert.equal(msgs.length, 1);
@@ -123,7 +122,7 @@ try {
   assert.ok(!m.text.includes('⚠️')); assert.ok(!/deposit|budget|PayNow/i.test(m.text));
   ok(`server-calculated total (${pageTotal}) matches the page, with no deposit or budget lines`);
   for (const s of ['Fabric backdrop · Standard', '🎨 Colours: Pink, Sage', 'Vinyl text: “Mia turns 7”', 'Inspiration: Pastel rainbow, like the photo', '1 moodboard image below']) assert.ok(m.text.includes(s), 'message missing: ' + s);
-  const photos = JSON.parse(fs.readFileSync(path.join(root, 'dev/.photos.json'), 'utf8'));
+  const photos = JSON.parse(fs.readFileSync(path.join(root, 'dev/.photos.json'), 'utf8')).filter((p) => p.kind !== 'Document'); // the quotation PDF is a document
   assert.equal(photos.length, 1); assert.ok(photos[0].caption.includes(ref) && photos[0].caption.includes('Fabric backdrop') && photos[0].jpeg);
   assert.ok((await txt('#review-list')).includes('Pink, Sage'));
   ok('owner gets the colours, vinyl text and inspiration in the message, and the moodboard as a photo');
@@ -192,10 +191,16 @@ try {
   assert.equal(x.s, 400); ok('a verified token for a different email is refused');
   x = await api({ ...base, bookingFor: 'company', wantQuote: true, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
   assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 48000);
-  assert.ok(sent().at(-1).text.includes('Company booking') && mails().at(-1).text.includes('nothing to pay at this stage') && mails().at(-1).attachments.length === 1 && mails().at(-1).subject.includes('Quotation'));
+  assert.ok(sent().at(-1).text.includes('CORPORATE BOOKING: yes') && mails().at(-1).text.includes('nothing to pay at this stage') && mails().at(-1).attachments.length === 1 && mails().at(-1).subject.includes('Quotation'));
   ok('company booking: same price, invoice requested on Telegram and in the email');
+  x = await api({ ...base, bookingFor: 'company', wantQuote: true, corporate: { procurement: true }, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingContact: 'Finance Team', poRef: 'PO-77', billingNotes: 'Two invoices please' } }, { 'X-Forwarded-For': '10.0.4.1' });
+  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 48000);
+  const ct = sent().at(-1).text;
+  assert.ok(ct.includes('CORPORATE BOOKING: yes') && ct.includes('corporate-friendly package') && ct.includes('PO reference: <b>PO-77</b>') && ct.includes('Finance Team') && ct.includes('Two invoices please') && ct.includes('VENDOR REGISTRATION / PROCUREMENT SUPPORT REQUESTED'));
+  assert.ok(mails().at(-1).text.includes('assist with the necessary procurement documentation'));
+  ok('corporate options: Telegram flags procurement, PO reference, billing contact and quotation style; the email says our team will help with documents');
   x = await api({ ...base, website: 'http://spam' }, { 'X-Forwarded-For': '10.0.0.5' });
-  assert.equal(x.s, 200); assert.equal(sent().length, before + 3); // the $480 request, the quotation request and the company booking, nothing from the bot
+  assert.equal(x.s, 200); assert.equal(sent().length, before + 4); // the $480 request, the quotation request and two company bookings, nothing from the bot
   ok('honeypot (bot) submissions are dropped silently');
   const g = await p2.evaluate(async () => (await fetch('/api/request')).status);
   assert.equal(g, 405); ok('GET is refused (405)');

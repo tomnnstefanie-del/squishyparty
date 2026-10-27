@@ -11,6 +11,7 @@ const { validateFeedback } = await import('../lib/feedback.js');
 const Ref = await import('../lib/referral.js');
 const { statusLink, checkStatusToken } = await import('../lib/status-link.js');
 const nodeFs = await import('node:fs');
+const nodeZlib = await import('node:zlib');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
@@ -94,7 +95,7 @@ t('company booking: Telegram asks for an invoice; email says nothing to pay now'
   const g = dateOK(); g.bookingFor = 'company'; Object.assign(g.contact, { companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' });
   const c = validateRequest(g), pr = priceRequest(c.plan);
   const m = buildMessage({ ref: 'SP-1', plan: c.plan, contact: c.contact, price: pr, clientTotalCents: null });
-  assert.ok(m.includes('Acme Pte Ltd') && m.includes('Invoice to finance@acme.sg') && m.includes('send a quotation and invoice')); assert.ok(!m.includes('holding deposit'));
+  assert.ok(m.includes('Acme Pte Ltd') && m.includes('Invoice to finance@acme.sg') && m.includes('CORPORATE BOOKING: yes')); assert.ok(!m.includes('holding deposit'));
   const e = confirmationEmail({ ref: 'SP-1', plan: c.plan, contact: c.contact, price: pr });
   assert.ok(e.text.includes('nothing to pay at this stage') && e.text.includes('finance@acme.sg')); assert.ok(!e.text.includes('holding deposit'));
   assert.equal(validateRequest(dateOK()).bookingFor, 'family');
@@ -143,6 +144,15 @@ t('security headers: HSTS, no plugins, no framing, private pages not indexed', (
   for (const x of ['Strict-Transport-Security', "object-src 'none'", "frame-ancestors 'none'", 'X-Content-Type-Options', '/(admin|feedback).html']) assert.ok(all.includes(x), x);
 });
 t('the daily bump runs at 9am Singapore time', () => { const v = JSON.parse(nodeFs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')); assert.deepEqual(v.crons, [{ path: '/api/digest', schedule: '0 1 * * *' }]); });
+t('quotation package line costs exactly the same as the itemised breakdown', () => {
+  const zlib = nodeZlib, text = (buf) => { const s = buf.toString('latin1'); return [...s.matchAll(/stream\n([\s\S]*?)\nendstream/g)].map((m) => { try { return zlib.inflateSync(Buffer.from(m[1], 'latin1')).toString('latin1'); } catch { return ''; } }).join(''); };
+  const q = { ref: 'SP-1', issued: new Date('2026-10-27'), plan: v.plan, contact: { ...v.contact, companyName: 'Acme' }, price, discountCents: 0, contactEmail: 'x@example.com', site: 'https://e.sg' };
+  const pkg = text(quotePdf({ ...q, bookingFor: 'company' })), det = text(quotePdf({ ...q, bookingFor: 'company', detailed: true })), fam = text(quotePdf({ ...q, bookingFor: 'family', contact: v.contact }));
+  const total = 'S$' + (price.totalCents / 100).toLocaleString('en-SG', { minimumFractionDigits: 2 });
+  assert.ok(pkg.includes('Corporate Team Bonding Workshop Package') && pkg.includes(total));
+  assert.ok(det.includes('Squishy DIY') && !det.includes('Workshop Package') && det.includes(total));
+  assert.ok(fam.includes('Birthday Party Activity Package') && fam.includes(total));
+});
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));
 
