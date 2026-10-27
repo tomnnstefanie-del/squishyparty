@@ -1578,7 +1578,7 @@
   /* WhatsApp number: country code + local number, checked for length like lib/phone.js (the list is built in from there) */
   var COUNTRIES = /*__COUNTRIES__*/[];
   function checkPhone(iso, input){
-    var c = COUNTRIES.filter(function(x){ return x[0] === iso; })[0] || COUNTRIES[0], name = c[1], dial = c[2], min = c[3], max = c[4], starts = c[5];
+    var c = COUNTRIES.filter(function(x){ return x[0] === iso; })[0] || COUNTRIES.filter(function(x){ return x[0] === 'SG'; })[0], name = c[1], dial = c[2], min = c[3], max = c[4], starts = c[5];
     var raw = String(input || ''), d = raw.replace(/\D/g, '');
     if (/^\s*(\+|00)/.test(raw)) { d = d.replace(/^00/, ''); if (d.indexOf(dial) === 0) d = d.slice(dial.length); }
     else if (d.indexOf(dial) === 0 && d.length - dial.length >= min && d.length - dial.length <= max) d = d.slice(dial.length);
@@ -1592,11 +1592,13 @@
   }
   (function(){
     var sel = $('phone-country'), inp = $('req-phone'), face = $('tel-cc-face'), hint = $('phone-hint');
-    COUNTRIES.forEach(function(c){ var o = el('option', null, c[1] + ' (+' + c[2] + ')'); o.value = c[0]; sel.appendChild(o); });
+    // Flag emoji from the ISO code (two regional-indicator letters); public/fonts/flags.woff2 draws them on Windows too
+    function flag(iso){ return String.fromCodePoint(0x1F1E6 + iso.charCodeAt(0) - 65, 0x1F1E6 + iso.charCodeAt(1) - 65); }
+    COUNTRIES.forEach(function(c){ var o = el('option', null, flag(c[0]) + '  ' + c[1] + ' (+' + c[2] + ')'); o.value = c[0]; sel.appendChild(o); });
     sel.value = 'SG';
     function sync(final){
       var c = COUNTRIES.filter(function(x){ return x[0] === sel.value; })[0], r = checkPhone(sel.value, inp.value), v = inp.value.trim();
-      face.textContent = c[0] + ' +' + c[2]; inp.placeholder = c[6];
+      face.textContent = flag(c[0]) + ' +' + c[2]; face.title = c[1]; inp.placeholder = c[6];
       inp.setCustomValidity(!v || r.ok ? '' : r.error);
       hint.classList.toggle('ok', r.ok); hint.classList.toggle('err', !!v && !r.ok && final);
       hint.textContent = r.ok ? '✓ We’ll WhatsApp you at ' + r.pretty : v && final ? r.error : r.rule + '.';
