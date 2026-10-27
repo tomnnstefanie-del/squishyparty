@@ -1243,17 +1243,14 @@ footer .wrap{padding:44px var(--gut) 24px}
 @media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
 /* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
 .retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
-/* v40 Wax Cracking card: compact, same wash as the in-store card, the cracking hands in view */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(100deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.7) 36%,rgba(24,32,140,.12) 66%,rgba(24,32,140,0) 100%),url('img/how/wax-full.jpg') 60% 72%/cover no-repeat,#2234b8}
-.addon[for="wax"] .addon-body{max-width:58%}
-.addon[for="wax"] .addon-copy{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.88) 0%,rgba(24,32,140,.6) 50%,rgba(24,32,140,.1) 100%),url('img/how/wax-full.jpg') 50% 75%/cover no-repeat,#2234b8}.addon[for="wax"] .addon-body{max-width:none}}
-/* In-store card: shop button bottom-right */
-.retail-photo{position:relative}
-.retail-btn{position:absolute;right:20px;bottom:20px;display:inline-flex;align-items:center;gap:10px;padding:10px 16px 10px 12px;border-radius:14px;background:rgba(30,42,170,.92);color:#fff;font-weight:700;text-decoration:none;min-height:48px;box-shadow:0 6px 18px rgba(10,14,60,.3);transition:transform .15s ease,background .15s ease}
-.retail-btn .icon{width:28px;height:28px;color:var(--lemon)}
-.retail-btn:hover{background:#2234b8;transform:translateY(-2px)}
-.retail-btn:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+/* v41 Wax Cracking card: top-to-bottom wash, the whole photo (heater, pot, cracking hands) visible */
+.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.5) 0%,rgba(24,32,140,.08) 100%),url('img/how/wax-full.jpg') right center/auto 100% no-repeat,#2234b8}
+@media (min-width:641px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-right:236px;min-height:166px;background:linear-gradient(180deg,rgba(24,32,140,.5) 0%,rgba(24,32,140,.08) 100%),url('img/how/wax-full.jpg') right 12px center/208px 156px no-repeat,#2234b8}}
+@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-bottom:262px;background:linear-gradient(180deg,rgba(24,32,140,.5) 0%,rgba(24,32,140,.05) 100%),url('img/how/wax-full.jpg') center bottom 12px/calc(100% - 24px) auto no-repeat,#2234b8}.addon[for="wax"] .addon-body{max-width:none}}
+/* In-store card: the shop icon sits bottom-right and opens Our stores */
+.retail-photo .retail-icon{align-self:flex-end;display:inline-flex;background:rgba(30,42,170,.88);border-radius:14px;padding:8px;line-height:0;transition:transform .15s ease}
+.retail-photo .retail-icon:hover{transform:translateY(-2px)}
+.retail-photo .retail-icon:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
 /* Our stores */
 .store-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .store-card{border-radius:var(--r-lg);overflow:hidden;background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);display:flex;flex-direction:column}
@@ -1268,3 +1265,6 @@ footer .wrap{padding:44px var(--gut) 24px}
 /* Footer: a darker band than the page */
 footer{background:#efece7;border-top:0}
 .foot-base{border-top-color:#ddd8d0}
+.store-line{margin:0;display:flex;gap:8px;align-items:flex-start;color:var(--ink-2);font-size:.9375rem}
+.store-line .icon{width:18px;height:18px;flex:none;margin-top:3px;color:var(--teal-700)}
+.store-line a{color:var(--ink);font-weight:600}

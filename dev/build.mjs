@@ -62,7 +62,7 @@ fs.writeFileSync(path.join(root, 'public/sitemap.xml'), `<?xml version="1.0" enc
 // Component styles and the icon sprite from base-v2.html, plus the "x" icon
 const v2style = v2.slice(0, v2.indexOf('</style>') + 8);
 const s0 = v2.indexOf('<svg width="0"');
-const v2sprite = replaceAll(v2.slice(s0, v2.indexOf('</svg>', s0) + 6), '</svg>', '  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>\n</svg>');
+const v2sprite = replaceAll(v2.slice(s0, v2.indexOf('</svg>', s0) + 6), '</svg>', '  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>\n  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>\n</svg>');
 const b0 = base.indexOf('<body>');
 const sprite = base.slice(b0, base.indexOf('</svg>', b0) + 6);
 
