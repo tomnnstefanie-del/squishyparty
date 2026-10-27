@@ -1291,3 +1291,5 @@ footer{background:#efece7;border-top:0}
 .addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:16px 18px;align-items:center;align-content:normal;background:linear-gradient(90deg,rgba(12,16,40,.82) 0%,rgba(12,16,40,.62) 50%,rgba(12,16,40,.2) 100%),url('img/how/wax-full.jpg') 50% 45%/cover no-repeat,#1b1f3a}
 .addon[for="wax"] .addon-icon{display:grid}
 @media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:14px;align-items:center;background:linear-gradient(180deg,rgba(12,16,40,.8) 0%,rgba(12,16,40,.6) 60%,rgba(12,16,40,.45) 100%),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}}
+/* v50 head-start link sits under "Send my request" */
+#booking-form .ready-link{margin:18px 0 0}

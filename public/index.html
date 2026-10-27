@@ -1933,6 +1933,8 @@ footer{background:#efece7;border-top:0}
 .addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:16px 18px;align-items:center;align-content:normal;background:linear-gradient(90deg,rgba(12,16,40,.82) 0%,rgba(12,16,40,.62) 50%,rgba(12,16,40,.2) 100%),url('img/how/wax-full.jpg') 50% 45%/cover no-repeat,#1b1f3a}
 .addon[for="wax"] .addon-icon{display:grid}
 @media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:14px;align-items:center;background:linear-gradient(180deg,rgba(12,16,40,.8) 0%,rgba(12,16,40,.6) 60%,rgba(12,16,40,.45) 100%),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}}
+/* v50 head-start link sits under "Send my request" */
+#booking-form .ready-link{margin:18px 0 0}
 </style>
 </head>
 <body>
@@ -2492,7 +2494,6 @@ footer{background:#efece7;border-top:0}
       <section class="wstep" id="wstep-5" aria-labelledby="ws5-h" hidden>
         <p class="eyebrow">Step 4</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
         <p class="wlead">Tell us how to reach you and verify your email. There’s nothing to pay now: we confirm availability on WhatsApp, then send you one quotation.</p>
-        <a class="ready-link" href="#plan-ready" id="ready-early"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Want a head start? See your to-do list, schedule and invitation</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         <details class="acc acc-card plan-review" open hidden>
           <summary>Your plan <span class="acc-meta" id="recap-total">$0.00</span></summary>
           <div class="acc-body">
@@ -2547,6 +2548,7 @@ footer{background:#efece7;border-top:0}
             <button type="button" class="btn btn-primary" id="booking-submit">Send my request</button>
             <p class="submit-note" id="note-family">Nothing to pay now. Once we confirm availability, we’ll send you one quotation.</p>
             <p class="submit-note" id="note-company" hidden>Nothing to pay now. Once we confirm availability, we’ll send a quotation and invoice to your company, at the same prices shown.</p>
+            <a class="ready-link" href="#plan-ready" id="ready-early"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg><span>Want a head start? See your to-do list, schedule and invitation</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </form>
         </div>
         <div class="sent-card" id="sent-card" tabindex="-1" hidden>
