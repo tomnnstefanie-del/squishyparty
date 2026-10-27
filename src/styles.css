@@ -1229,18 +1229,28 @@ footer .brand-logo{height:48px}
 .hero{padding-top:clamp(20px,3vw,44px)}
 .h1-kicker{display:block;font-family:var(--sans);font-weight:700;font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin-bottom:12px;line-height:1.4}
 #explore{padding-bottom:clamp(24px,3vw,40px)}
-footer .wrap{padding:44px var(--gut) 24px}
-.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:28px 32px}
-.foot-brand p{margin:12px 0 16px;max-width:340px;font-size:.9375rem;color:var(--ink-2)}
-.foot-col{display:flex;flex-direction:column;gap:10px;font-size:.9375rem}
-.foot-col h2{font-family:var(--sans);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin:4px 0 4px}
-.foot-col a{color:var(--ink);text-decoration:none;min-height:28px;display:flex;align-items:center}
-.foot-col a:hover{color:var(--pink);text-decoration:underline}
-.foot-col span{color:var(--ink-2)}
-.foot-base{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted)}
-.foot-base a{color:var(--ink)}
-@media (max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}}
-@media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
+/* v42 footer: compact brand, Explore / Support, Our Partners, legal row */
+footer .foot{padding:28px var(--gut) 22px;max-width:var(--wrap)}
+footer h2{font-family:var(--sans);font-size:.6875rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-700);margin:0 0 10px}
+.foot-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:18px;border-bottom:1px solid #ddd8d0}
+.foot-logo{display:inline-flex;line-height:0}
+.foot-logo img{height:36px;width:auto}
+.foot-tag{margin:0;font-size:.8125rem;color:var(--muted);white-space:nowrap}
+.foot-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;padding:20px 0}
+.foot-nav nav,.foot-partners{display:flex;flex-direction:column;align-items:flex-start}
+.foot-nav a,.foot-partners a{color:var(--ink);text-decoration:none;font-size:.9375rem;line-height:1.5;padding:4px 0;min-height:32px;display:inline-flex;align-items:center}
+.foot-nav a:hover,.foot-partners a:hover{color:var(--pink)}
+.foot-partners{padding:16px 0 18px;border-top:1px solid #ddd8d0}
+.foot-partners a{font-weight:700}
+.foot-partners a span{margin-left:6px;transition:transform .15s ease}
+.foot-partners a:hover span{transform:translateX(3px)}
+.foot-base{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;margin:0;padding-top:14px;border-top:1px solid #ddd8d0;font-size:.75rem;color:var(--muted)}
+.foot-legal{display:flex;gap:16px}
+.foot-legal a{color:var(--muted)}
+footer a:focus-visible{outline:2px solid var(--teal-700);outline-offset:2px;border-radius:4px}
+@media (min-width:861px){.foot-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.foot-nav nav{grid-column:span 1}}
+@media (max-width:640px){footer .foot{padding-bottom:96px}}
+@media (max-width:360px){.foot-nav{gap:16px}.foot-nav a{font-size:.875rem}.foot-tag{font-size:.75rem}}
 /* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
 .retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
 /* v41 Wax Cracking card: top-to-bottom wash, the whole photo (heater, pot, cracking hands) visible */

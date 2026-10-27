@@ -1433,7 +1433,8 @@
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
-  document.querySelectorAll('a[href="#care"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); $('tab-faq').click(); var d = $('care'); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
+  // #care and #privacy open that FAQ answer
+  document.querySelectorAll('a[href="#care"],a[href="#privacy"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); $('tab-faq').click(); var d = $(a.getAttribute('href').slice(1)); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */

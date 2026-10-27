@@ -1871,18 +1871,28 @@ footer .brand-logo{height:48px}
 .hero{padding-top:clamp(20px,3vw,44px)}
 .h1-kicker{display:block;font-family:var(--sans);font-weight:700;font-size:.8125rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin-bottom:12px;line-height:1.4}
 #explore{padding-bottom:clamp(24px,3vw,40px)}
-footer .wrap{padding:44px var(--gut) 24px}
-.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:28px 32px}
-.foot-brand p{margin:12px 0 16px;max-width:340px;font-size:.9375rem;color:var(--ink-2)}
-.foot-col{display:flex;flex-direction:column;gap:10px;font-size:.9375rem}
-.foot-col h2{font-family:var(--sans);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-700);margin:4px 0 4px}
-.foot-col a{color:var(--ink);text-decoration:none;min-height:28px;display:flex;align-items:center}
-.foot-col a:hover{color:var(--pink);text-decoration:underline}
-.foot-col span{color:var(--ink-2)}
-.foot-base{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:32px;padding-top:18px;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted)}
-.foot-base a{color:var(--ink)}
-@media (max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1}}
-@media (max-width:640px){footer .wrap{padding-bottom:100px}.foot-grid{gap:24px}}
+/* v42 footer: compact brand, Explore / Support, Our Partners, legal row */
+footer .foot{padding:28px var(--gut) 22px;max-width:var(--wrap)}
+footer h2{font-family:var(--sans);font-size:.6875rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-700);margin:0 0 10px}
+.foot-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:18px;border-bottom:1px solid #ddd8d0}
+.foot-logo{display:inline-flex;line-height:0}
+.foot-logo img{height:36px;width:auto}
+.foot-tag{margin:0;font-size:.8125rem;color:var(--muted);white-space:nowrap}
+.foot-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;padding:20px 0}
+.foot-nav nav,.foot-partners{display:flex;flex-direction:column;align-items:flex-start}
+.foot-nav a,.foot-partners a{color:var(--ink);text-decoration:none;font-size:.9375rem;line-height:1.5;padding:4px 0;min-height:32px;display:inline-flex;align-items:center}
+.foot-nav a:hover,.foot-partners a:hover{color:var(--pink)}
+.foot-partners{padding:16px 0 18px;border-top:1px solid #ddd8d0}
+.foot-partners a{font-weight:700}
+.foot-partners a span{margin-left:6px;transition:transform .15s ease}
+.foot-partners a:hover span{transform:translateX(3px)}
+.foot-base{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;margin:0;padding-top:14px;border-top:1px solid #ddd8d0;font-size:.75rem;color:var(--muted)}
+.foot-legal{display:flex;gap:16px}
+.foot-legal a{color:var(--muted)}
+footer a:focus-visible{outline:2px solid var(--teal-700);outline-offset:2px;border-radius:4px}
+@media (min-width:861px){.foot-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.foot-nav nav{grid-column:span 1}}
+@media (max-width:640px){footer .foot{padding-bottom:96px}}
+@media (max-width:360px){.foot-nav{gap:16px}.foot-nav a{font-size:.875rem}.foot-tag{font-size:.75rem}}
 /* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
 .retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
 /* v41 Wax Cracking card: top-to-bottom wash, the whole photo (heater, pot, cracking hands) visible */
@@ -2054,7 +2064,7 @@ footer{background:#efece7;border-top:0}
             </section>
               </div>
             </li>
-            <li class="tl-step">
+            <li class="tl-step" id="partners">
               <span class="tl-dot" aria-hidden="true">02</span>
               <div class="tl-text">
                 <p class="tl-k">Step 02</p>
@@ -2163,6 +2173,7 @@ footer{background:#efece7;border-top:0}
             <details class="acc"><summary>What do I need to provide?</summary><div class="acc-body"><p>The venue, tables and chairs, and anything you don’t add from our partners, such as food or cake. Your checklist updates as you plan.</p></div></details>
             <details class="acc"><summary>Do you have a referral offer?</summary><div class="acc-body"><p>Yes. Scan the QR code on a Confetti Club capsule, or use a link or code a friend shares with you, and you get $10 off your first hosted party. We take it off your quotation. It’s for new customers, once per family, and can’t be combined with other offers.</p></div></details>
             <details class="acc" id="care"><summary>How do I look after my squishy?</summary><div class="acc-body"><p>Keep it in its capsule with the lid closed when you’re not playing, so it stays soft. Keep it out of direct sun and away from heat. Play with clean, dry hands, away from clothes, carpets and hair.</p></div></details>
+            <details class="acc" id="privacy"><summary>How do you use my details?</summary><div class="acc-body"><p>We use your details only to arrange your party and reply to your request. Our website analytics never receive your name, phone number, email or address.</p></div></details>
             <details class="acc"><summary>When do I pay?</summary><div class="acc-body"><p>Nothing is paid when you send your request. We confirm availability on WhatsApp, then send you one quotation with everything in it.</p></div></details>
           </div>
         </div>
@@ -2248,39 +2259,34 @@ footer{background:#efece7;border-top:0}
 </main>
 
 <footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div class="foot-brand">
-        <a class="brand" href="#top"><img class="brand-logo" src="img/logo.webp" alt="Confetti Club" width="609" height="240"></a>
-        <p>Trending activities for birthday parties, team bonding and every celebration in between. Hosted at your venue in Singapore, by Tom &amp; Stefanie.</p>
-        <a class="btn btn-primary" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-      </div>
-      <nav class="foot-col" aria-label="Parties">
-        <h2>Parties</h2>
-        <a href="#plan-1">Build my party</a>
-        <a href="#explore" data-tab-link="tab-how">How it works</a>
-        <a href="#explore" data-tab-link="tab-day">On the day</a>
-        <a href="#companies">For companies</a>
+  <div class="wrap foot">
+    <div class="foot-top">
+      <a class="foot-logo" href="#top"><img src="img/logo.webp" alt="Confetti Club" width="609" height="240"></a>
+      <p class="foot-tag">Parties made magical.</p>
+    </div>
+    <div class="foot-nav">
+      <nav aria-label="Explore">
+        <h2>Explore</h2>
+        <a href="#plan-1">Build My Party</a>
+        <a href="#explore" data-tab-link="tab-how">How It Works</a>
+        <a href="#plan-2">Party Packages</a>
+        <a href="#companies">Corporate Events</a>
       </nav>
-      <nav class="foot-col" aria-label="Help">
-        <h2>Help</h2>
-        <a href="#explore" data-tab-link="tab-faq">FAQ</a>
-        <a href="#explore" data-tab-link="tab-safety">Safety</a>
-        <a href="#care">Squishy care</a>
+      <nav aria-label="Support">
+        <h2>Support</h2>
+        <a href="#explore" data-tab-link="tab-faq">FAQs</a>
+        <a href="#explore" data-tab-link="tab-safety">Safety &amp; Care</a>
         <a href="#reviews">Reviews</a>
-        <a href="#stores">Our stores</a>
+        <a href="#stores">Our Stores</a>
       </nav>
-      <div class="foot-col">
-        <h2>Partners</h2>
-        <span>Bloom · balloon styling</span>
-        <span>PartyPainters.sg · face painting</span>
-        <span>Butter Studio · cakes</span>
-        <span>Try it in store at Tom &amp; Stefanie outlets</span>
-      </div>
+    </div>
+    <div class="foot-partners">
+      <h2>Our Partners</h2>
+      <a href="#partners" data-tab-link="tab-how">Explore Our Party Partners <span aria-hidden="true">→</span></a>
     </div>
     <div class="foot-base">
-      <span>© <span id="foot-year">2026</span> Confetti Club by Tom &amp; Stefanie. All rights reserved.</span>
-      <a href="#top">Back to top</a>
+      <span>© <span id="foot-year">2026</span> Confetti Club by Tom &amp; Stefanie</span>
+      <span class="foot-legal"><a href="#privacy">Privacy</a></span>
     </div>
   </div>
 </footer>
@@ -4032,7 +4038,8 @@ footer{background:#efece7;border-top:0}
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
-  document.querySelectorAll('a[href="#care"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); $('tab-faq').click(); var d = $('care'); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
+  // #care and #privacy open that FAQ answer
+  document.querySelectorAll('a[href="#care"],a[href="#privacy"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); $('tab-faq').click(); var d = $(a.getAttribute('href').slice(1)); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
   (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (h !== '#care') return; $('tab-faq').click(); var d = $('care'); d.open = true; setTimeout(function(){ d.scrollIntoView({block:'center'}); }, 50); })();
 
   /* ================= REQUEST: validated, never sent offline ================= */
