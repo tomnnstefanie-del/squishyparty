@@ -1237,7 +1237,7 @@
     if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
     var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—', off = shown ? referralOff() : 0;
     // A friend's code or the capsule QR: show $10 off (the server still prices the full amount; we take it off the quotation)
-    function struck(id){ var e = $(id); e.textContent = ''; e.appendChild(el('s', 'was', money(T.total))); e.appendChild(document.createTextNode(' ' + money(T.total - off) + (T.pending.length ? '+' : ''))); }
+    function struck(id){ var e = $(id), w = el('s', 'was', money(T.total)); e.textContent = money(T.total - off) + (T.pending.length ? '+' : ''); w.setAttribute('aria-label', 'was ' + money(T.total)); e.appendChild(w); }
     if (off) struck('total-price'); else put('total-price', totalTxt);
     $('ref-off').hidden = !off;
     put('per-child', shown ? money(Math.round((T.total - off) / s.participants)) : '—');
@@ -1336,14 +1336,13 @@
     if (!REF.code) { $('ref-banner').hidden = false; $('ref-banner').querySelector('span').innerHTML = 'Scanned a squishy capsule? <b>$10 off your first hosted party</b> is added to your request.'; }
   }
   function referralOff(){
-    var r = $('ref-returning'), c = $('ref-code'); if (!r || !c || typeof REF === 'undefined') return 0;
+    var c = $('ref-code'); if (!c || typeof REF === 'undefined') return 0;
     var v = c.value.trim(), code = /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v);
-    return (code || (!v && REF.source === 'capsule')) && !r.checked ? 1000 : 0;
+    return code || (!v && REF.source === 'capsule') ? 1000 : 0;
   }
-  $('ref-returning').addEventListener('change', function(){ refHint(); render(false); });
   function refHint(){
     var v = $('ref-code').value.trim(), ok = !v || /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v), h = $('ref-hint');
-    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? ($('ref-returning').checked ? 'Referral codes are for first parties, so this one won’t apply if you’ve booked before.' : 'Thanks! $10 off is shown in your total. We take it off your quotation once we’ve checked the code.') : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
+    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? 'Thanks! $10 off is shown in your total.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
     h.classList.toggle('err', !ok); $('ref-code').toggleAttribute('aria-invalid', !ok);
   }
   $('ref-code').addEventListener('input', function(){ refHint(); render(false); }); refHint();
@@ -1634,7 +1633,7 @@
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: $('want-quote').checked,
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked, sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';

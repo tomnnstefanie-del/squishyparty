@@ -1353,3 +1353,9 @@ footer{background:#efece7;border-top:0}
 .quote-opt span{display:flex;flex-direction:column;gap:2px}
 .quote-opt small{font-size:.8125rem;color:var(--muted);font-weight:500}
 .quote-opt + .consent{margin-top:16px}
+/* v54 Home: less empty space above and below the hero */
+.hero{padding-top:clamp(12px,2vw,24px);padding-bottom:clamp(8px,1.5vw,20px)}
+.hero + .section{padding-top:clamp(24px,3vw,40px)}
+/* $10 off: the new total first, the old one beside it, smaller and struck through */
+.total .was,.mobile-bar .was{display:inline-block;margin:0 0 0 10px;font-family:var(--sans);font-size:.5em;font-weight:700;opacity:1;color:rgba(255,255,255,.8);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--lemon);vertical-align:middle}
+.total .was,.mobile-bar .was{font-size:.62em;font-weight:600;color:rgba(255,255,255,.78);text-decoration-color:rgba(255,255,255,.9);text-decoration-thickness:1.5px}
