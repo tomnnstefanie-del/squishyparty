@@ -2148,6 +2148,72 @@ footer{background:#efece7;border-top:0}
 .ad-book .mini:hover,.ad-vendor .mini:hover{border-color:var(--cobalt)}
 .ad-book-empty{padding:16px}
 @media (max-width:900px){.ad-book-top{grid-template-columns:1fr}.ad-cal-day{min-height:54px}.ad-books{grid-template-columns:1fr}}
+/* v60 Dashboard stages: yellow waiting for vendors, orange ask for deposit, blue deposit paid, green paid in full */
+.st-pending{--st:#f5b800;--st-bg:#fff3d6;--st-ink:#7a5600}
+.st-ready{--st:#f07a1a;--st-bg:#ffe7d4;--st-ink:#9a4300}
+.st-booked{--st:#2f6fe0;--st-bg:#e1ecff;--st-ink:#1d4ea8}
+.st-paid{--st:#1f9d5c;--st-bg:#e3f5ea;--st-ink:#0f6a40}
+.st-lost{--st:#c9ccd8;--st-bg:#f0f0f3;--st-ink:#6b6f8f}
+.ad-legend .k.st-pending,.ad-legend .k.st-ready,.ad-legend .k.st-booked,.ad-legend .k.st-paid,.ad-events .k.st-booked,.ad-events .k.st-paid{background:var(--st)}
+.ad-cal-ev.st-pending,.ad-cal-ev.st-ready,.ad-cal-ev.st-booked,.ad-cal-ev.st-paid{background:var(--st-bg);color:var(--st-ink);box-shadow:inset 3px 0 0 var(--st)}
+.ad-book.pending,.ad-book.ready,.ad-book.booked,.ad-book.paid{border-left-color:var(--st)}
+.ad-book .tag[class*="st-"]{background:var(--st-bg);color:var(--st-ink)}
+.ad-guide{margin:0 0 20px;padding:4px 18px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line)}
+.ad-guide summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px}
+.ad-guide ol{margin:0 0 14px;padding-left:22px;display:flex;flex-direction:column;gap:10px;font-size:.9rem;color:var(--ink-2)}
+.ad-guide .dot{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--st);margin-right:6px;vertical-align:middle}
+/* v61 Experiences menu: separators between groups */
+.nav-drop .nav-sep{border:0;border-top:1px solid var(--line);margin:6px 8px}
+/* v62 Booking cards as wide rows: who and when | partner vendors | to-dos and buttons */
+.ad-books{grid-template-columns:1fr}
+.ad-book{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.2fr) minmax(0,1fr);gap:16px 20px;align-items:start}
+.ad-col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ad-col-do{height:100%}
+.ad-book .ad-book-head{flex-wrap:wrap}
+.ad-novendor{margin:0;padding:10px;border-radius:12px;background:#faf9f6}
+.ad-alldone{margin:0;font-size:.8125rem;font-weight:700;color:#0f7a4a}
+@media (max-width:900px){.ad-book{grid-template-columns:1fr}.ad-col-do{height:auto}}
+/* v63 Booking rows stay in three columns down to 600px wide, more compact */
+@media (max-width:900px){.ad-book{grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr) minmax(0,1fr);gap:10px 12px}.ad-col-do{height:100%}}
+@media (max-width:900px) and (min-width:601px){
+  .ad-book{padding:12px 14px}
+  .ad-book-when b{font-size:.9rem}
+  .ad-book-info,.ad-book-todo{font-size:.78rem}
+  .ad-book-where,.ad-vendor small{font-size:.7rem}
+  .ad-vendors{padding:8px}
+  .ad-vendor{flex-wrap:wrap;gap:4px}
+  .ad-book .mini,.ad-vendor .mini{min-height:28px;padding:3px 9px;font-size:.7rem}
+}
+@media (max-width:600px){.ad-book{grid-template-columns:1fr}.ad-col-do{height:auto}}
+/* v64 Booking tiles: small, readable at a glance; actions under Details */
+.ad-books{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;align-items:start}
+.ad-tile-b{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 10px;border-radius:14px;background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);border-top:5px solid var(--st);scroll-margin-top:90px}
+.ad-tile-b:target{box-shadow:0 0 0 3px var(--cobalt)}
+.ad-tile-b.st-lost{opacity:.6}
+.tb-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.tb-date{font-size:.9rem;color:var(--ink)}
+.tb-stage{flex:none;padding:2px 8px;border-radius:999px;background:var(--st-bg);color:var(--st-ink);font-size:.6875rem;font-weight:800;white-space:nowrap}
+.tb-who{margin:0;font-size:.8125rem;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-next{margin:2px 0 0;padding:8px 10px;border-radius:10px;background:var(--st-bg);color:var(--st-ink);font-size:.8125rem;font-weight:700;line-height:1.35}
+.tb-next.done{background:#eef7f1;color:#0f6a40}
+.tb-next-k{display:block;font-size:.625rem;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-bottom:1px}
+.tb-chips{display:flex;flex-wrap:wrap;gap:4px}
+.tb-chip{padding:2px 7px;border-radius:999px;font-size:.6875rem;font-weight:700;white-space:nowrap}
+.tb-chip.ok{background:#e3f5ea;color:#0f6a40}.tb-chip.wait{background:#fff3d6;color:#7a5600}
+.tb-more summary{list-style:none;cursor:pointer;font-size:.75rem;font-weight:700;color:var(--cobalt);padding:4px 0;min-height:32px;display:flex;align-items:center}
+.tb-more summary::-webkit-details-marker{display:none}
+.tb-more summary::after{content:"▾";margin-left:4px}.tb-more[open] summary::after{content:"▴"}
+.tb-more[open]{display:flex;flex-direction:column;gap:6px;padding-top:2px;border-top:1px dashed var(--line-2)}
+.tb-line{margin:0;font-size:.75rem;color:var(--ink-2)}.tb-line.muted{color:var(--muted)}
+.tb-vendor{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:#faf9f6}
+.tb-vendor b{display:block;font-size:.75rem}.tb-vendor small{display:block;font-size:.6875rem;color:var(--muted)}
+.tb-vendor.ok b{color:#0f6a40}.tb-vendor.wait b{color:#7a5600}
+.tb-todos{margin:0;padding-left:16px;font-size:.75rem;color:#c0254a;font-weight:600}
+.tb-acts{display:flex;flex-wrap:wrap;gap:4px}
+.ad-tile-b .mini{min-height:30px;padding:3px 10px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font:inherit;font-size:.7rem;font-weight:700;color:var(--ink);cursor:pointer;white-space:nowrap}
+.ad-tile-b .mini.on{background:#e9f7ef;border-color:#bfe5cf;color:#0f7a4a}
+.ad-tile-b .mini:hover{border-color:var(--cobalt)}
+.ad-bar-btns{display:flex;flex-wrap:wrap;gap:8px}
 </style>
 </head>
 <body>
@@ -2199,10 +2265,12 @@ footer{background:#efece7;border-top:0}
     <nav class="nav" aria-label="Explore">
       <details class="nav-menu" id="nav-exp"><summary>Experiences <svg class="icon" aria-hidden="true"><use href="./#i-chevron"/></svg></summary>
         <div class="nav-drop">
-          <a href="./#tab-how"><b>Squishy DIY parties</b><small>Hosted at your home, office or venue</small></a>
-          <a href="./#partners"><b>Party partners</b><small>Cakes, decor, photos and more, in one quote</small></a>
-          <a href="stores.html"><b>Try it in store</b><small>Our squishy bars in Woodlands, PLQ and Eastpoint</small></a>
-          <a href="./#reviews"><b>Reviews</b><small>What families say</small></a>
+          <a href="./#tab-how"><b>Squishy Bar</b><small>The viral squishy-making experience, your way.</small></a>
+          <a href="stores.html"><b>NOMI Clicker Bar</b><small>Build and personalise your own clicker.</small></a>
+          <hr class="nav-sep">
+          <a href="./#partners"><b>Party Services</b><small>Cakes, decorations, entertainment &amp; more.</small></a>
+          <hr class="nav-sep">
+          <a href="stores.html"><b>Visit Us In-Store</b><small>Discover our DIY bars at Tom &amp; Stefanie.</small></a>
         </div>
       </details><a href="./#tab-how">How it works</a><a href="./#companies">For companies</a><a href="./#tab-faq">FAQ</a>
     </nav>

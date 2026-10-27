@@ -142,6 +142,7 @@ t('security headers: HSTS, no plugins, no framing, private pages not indexed', (
   const v = JSON.parse(nodeFs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')), all = JSON.stringify(v.headers);
   for (const x of ['Strict-Transport-Security', "object-src 'none'", "frame-ancestors 'none'", 'X-Content-Type-Options', '/(admin|feedback).html']) assert.ok(all.includes(x), x);
 });
+t('the daily bump runs at 9am Singapore time', () => { const v = JSON.parse(nodeFs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')); assert.deepEqual(v.crons, [{ path: '/api/digest', schedule: '0 1 * * *' }]); });
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));
 

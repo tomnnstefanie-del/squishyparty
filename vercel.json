@@ -69,5 +69,11 @@
       "source": "/c",
       "destination": "/api/scan"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/digest",
+      "schedule": "0 1 * * *"
+    }
   ]
 }

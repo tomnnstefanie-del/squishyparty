@@ -107,7 +107,7 @@ subPage('admin.html', { title: 'Dashboard | Confetti Club', ogTitle: 'Confetti C
 if (process.argv.includes('--preview')) {
   // Offline preview: embed the photos from public/img too (the live site loads them as files).
   let prev = out, n = 0;
-  for (const sub of ['making', 'how', 'cakes', 'bloom', 'events', 'partypainters', 'jsquare']) {
+  for (const sub of ['making', 'how', 'butter', 'bloom', 'events', 'partypainters', 'jsquare']) {
     const dir = path.join(root, 'public/img', sub);
     for (const f of fs.readdirSync(dir).filter((x) => /\.(jpg|png|webp)$/.test(x)).sort()) {
       const type = f.endsWith('.png') ? 'image/png' : f.endsWith('.webp') ? 'image/webp' : 'image/jpeg';

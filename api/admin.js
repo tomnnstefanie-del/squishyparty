@@ -1,11 +1,13 @@
 // /api/admin  (Authorization: Bearer <ADMIN_PASSWORD>): the private dashboard at /admin.html.
 //   GET                                          -> the numbers
 //   POST { action: 'mark' | 'undo', ref, status } -> record (or clear) contacted / confirmed / lost / paid / vendor n
+//   POST { action: 'digest' }                      -> send the to-do list to Telegram now
 // ADMIN_PASSWORD is a Vercel environment variable (12+ characters); without it the dashboard stays locked.
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
 import { clientIp, limiter, fail, HttpError, readJson, assertSameOrigin } from '../lib/http.js';
 import { readStats, markStatus, tooManyFailures, validStatus } from '../lib/stats.js';
+import { sendDigest } from './digest.js';
 
 const rateLimited = limiter(30, 10 * 60 * 1000); // per instance, on top of the shared lockout
 const REF = /^SP-\d{6}-[0-9A-F]{4}$/;
@@ -29,6 +31,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       assertSameOrigin(req);
       const b = await readJson(req, 1024);
+      if (b.action === 'digest') { const r = await sendDigest(); if (!r.sent) throw new HttpError(503, r.reason); return res.status(200).json({ ok: true, count: r.count }); }
       if (!['mark', 'undo'].includes(b.action) || !REF.test(String(b.ref || '')) || !validStatus(b.status)) throw new HttpError(400, 'Please refresh and try again.');
       const r = await markStatus(b.ref, b.status, b.action === 'undo');
       if (!r) throw new HttpError(404, 'That request isn’t in the dashboard.');

@@ -4,7 +4,7 @@ import { checkStatusToken } from '../lib/status-link.js';
 import { markStatus, statsConfigured } from '../lib/stats.js';
 
 const REF = /^SP-\d{6}-[0-9A-F]{4}$/;
-const LABEL = { contacted: 'contacted', confirmed: 'confirmed', paid: 'paid' };
+const LABEL = { contacted: 'contacted', confirmed: 'deposit paid', paid: 'paid in full' };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const sgTime = (iso) => new Date(iso).toLocaleString('en-SG', { timeZone: 'Asia/Singapore', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 
