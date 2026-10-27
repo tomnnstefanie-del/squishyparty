@@ -16,14 +16,17 @@ if (fs.existsSync(envFile)) {
 const ROUTES = {
   '/api/request': (await import('../api/request.js')).default,
   '/api/otp': (await import('../api/otp.js')).default,
-  '/api/feedback': (await import('../api/feedback.js')).default,};
+  '/api/feedback': (await import('../api/feedback.js')).default,
+  '/api/event': (await import('../api/event.js')).default,
+  '/api/admin': (await import('../api/admin.js')).default,
+  '/api/status': (await import('../api/status.js')).default,
+  '/c': (await import('../api/scan.js')).default, // same as the vercel.json rewrite: the capsule QR sticker
+};
 const PORT = Number(process.env.PORT || 3000);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  // Same short link as vercel.json: the QR sticker on the capsule lids points here
-  if (url.pathname === '/c') { res.writeHead(307, { Location: '/?src=capsule#offer' }); return res.end(); }
   const handler = ROUTES[url.pathname];
   if (handler) {
     res.status = (c) => { res.statusCode = c; return res; };

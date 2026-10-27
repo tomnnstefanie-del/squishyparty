@@ -101,6 +101,8 @@ const stores = subPage('stores.html', { title: 'Our Stores | Confetti Club by To
 // Feedback: linked from the after-party WhatsApp message, and kept out of search results.
 const feedback = subPage('feedback.html', { title: 'How was your party? | Confetti Club', ogTitle: 'How was your party? | Confetti Club', noindex: true,
   desc: 'Tell us how your Confetti Club party went. It takes 15 seconds.' });
+// Private referral dashboard (password in Vercel), also kept out of search results.
+subPage('admin.html', { title: 'Referral dashboard | Confetti Club', ogTitle: 'Confetti Club', noindex: true, desc: 'Private dashboard.' });
 
 if (process.argv.includes('--preview')) {
   // Offline preview: embed the photos from public/img too (the live site loads them as files).

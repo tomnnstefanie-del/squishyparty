@@ -13,6 +13,8 @@ import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpErro
 import { checkVerified } from '../lib/otp.js';
 import { mailConfigured, sendMail } from '../lib/mail.js';
 import { confirmationEmail } from '../lib/emails.js';
+import { recordRequest, statsConfigured } from '../lib/stats.js';
+import { statusLink } from '../lib/status-link.js';
 
 const rateLimited = limiter(5, 10 * 60 * 1000); // best-effort, per server instance
 
@@ -52,12 +54,19 @@ export default async function handler(req, res) {
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
       const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, shareCode, site }));
-      await sendTelegram({ token, chatId, text, buttonUrl, afterUrl, apiBase: process.env.TELEGRAM_API_BASE || undefined });
+      // With the dashboard connected, two buttons record when we got back to them and when they confirmed
+      const statusUrls = statsConfigured() ? { contacted: statusLink(site, ref, 'contacted'), confirmed: statusLink(site, ref, 'confirmed') } : null;
+      await sendTelegram({ token, chatId, text, buttonUrl, afterUrl, statusUrls, apiBase: process.env.TELEGRAM_API_BASE || undefined });
     } catch (e) {
       console.error('[request] telegram send failed', ref, e.message); // no personal data in logs
       throw new HttpError(502, 'We couldn’t send your request just now. Please try again in a minute.');
     }
     console.log('[request] sent', ref);
+
+    // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
+    const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
+    const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
+    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {

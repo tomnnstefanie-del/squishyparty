@@ -1324,7 +1324,11 @@
     try { new URLSearchParams(location.search).forEach(function(v, k){ q[k] = v; }); } catch (e) {}
     var code = String(q.ref || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 16);
     var src = String(q.src || q.utm_source || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 24);
-    if (code) { saved.code = code; saved.at = Date.now(); track('referral_link_opened', {}); }
+    if (code) {
+      // Count this friend's link once per device for the referral dashboard (only the code is sent)
+      if (code !== saved.code && isWeb()) { try { fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'link_open', code:code})}).catch(function(){}); } catch (e) {} }
+      saved.code = code; saved.at = Date.now(); track('referral_link_opened', {});
+    }
     if (src) { saved.source = src; saved.at = saved.at || Date.now(); track('arrived_from', {source:src}); }
     try { if (code || src) localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
     return saved;

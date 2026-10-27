@@ -9,6 +9,8 @@ const { confirmationEmail } = await import('../lib/emails.js');
 const { quotePdf, referralDiscount } = await import('../lib/quote-pdf.js');
 const { validateFeedback } = await import('../lib/feedback.js');
 const Ref = await import('../lib/referral.js');
+const { statusLink, checkStatusToken } = await import('../lib/status-link.js');
+const nodeFs = await import('node:fs');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
@@ -30,7 +32,7 @@ console.log('search (SEO)');
   const fs = await import('node:fs'); const html = fs.readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
   t('page is indexable, with title, description and canonical', () => { assert.ok(!/noindex/.test(html)); assert.match(html, /<title>[^<]*Singapore[^<]*<\/title>/); assert.match(html, /<meta name="description" content="[^"]{80,170}">/); assert.match(html, /<link rel="canonical" href="https:\/\/[^"]+\/">/); });
   t('structured data is valid JSON with the FAQ', () => { const j = JSON.parse(html.match(/application\/ld\+json">(.*?)<\/script>/)[1]); const faq = j['@graph'].find((x) => x['@type'] === 'FAQPage'); assert.ok(faq.mainEntity.length >= 5); });
-  t('robots.txt allows search engines and points at the sitemap', () => { const r = fs.readFileSync(new URL('../public/robots.txt', import.meta.url), 'utf8'); assert.match(r, /Allow: \//); assert.match(r, /Sitemap: /); assert.ok(!JSON.stringify(JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'))).includes('noindex')); });
+  t('robots.txt allows search engines and points at the sitemap', () => { const r = fs.readFileSync(new URL('../public/robots.txt', import.meta.url), 'utf8'); assert.match(r, /Allow: \//); assert.match(r, /Sitemap: /); const hs = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).headers; assert.ok(!JSON.stringify(hs.find((h) => h.source === '/(.*)')).includes('noindex')); /* only private pages and APIs are noindex */ });
 }
 
 console.log('email codes');
@@ -131,6 +133,15 @@ t('feedback: 1-5 stars only, unknown references dropped, photo must be a JPEG', 
   assert.throws(() => validateFeedback({ rating: 5, photo: 'data:text/html;base64,AAAA' }), (e) => e.field === 'photo');
   assert.equal(validateFeedback({ rating: 4, photo: 'data:image/jpeg;base64,AAAA' }).photo, 'AAAA');
 });
+t('status links are signed: changing the reference or status breaks them', () => {
+  const u = new URL(statusLink('https://example.sg', 'SP-261107-AB12', 'contacted')), tok = u.searchParams.get('t');
+  assert.ok(checkStatusToken('SP-261107-AB12', 'contacted', tok));
+  assert.ok(!checkStatusToken('SP-261107-AB13', 'contacted', tok) && !checkStatusToken('SP-261107-AB12', 'confirmed', tok) && !checkStatusToken('SP-261107-AB12', 'contacted', ''));
+});
+t('security headers: HSTS, no plugins, no framing, private pages not indexed', () => {
+  const v = JSON.parse(nodeFs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')), all = JSON.stringify(v.headers);
+  for (const x of ['Strict-Transport-Security', "object-src 'none'", "frame-ancestors 'none'", 'X-Content-Type-Options', '/(admin|feedback).html']) assert.ok(all.includes(x), x);
+});
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));
 
@@ -171,7 +182,7 @@ console.log('referrals (friend gets $10 off, no database)');
     assert.match(mc, /Capsule QR offer<\/b>: \$10 off their first hosted party/); assert.match(mc, /Made by: Mia/);
   });
   const fs = await import('node:fs');
-  t('the sticker short link /c goes to the capsule offer', () => { const r = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).redirects; assert.ok(r.some((x) => x.source === '/c' && x.destination.includes('src=capsule'))); });
+  t('the sticker short link /c is counted, then opens the capsule offer', () => { const r = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).rewrites; assert.ok(r.some((x) => x.source === '/c' && x.destination === '/api/scan')); assert.ok(fs.readFileSync(new URL('../api/scan.js', import.meta.url), 'utf8').includes("'/?src=capsule#offer'")); });
   t('a bad source value is dropped', () => { const b = dateOK(); b.referral = { source: '<script>' }; assert.equal(validateRequest(b).referral.source, ''); });
 }
 

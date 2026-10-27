@@ -2025,6 +2025,70 @@ footer{background:#efece7;border-top:0}
 .fb-done:focus{outline:none}
 @media (prefers-reduced-motion:reduce){.fb-star-row label{transition:none}.fb-star-row label:hover{transform:none}}
 .fb-photo{position:relative}.fb-photo input[type=file]{left:0;top:0}.fb-card{position:relative;overflow:hidden}
+/* v56 Referral dashboard (admin.html) */
+.ad-wrap{padding-top:clamp(20px,3vw,40px)}
+.ad-h1{margin:4px 0 20px;font-size:clamp(2rem,1.6rem + 1.6vw,2.8rem)}
+.ad-h2{margin:36px 0 12px;font-size:1.35rem}
+.ad-login{max-width:420px;display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-md)}
+.ad-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.ad-note{margin:0;color:var(--muted);font-size:.875rem;max-width:62ch}
+.ad-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ad-src{border-radius:var(--r-lg);padding:22px;background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line)}
+.ad-src h2{margin:0 0 14px;font-size:1.1rem;display:flex;align-items:center;gap:8px}
+.ad-src h2::before{content:"";width:12px;height:12px;border-radius:4px;background:var(--k)}
+.ad-capsule{--k:#f5b800}.ad-friend{--k:#e2335a}
+.ad-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ad-nums div{display:flex;flex-direction:column;gap:2px}
+.ad-nums b{font-family:var(--serif,inherit);font-size:2rem;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.ad-nums span{font-size:.8125rem;color:var(--muted);font-weight:600}
+.ad-fine{margin:12px 0 0;font-size:.8125rem;color:var(--muted)}
+.ad-total{margin-top:14px}
+.ad-chart{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;height:180px;padding:14px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line)}
+.ad-day{display:flex;flex-direction:column;min-width:0}
+.ad-bars{flex:1;display:flex;align-items:flex-end;gap:2px}
+.ad-b{flex:1;min-height:2px;border-radius:3px 3px 0 0}
+.k-scan{background:#f5b800}.k-open{background:#e2335a}.k-req{background:var(--cobalt)}
+.ad-dl{font-size:.625rem;color:var(--muted);text-align:center;margin-top:4px;white-space:nowrap;overflow:hidden}
+.ad-legend{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;font-size:.8125rem;color:var(--ink-2);margin:8px 0 0}
+.ad-legend .k{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:-8px}
+.ad-table-wrap{overflow-x:auto;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line)}
+.ad-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.ad-table th{text-align:left;font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line)}
+.ad-table td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.ad-table tr:last-child td{border-bottom:0}
+.ad-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.ad-table .mono{font-family:ui-monospace,Consolas,monospace;font-size:.8125rem}
+.ad-table td b{display:block}.ad-table td small{color:var(--muted)}
+.ad-win{font-weight:800;color:#0f7a4a}
+.ad-brought{font-size:.8125rem;color:var(--ink-2)}
+.ad-empty{color:var(--muted);text-align:center}
+.via-friend{color:#c0254a;font-weight:700}.via-capsule{color:#8a6500;font-weight:700}
+@media (max-width:760px){.ad-compare{grid-template-columns:1fr}.ad-chart{gap:3px;padding:10px}.ad-dl{font-size:.5625rem}}
+.ad-table{min-width:760px}.ad-table .mono,.ad-table th{white-space:nowrap}.ad-brought span{display:block;white-space:nowrap}
+/* v57 Dashboard: response times, activity log, status buttons */
+.ad-life{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.ad-tile{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:var(--r-md);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line)}
+.ad-tile span{font-size:.8125rem;font-weight:600;color:var(--ink-2)}
+.ad-tile b{font-size:1.6rem;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
+.ad-tile small{font-size:.75rem;color:var(--muted)}
+.ad-alert.on{box-shadow:inset 0 0 0 2px #e2335a;background:#fff5f7}.ad-alert.on b{color:#c0254a}
+.ad-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.ad-filter .chip{min-height:36px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font:inherit;font-size:.8125rem;font-weight:700;color:var(--ink-2);cursor:pointer}
+.ad-filter .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.ad-events{list-style:none;margin:0;padding:6px 16px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-sm),inset 0 0 0 1.5px var(--line);max-height:460px;overflow-y:auto}
+.ad-events li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.875rem}
+.ad-events li:last-child{border-bottom:0}
+.ad-events .k{width:10px;height:10px;border-radius:3px;flex:none}
+.ad-events time{flex:none;width:118px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ad-ev-d{color:var(--ink-2);font-family:ui-monospace,Consolas,monospace;font-size:.8125rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.k-ok{background:#1f9d5c}.k-lost{background:#9aa0b4}
+.ad-status{white-space:nowrap}
+.ad-status .tag{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--cobalt-50);color:var(--cobalt);font-size:.75rem;font-weight:700;margin-right:6px}
+.ad-status .tag.ok{background:#e9f7ef;color:#0f7a4a}.ad-status .tag.lost{background:#f0f0f3;color:#6b6f8f}
+.ad-status .mini{min-height:30px;padding:4px 10px;margin:2px 4px 2px 0;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font:inherit;font-size:.75rem;font-weight:700;color:var(--ink);cursor:pointer}
+.ad-status .mini:hover{border-color:var(--cobalt)}
+.ad-table{min-width:1080px}
+@media (max-width:900px){.ad-life{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>

@@ -9,9 +9,10 @@ import { chromium } from 'playwright';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outbox = path.join(root, 'dev/.outbox.json'), mailbox = path.join(root, 'dev/.mailbox.json');
 const PORT = 3100, MOCK = 8789, BASE = `http://localhost:${PORT}`;
-const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEGRAM_BOT_TOKEN: 'test:token', TELEGRAM_CHAT_ID: '4242', TELEGRAM_API_BASE: `http://localhost:${MOCK}`, MAIL_TRANSPORT: 'file' };
+const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEGRAM_BOT_TOKEN: 'test:token', TELEGRAM_CHAT_ID: '4242', TELEGRAM_API_BASE: `http://localhost:${MOCK}`, MAIL_TRANSPORT: 'file', STATS_MEMORY: '1', ADMIN_PASSWORD: 'test-dashboard-pass' };
 process.env.TELEGRAM_BOT_TOKEN = 'test:token'; // so the test can mint a verified-email token like the server does
 const { issueVerified } = await import('../lib/otp.js');
+const { makeReferralCode } = await import('../lib/referral.js');
 const mails = () => (fs.existsSync(mailbox) ? JSON.parse(fs.readFileSync(mailbox, 'utf8')) : []);
 const procs = [];
 const start = (file, e = env) => new Promise((ok) => { const p = spawn('node', [file], { cwd: root, env: e }); procs.push(p); p.stdout.on('data', (d) => { if (/on http/.test(d)) ok(p); }); p.stderr.on('data', (d) => process.stderr.write(d)); });
@@ -213,6 +214,44 @@ try {
   await fp.waitForSelector('#fb-done:not([hidden])', { timeout: 10000 });
   assert.ok(sent().at(-1).text.includes('4/5') && sent().at(-1).text.includes('Lovely team')); await fp.close();
   ok('the feedback page sends a rating and comment, then says thank you');
+
+  console.log('referral dashboard');
+  const adm = (pw) => p2.evaluate(async (pw) => { const r = await fetch('/api/admin', { headers: pw ? { Authorization: 'Bearer ' + pw } : {} }); return { s: r.status, b: await r.json().catch(() => ({})) }; }, pw);
+  assert.equal((await adm('')).s, 401); assert.equal((await adm('wrong-password')).s, 401); ok('the dashboard needs the right password');
+  const before0 = (await adm('test-dashboard-pass')).b.totals;
+  const scan = await fetch(BASE + '/c', { redirect: 'manual' }); assert.equal(scan.status, 307); assert.equal(scan.headers.get('location'), '/?src=capsule#offer');
+  const friendCode = makeReferralCode('Mia Tan');
+  const lp = await browser.newPage(); await lp.goto(BASE + '/?ref=' + friendCode); await lp.waitForTimeout(600);
+  await lp.reload(); await lp.waitForTimeout(400); await lp.close(); // a second visit on the same device isn't counted again
+  x = await api({ ...base, referral: { code: friendCode } }, { 'X-Forwarded-For': '10.0.2.1' }); assert.equal(x.s, 200);
+  x = await api({ ...base, referral: { source: 'capsule' } }, { 'X-Forwarded-For': '10.0.2.2' }); assert.equal(x.s, 200);
+  const st = (await adm('test-dashboard-pass')).b;
+  assert.equal(st.totals.capsuleScans - before0.capsuleScans, 1); assert.equal(st.totals.linkOpens - before0.linkOpens, 1);
+  assert.equal(st.totals.viaFriend - before0.viaFriend, 1); assert.equal(st.totals.viaCapsule - before0.viaCapsule, 1);
+  const rr = st.referrers.find((r) => r.code === friendCode); assert.ok(rr && rr.opens === 1 && rr.requests === 1 && rr.brought.length === 1);
+  assert.ok(st.recent.some((q) => q.via === 'friend' && q.code === friendCode) && !JSON.stringify(st).includes('a@example.com') && !JSON.stringify(st).includes('91234567'));
+  ok('QR scans, friend-link opens (once per device) and the requests each brought show on the dashboard, with no contact details');
+  const dp = await browser.newPage(); await dp.goto(BASE + '/admin.html'); await dp.fill('#ad-pass', 'test-dashboard-pass'); await dp.click('#ad-login button');
+  await dp.waitForSelector('#ad-body:not([hidden])'); assert.ok((await dp.textContent('#ad-referrers')).includes(friendCode)); await dp.close();
+  ok('the dashboard page opens with the password and lists who referred whom');
+
+  // Response times: the Telegram request message has signed "Contacted" / "Confirmed" buttons
+  const kb = sent().at(-1).reply_markup.inline_keyboard.flat();
+  const contactedUrl = kb.find((b) => b.text.includes('Contacted')).url, confirmedUrl = kb.find((b) => b.text.includes('Confirmed')).url;
+  const lastRef = new URL(contactedUrl).searchParams.get('ref');
+  const local = (u) => BASE + new URL(u).pathname + new URL(u).search;
+  const forged = new URL(local(contactedUrl)); forged.searchParams.set('ref', 'SP-261107-0000');
+  assert.equal((await fetch(forged)).status, 400); ok('a status link with a changed reference is refused');
+  let sr = await fetch(local(contactedUrl)); assert.equal(sr.status, 200); assert.ok((await sr.text()).includes('marked contacted'));
+  sr = await fetch(local(confirmedUrl)); assert.equal(sr.status, 200);
+  const st2 = (await adm('test-dashboard-pass')).b;
+  const life = st2.recent.find((q) => q.ref === lastRef).life; assert.ok(life.contacted && life.confirmed);
+  assert.ok(st2.lifecycle.toContact.n >= 1 && st2.lifecycle.toConfirm.n >= 1 && st2.events.some((e) => e.type === 'confirmed' && e.ref === lastRef) && st2.events.some((e) => e.type === 'scan'));
+  ok('the Telegram buttons record when we contacted and confirmed; the dashboard shows response times and the activity log');
+  const mk = await p2.evaluate(async (ref) => { const r = await fetch('/api/admin', { method: 'POST', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mark', ref, status: 'lost' }) }); return r.status; }, st2.recent.find((q) => q.ref !== lastRef).ref);
+  assert.equal(mk, 200); ok('a request can be marked from the dashboard');
+  const lock = await p2.evaluate(async () => { let s = 0; for (let i = 0; i < 12; i++) { const r = await fetch('/api/admin', { headers: { Authorization: 'Bearer nope-nope-nope', 'X-Forwarded-For': '10.9.9.9' } }); s = r.status; } return s; });
+  assert.equal(lock, 429); ok('after 10 wrong passwords the dashboard locks that address for 15 minutes');
   const cross = await fetch(`${BASE}/api/request`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' }, body: JSON.stringify(base) });
   assert.equal(cross.status, 403); ok('cross-site posts are refused (403)');
   let codes = [];

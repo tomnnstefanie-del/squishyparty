@@ -1,0 +1,180 @@
+
+<!-- Private referral dashboard (admin.html). Locked with ADMIN_PASSWORD; the numbers come from /api/admin (lib/stats.js).
+     Header and footer are copied from markup.html at build time. Not listed in search results. -->
+<div id="view-admin">
+__HEADER__
+
+<main id="main" class="ad-page">
+  <section class="section ad-wrap">
+    <div class="wrap">
+      <p class="eyebrow">Private</p>
+      <h1 class="ad-h1">Referral dashboard</h1>
+
+      <form class="ad-login" id="ad-login">
+        <label class="field">Dashboard password<input type="password" id="ad-pass" autocomplete="current-password" required></label>
+        <button class="btn btn-primary" type="submit">Open dashboard</button>
+        <p class="form-error" id="ad-error" role="alert" hidden></p>
+      </form>
+
+      <div id="ad-body" hidden>
+        <div class="ad-bar"><p class="ad-note" id="ad-note"></p><button class="btn btn-ghost" type="button" id="ad-refresh">Refresh</button></div>
+
+        <div class="ad-compare">
+          <article class="ad-src ad-capsule">
+            <h2>Capsule QR sticker</h2>
+            <div class="ad-nums"><div><b id="n-scans">0</b><span>scans</span></div><div><b id="n-cap-req">0</b><span>requests</span></div><div><b id="n-cap-rate">–</b><span>scans → request</span></div></div>
+            <p class="ad-fine">One QR on every lid. Anyone can scan it, so it can’t tell which party it came from.</p>
+          </article>
+          <article class="ad-src ad-friend">
+            <h2>Friend’s referral link</h2>
+            <div class="ad-nums"><div><b id="n-opens">0</b><span>links opened</span></div><div><b id="n-fr-req">0</b><span>requests</span></div><div><b id="n-fr-rate">–</b><span>opens → request</span></div></div>
+            <p class="ad-fine">Each family gets their own link after their party, so you can see exactly who referred whom.</p>
+          </article>
+        </div>
+        <p class="ad-fine ad-total">All requests: <b id="n-req">0</b><span id="n-unknown"></span></p>
+
+        <h2 class="ad-h2">How fast we get back to customers</h2>
+        <div class="ad-life">
+          <div class="ad-tile"><span>Request → we contact them</span><b id="l-contact">–</b><small id="l-contact-s"></small></div>
+          <div class="ad-tile"><span>We contact them → confirmed</span><b id="l-c2c">–</b><small id="l-c2c-s"></small></div>
+          <div class="ad-tile"><span>Request → confirmed</span><b id="l-confirm">–</b><small id="l-confirm-s"></small></div>
+          <div class="ad-tile"><span>Confirmed</span><b id="l-rate">–</b><small id="l-rate-s"></small></div>
+          <div class="ad-tile ad-alert" id="l-wait-tile"><span>Waiting for a reply</span><b id="l-wait">0</b><small>Not contacted yet</small></div>
+        </div>
+        <p class="ad-fine">Tap <b>✅ Contacted</b> and <b>🎉 Confirmed</b> on each Telegram request (or use the buttons below) to record the times. Average and middle value are shown, as one slow reply can pull the average up.</p>
+
+        <h2 class="ad-h2">Last 14 days</h2>
+        <div class="ad-chart" id="ad-chart" role="img" aria-label="Scans, link opens and requests per day for the last 14 days"></div>
+        <p class="ad-legend"><span class="k k-scan"></span>QR scans <span class="k k-open"></span>Links opened <span class="k k-req"></span>Requests</p>
+
+        <h2 class="ad-h2">Who referred whom</h2>
+        <div class="ad-table-wrap"><table class="ad-table">
+          <thead><tr><th>Referring family</th><th>Their code</th><th class="num">Link opened</th><th class="num">Friends’ requests</th><th>Requests they brought</th></tr></thead>
+          <tbody id="ad-referrers"></tbody>
+        </table></div>
+
+        <h2 class="ad-h2">Recent requests</h2>
+        <div class="ad-table-wrap"><table class="ad-table">
+          <thead><tr><th>Reference</th><th>Sent</th><th>Party date</th><th class="num">People</th><th class="num">Estimate</th><th>Found us via</th><th>Replied after</th><th>Confirmed after</th><th>Status</th></tr></thead>
+          <tbody id="ad-recent"></tbody>
+        </table></div>
+        <p class="ad-fine">These count requests, not paid parties. Numbers start from the day the database was connected.</p>
+
+        <h2 class="ad-h2">Activity</h2>
+        <div class="ad-filter" role="group" aria-label="Show">
+          <button type="button" class="chip on" data-f="">All</button><button type="button" class="chip" data-f="scan">QR scans</button><button type="button" class="chip" data-f="open">Links opened</button><button type="button" class="chip" data-f="request">Requests</button><button type="button" class="chip" data-f="status">Contacted / confirmed</button>
+        </div>
+        <ol class="ad-events" id="ad-events"></ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+__FOOTER__
+</div>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = 'cc-admin', pass = ''; try { pass = sessionStorage.getItem(KEY) || ''; } catch (e) {}
+  var money = function(c){ return '$' + (c / 100).toLocaleString('en-SG', {minimumFractionDigits:2, maximumFractionDigits:2}); };
+  var pct = function(a, b){ return b ? Math.round(a / b * 100) + '%' : '–'; };
+  var fmtDate = function(d){ return d ? new Date(d.length === 10 ? d + 'T00:00' : d).toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : ''; };
+  function el(tag, cls, txt){ var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function cell(tr, txt, cls){ var td = el('td', cls, txt); tr.appendChild(td); return td; }
+  var VIA = { friend:'Friend’s link', capsule:'Capsule QR', 'unknown-code':'A code that isn’t ours', '':'—' };
+  var dur = function(h){ if (h == null) return '–'; if (h < 1) return Math.max(1, Math.round(h * 60)) + ' min'; if (h < 48) return (Math.round(h * 10) / 10) + ' h'; return (Math.round(h / 24 * 10) / 10) + ' days'; };
+  var since = function(a, b){ return a && b ? dur((new Date(b) - new Date(a)) / 36e5) : ''; };
+  var when = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
+  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Confirmed', 'k-ok'], lost:['Didn’t book', 'k-lost'] };
+  var last = null, filter = '';
+  function events(){
+    var ol = $('ad-events'); ol.textContent = '';
+    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost/.test(e.type) : e.type === filter); });
+    if (!list.length) { ol.appendChild(el('li', 'ad-empty', 'Nothing yet.')); return; }
+    list.slice(0, 120).forEach(function(e){
+      var li = el('li'), k = EV[e.type] || [e.type, '']; li.appendChild(el('span', 'k ' + k[1]));
+      li.appendChild(el('time', null, when(e.at))); li.appendChild(el('b', null, k[0]));
+      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
+      ol.appendChild(li);
+    });
+  }
+  document.querySelectorAll('.ad-filter .chip').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('.ad-filter .chip').forEach(function(x){ x.classList.toggle('on', x === b); }); filter = b.dataset.f; if (last) events(); }); });
+  function mark(ref, status, btn){
+    btn.disabled = true;
+    fetch('/api/admin', { method:'POST', headers:{ Authorization:'Bearer ' + pass, 'Content-Type':'application/json' }, body: JSON.stringify({action:'mark', ref:ref, status:status}) })
+      .then(function(r){ return r.json(); }).then(function(j){ if (j.ok) load(); else { btn.disabled = false; alert(j.error || 'Something went wrong.'); } })
+      .catch(function(){ btn.disabled = false; });
+  }
+
+  function show(d){
+    $('ad-login').hidden = true; $('ad-body').hidden = false;
+    if (!d.connected) { $('ad-note').textContent = 'The database isn’t connected yet, so nothing is being counted. In Vercel: Storage → Create → Upstash for Redis → connect it to this project, then redeploy.'; return; }
+    var t = d.totals;
+    $('ad-note').textContent = 'Updated ' + new Date().toLocaleTimeString('en-SG', {hour:'numeric', minute:'2-digit'});
+    $('n-scans').textContent = t.capsuleScans; $('n-cap-req').textContent = t.viaCapsule; $('n-cap-rate').textContent = pct(t.viaCapsule, t.capsuleScans);
+    $('n-opens').textContent = t.linkOpens; $('n-fr-req').textContent = t.viaFriend; $('n-fr-rate').textContent = pct(t.viaFriend, t.linkOpens);
+    $('n-req').textContent = t.requests; $('n-unknown').textContent = t.unknownCode ? ' · ' + t.unknownCode + ' with a code that isn’t ours' : '';
+
+    var ch = $('ad-chart'); ch.textContent = '';
+    var max = Math.max(1, Math.max.apply(null, d.daily.map(function(x){ return Math.max(x.scans, x.opens, x.requests); })));
+    d.daily.forEach(function(x){
+      var col = el('div', 'ad-day'), bars = el('div', 'ad-bars');
+      [['scans','k-scan'], ['opens','k-open'], ['requests','k-req']].forEach(function(b){ var bar = el('span', 'ad-b ' + b[1]); bar.style.height = (x[b[0]] / max * 100) + '%'; bar.title = x[b[0]] + ' ' + b[0]; bars.appendChild(bar); });
+      col.appendChild(bars); var dl = el('span', 'ad-dl', String(+x.day.slice(8))); dl.title = fmtDate(x.day); col.appendChild(dl); ch.appendChild(col);
+    });
+
+    last = d; var L = d.lifecycle || {};
+    var tile = function(id, t){ $(id).textContent = t && t.n ? dur(t.avg) : '–'; $(id + '-s').textContent = t && t.n ? 'middle ' + dur(t.median) + ' · ' + t.n + ' request' + (t.n > 1 ? 's' : '') : 'No data yet'; };
+    tile('l-contact', L.toContact); tile('l-c2c', L.contactToConfirm); tile('l-confirm', L.toConfirm);
+    $('l-rate').textContent = L.requests ? Math.round(L.confirmed / L.requests * 100) + '%' : '–';
+    $('l-rate-s').textContent = L.requests ? L.confirmed + ' of ' + L.requests + ' requests' + (L.lost ? ' · ' + L.lost + ' didn’t book' : '') : 'No data yet';
+    $('l-wait').textContent = L.waiting || 0; $('l-wait-tile').classList.toggle('on', !!L.waiting);
+    events();
+
+    var rb = $('ad-referrers'); rb.textContent = '';
+    if (!d.referrers.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'No friend links opened yet.', 'ad-empty'); td0.colSpan = 5; rb.appendChild(tr0); }
+    d.referrers.forEach(function(r){
+      var tr = el('tr'), who = cell(tr, '');
+      if (r.from) { who.appendChild(el('b', null, r.from.first)); who.appendChild(el('small', null, r.from.ref + ' · party ' + fmtDate(r.from.date))); } else who.textContent = 'Before the dashboard';
+      cell(tr, r.code, 'mono'); cell(tr, r.opens, 'num'); cell(tr, r.requests, 'num' + (r.requests ? ' ad-win' : ''));
+      var br = cell(tr, r.brought.length ? '' : '—', 'ad-brought'); r.brought.forEach(function(b){ br.appendChild(el('span', null, b.ref + ' · ' + b.participants + ' people · ' + money(b.totalCents))); });
+      rb.appendChild(tr);
+    });
+
+    var rc = $('ad-recent'); rc.textContent = '';
+    if (!d.recent.length) { var tr1 = el('tr'); var td1 = cell(tr1, 'No requests yet.', 'ad-empty'); td1.colSpan = 9; rc.appendChild(tr1); }
+    d.recent.forEach(function(q){
+      var tr = el('tr'); cell(tr, q.ref, 'mono'); cell(tr, fmtDate(q.at)); cell(tr, fmtDate(q.date)); cell(tr, q.participants, 'num'); cell(tr, money(q.totalCents), 'num');
+      var v = cell(tr, (VIA[q.via] || q.via) + (q.code ? ' · ' + q.code : '') + (q.company ? ' · company' : '')); if (q.via) v.className = 'via-' + q.via;
+      var lf = q.life || {};
+      cell(tr, since(q.at, lf.contacted) || '—'); cell(tr, since(q.at, lf.confirmed) || '—');
+      var st = cell(tr, '', 'ad-status');
+      if (lf.confirmed) st.appendChild(el('span', 'tag ok', 'Confirmed'));
+      else if (lf.lost) st.appendChild(el('span', 'tag lost', 'Didn’t book'));
+      else {
+        if (lf.contacted) st.appendChild(el('span', 'tag', 'Contacted'));
+        [['contacted', 'Contacted'], ['confirmed', 'Confirmed'], ['lost', 'Didn’t book']].forEach(function(s){
+          if (s[0] === 'contacted' && lf.contacted) return;
+          var b = el('button', 'mini', s[1]); b.type = 'button'; b.addEventListener('click', function(){ mark(q.ref, s[0], b); }); st.appendChild(b);
+        });
+      }
+      rc.appendChild(tr);
+    });
+  }
+
+  function load(){
+    var err = $('ad-error'); err.hidden = true;
+    fetch('/api/admin', { headers:{ Authorization:'Bearer ' + pass } })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {s:r.status, b:j}; }); })
+      .then(function(x){
+        if (x.s === 200 && x.b.ok) { try { sessionStorage.setItem(KEY, pass); } catch (e) {} show(x.b); return; }
+        try { sessionStorage.removeItem(KEY); } catch (e) {}
+        $('ad-login').hidden = false; $('ad-body').hidden = true; err.hidden = false; err.textContent = x.b.error || 'Something went wrong.';
+      })
+      .catch(function(){ err.hidden = false; err.textContent = 'We couldn’t reach the server.'; });
+  }
+  $('ad-login').addEventListener('submit', function(e){ e.preventDefault(); pass = $('ad-pass').value; load(); });
+  $('ad-refresh').addEventListener('click', load);
+  if (pass) load();
+})();
+</script>
