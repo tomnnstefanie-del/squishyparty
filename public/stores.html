@@ -1895,10 +1895,6 @@ footer a:focus-visible{outline:2px solid var(--teal-700);outline-offset:2px;bord
 @media (max-width:360px){.foot-nav{gap:16px}.foot-nav a{font-size:.875rem}.foot-tag{font-size:.75rem}}
 /* v38 in-store card: the original Squishy Party look (cobalt wash, lemon eyebrow and icon) */
 .retail-photo{--cobalt:#2234b8;--lemon:#f6e98c;background:#2234b8}
-/* v41 Wax Cracking card: top-to-bottom wash, the whole photo (heater, pot, cracking hands) visible */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.5) 0%,rgba(24,32,140,.08) 100%),url('img/how/wax-full.jpg') right center/auto 100% no-repeat,#2234b8}
-@media (min-width:641px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-right:236px;min-height:166px;background:linear-gradient(180deg,rgba(24,32,140,.5) 0%,rgba(24,32,140,.08) 100%),url('img/how/wax-full.jpg') right 12px center/208px 156px no-repeat,#2234b8}}
-@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-bottom:262px;background:linear-gradient(180deg,rgba(24,32,140,.5) 0%,rgba(24,32,140,.05) 100%),url('img/how/wax-full.jpg') center bottom 12px/calc(100% - 24px) auto no-repeat,#2234b8}.addon[for="wax"] .addon-body{max-width:none}}
 /* In-store card: the shop icon sits bottom-right and opens Our stores */
 .retail-photo .retail-icon{align-self:flex-end;display:inline-flex;background:rgba(30,42,170,.88);border-radius:14px;padding:8px;line-height:0;transition:transform .15s ease}
 .retail-photo .retail-icon:hover{transform:translateY(-2px)}
@@ -1923,6 +1919,9 @@ footer{background:#efece7;border-top:0}
 /* v44 header stays on one line with the extra Our stores link */
 .nav a,.header-cta{white-space:nowrap}
 @media (max-width:1380px){.site-header .brand-by{display:none}.nav{gap:22px}}
+/* v45 Wax Cracking card: the cracking photo full-bleed under the same wash as the in-store card */
+.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(100deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.7) 36%,rgba(24,32,140,.12) 66%,rgba(24,32,140,0) 100%),url('img/how/wax-full.jpg') 60% 62%/cover no-repeat,#2234b8}
+@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.88) 0%,rgba(24,32,140,.55) 45%,rgba(24,32,140,.08) 100%),url('img/how/wax-full.jpg') 50% 60%/cover no-repeat,#2234b8}}
 </style>
 </head>
 <body>
