@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
-      const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ contact, shareCode, site }));
+      const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, shareCode, site }));
       await sendTelegram({ token, chatId, text, buttonUrl, afterUrl, apiBase: process.env.TELEGRAM_API_BASE || undefined });
     } catch (e) {
       console.error('[request] telegram send failed', ref, e.message); // no personal data in logs

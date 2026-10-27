@@ -84,14 +84,23 @@ console.log('built public/index.html', (out.length / 1024).toFixed(0) + ' KB');
 const toMain = (h) => h.replace(/<a href="#explore" data-tab-link="(tab-\w+)"/g, '<a href="./#$1"').replace(/href="#top"/g, 'href="./"').replace(/href="#/g, 'href="./#');
 const header = toMain(markup.slice(markup.indexOf('<header class="site-header"'), markup.indexOf('</header>') + 9));
 const footer = toMain(markup.slice(markup.indexOf('<footer>'), markup.indexOf('</footer>') + 9));
-let storesHead = head.replace(/<title>[^<]*<\/title>/, '<title>Our Stores | Confetti Club by Tom &amp; Stefanie</title>')
-  .replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="Try squishy-making at the Tom &amp; Stefanie squishy bar: Woodlands Civic Centre, Paya Lebar Quarter (PLQ) and Eastpoint Mall, Singapore. Addresses, phone numbers and opening hours.">')
-  .replace(`<link rel="canonical" href="${SITE}/">`, `<link rel="canonical" href="${SITE}/stores.html">`).replace(`<meta property="og:url" content="${SITE}/">`, `<meta property="og:url" content="${SITE}/stores.html">`)
-  .replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="Our Stores | Confetti Club">')
-  .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '');
-const stores = storesHead + '\n' + v2style + '\n<style>\n' + src('styles.css') + '</style>\n</head>\n' + sprite + '\n' + v2sprite + '\n' + src('stores.html').replace('__HEADER__', header).replace('__FOOTER__', footer) + '\n</body>\n</html>\n';
-if (stores.includes('__HEADER__') || stores.includes('__FOOTER__')) throw new Error('stores.html header or footer was not filled in');
-fs.writeFileSync(path.join(root, 'public/stores.html'), stores);
+// Extra pages (Our stores, Feedback) share the head, styles, icons, header and footer.
+function subPage(file, { title, desc, ogTitle, noindex }) {
+  const h = head.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
+    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${desc}">`)
+    .replace(`<link rel="canonical" href="${SITE}/">`, `<link rel="canonical" href="${SITE}/${file}">`).replace(`<meta property="og:url" content="${SITE}/">`, `<meta property="og:url" content="${SITE}/${file}">`)
+    .replace(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${ogTitle}">`)
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '') + (noindex ? '\n<meta name="robots" content="noindex">' : '');
+  const page = h + '\n' + v2style + '\n<style>\n' + src('styles.css') + '</style>\n</head>\n' + sprite + '\n' + v2sprite + '\n' + src(file).replace('__HEADER__', header).replace('__FOOTER__', footer) + '\n</body>\n</html>\n';
+  if (page.includes('__HEADER__') || page.includes('__FOOTER__')) throw new Error(`${file}: header or footer was not filled in`);
+  fs.writeFileSync(path.join(root, 'public', file), page);
+  return page;
+}
+const stores = subPage('stores.html', { title: 'Our Stores | Confetti Club by Tom &amp; Stefanie', ogTitle: 'Our Stores | Confetti Club',
+  desc: 'Try squishy-making at the Tom &amp; Stefanie squishy bar: Woodlands Civic Centre, Paya Lebar Quarter (PLQ) and Eastpoint Mall, Singapore. Addresses, phone numbers and opening hours.' });
+// Feedback: linked from the after-party WhatsApp message, and kept out of search results.
+const feedback = subPage('feedback.html', { title: 'How was your party? | Confetti Club', ogTitle: 'How was your party? | Confetti Club', noindex: true,
+  desc: 'Tell us how your Confetti Club party went. It takes 15 seconds.' });
 
 if (process.argv.includes('--preview')) {
   // Offline preview: embed the photos from public/img too (the live site loads them as files).
@@ -114,5 +123,8 @@ if (process.argv.includes('--preview')) {
   prevStores = replaceAll(prevStores, 'href="img/icon.png"', `href="data:image/png;base64,${b64('public/img/icon.png')}"`);
   prevStores = prevStores.replace(/href="\.\/(#[^"]*)?"/g, (m, h) => `href="index.html${h || ''}"`);
   fs.writeFileSync(path.join(root, '.preview/stores.html'), prevStores);
+  let prevFb = replaceAll(feedback, 'src="img/logo.webp"', `src="data:image/webp;base64,${b64('public/img/logo.webp')}"`);
+  prevFb = replaceAll(prevFb, 'href="img/icon.png"', `href="data:image/png;base64,${b64('public/img/icon.png')}"`);
+  fs.writeFileSync(path.join(root, '.preview/feedback.html'), prevFb.replace(/href="\.\/(#[^"]*)?"/g, (m, h) => `href="index.html${h || ''}"`));
   console.log(`preview: .preview/index.html and tools/mobile-studio/site.html (${n} photos embedded)`);
 }

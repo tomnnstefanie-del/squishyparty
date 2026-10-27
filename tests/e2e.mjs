@@ -198,6 +198,21 @@ try {
   ok('honeypot (bot) submissions are dropped silently');
   const g = await p2.evaluate(async () => (await fetch('/api/request')).status);
   assert.equal(g, 405); ok('GET is refused (405)');
+
+  console.log('after-party feedback');
+  const fb = (body, ip) => p2.evaluate(async ([body, ip]) => { const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: JSON.stringify(body) }); return { s: res.status, b: await res.json().catch(() => ({})) }; }, [body, ip]);
+  x = await fb({ ref: 'SP-261107-AB12', rating: 0 }, '10.0.1.1'); assert.equal(x.s, 400); ok('feedback without a star rating is refused');
+  x = await fb({ ref: 'SP-261107-AB12', rating: 5, comment: 'The kids <loved> it' }, '10.0.1.2'); assert.equal(x.s, 200);
+  let fm = sent().at(-1).text; assert.ok(fm.includes('5/5') && fm.includes('SP-261107-AB12') && fm.includes('send their referral link') && fm.includes('&lt;loved&gt;'));
+  ok('5 stars reaches Telegram with the reference and “send their referral link”');
+  x = await fb({ ref: 'SP-261107-AB12', rating: 2 }, '10.0.1.3'); assert.equal(x.s, 200);
+  fm = sent().at(-1).text; assert.ok(fm.includes('2/5') && fm.includes('call or WhatsApp them personally') && !fm.includes('send their referral link'));
+  ok('2 stars asks for a personal follow-up instead of a referral');
+  const fp = await browser.newPage(); await fp.goto(BASE + '/feedback.html?ref=SP-261107-AB12');
+  await fp.click('label[for=fb-r4]'); await fp.fill('#fb-comment', 'Lovely team'); await fp.click('#fb-send');
+  await fp.waitForSelector('#fb-done:not([hidden])', { timeout: 10000 });
+  assert.ok(sent().at(-1).text.includes('4/5') && sent().at(-1).text.includes('Lovely team')); await fp.close();
+  ok('the feedback page sends a rating and comment, then says thank you');
   const cross = await fetch(`${BASE}/api/request`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' }, body: JSON.stringify(base) });
   assert.equal(cross.status, 403); ok('cross-site posts are refused (403)');
   let codes = [];

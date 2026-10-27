@@ -1359,3 +1359,26 @@ footer{background:#efece7;border-top:0}
 /* $10 off: the new total first, the old one beside it, smaller and struck through */
 .total .was,.mobile-bar .was{display:inline-block;margin:0 0 0 10px;font-family:var(--sans);font-size:.5em;font-weight:700;opacity:1;color:rgba(255,255,255,.8);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--lemon);vertical-align:middle}
 .total .was,.mobile-bar .was{font-size:.62em;font-weight:600;color:rgba(255,255,255,.78);text-decoration-color:rgba(255,255,255,.9);text-decoration-thickness:1.5px}
+/* v55 Feedback page (feedback.html) */
+.fb-wrap{padding-top:clamp(20px,4vw,48px)}
+.fb-inner{max-width:620px}
+.fb-card{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:clamp(22px,4vw,40px);display:flex;flex-direction:column;gap:18px}
+.fb-card h1{margin:0;font-size:clamp(2rem,1.6rem + 1.6vw,2.8rem)}
+.fb-card .lead{margin:0}
+.fb-stars{border:0;margin:0;padding:0}
+.fb-stars legend{font-weight:700;margin-bottom:6px}
+.fb-star-row{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px}
+.fb-star-row input{position:absolute;opacity:0;width:1px;height:1px}
+.fb-star-row label{font-size:2.6rem;line-height:1;color:#ddd8d0;cursor:pointer;padding:4px;min-width:48px;min-height:48px;display:grid;place-items:center;transition:color 120ms ease,transform 120ms ease}
+.fb-star-row label:hover,.fb-star-row label:hover~label,.fb-star-row input:checked~label{color:#f5b800}
+.fb-star-row label:hover{transform:scale(1.12)}
+.fb-star-row input:focus-visible+label{outline:2px solid var(--cobalt);outline-offset:2px;border-radius:10px}
+.fb-star-word{margin:4px 0 0;font-weight:700;color:var(--ink-2);min-height:1.5em}
+.fb-photo{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.fb-photo-btn{cursor:pointer}
+.fb-photo img{max-width:180px;max-height:180px;border-radius:14px;object-fit:cover;box-shadow:var(--shadow-sm)}
+.fb-card .btn-xl{align-self:stretch}
+.fb-done{align-items:center;text-align:center}
+.fb-done:focus{outline:none}
+@media (prefers-reduced-motion:reduce){.fb-star-row label{transition:none}.fb-star-row label:hover{transform:none}}
+.fb-photo{position:relative}.fb-photo input[type=file]{left:0;top:0}.fb-card{position:relative;overflow:hidden}

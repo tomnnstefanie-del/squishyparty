@@ -2,11 +2,12 @@
 import assert from 'node:assert/strict';
 import { priceRequest } from '../lib/pricing.js';
 import { validateRequest, RequestError } from '../lib/validate.js';
-import { buildMessage, whatsappLink, customerGreeting } from '../lib/telegram.js';
+import { buildMessage, whatsappLink, customerGreeting, afterPartyMessage } from '../lib/telegram.js';
 process.env.TELEGRAM_BOT_TOKEN = 'unit:token';
 const otp = await import('../lib/otp.js');
 const { confirmationEmail } = await import('../lib/emails.js');
 const { quotePdf, referralDiscount } = await import('../lib/quote-pdf.js');
+const { validateFeedback } = await import('../lib/feedback.js');
 const Ref = await import('../lib/referral.js');
 
 let passed = 0;
@@ -119,6 +120,16 @@ t('$10 referral on the quotation: valid code or capsule, not their own, first pa
   assert.equal(referralDiscount({ code: 'MIA-ZZZZ' }, readReferralCode, samePerson, 'Sarah Lim'), 0);
   assert.equal(referralDiscount({ source: 'capsule' }, readReferralCode, samePerson, 'Sarah Lim'), 1000);
   assert.equal(referralDiscount({}, readReferralCode, samePerson, 'Sarah Lim'), 0);
+});
+t('after-party message has care tips, the feedback link with their reference, and their referral link', () => {
+  const m = afterPartyMessage({ ref: 'SP-261107-AB12', contact: v.contact, shareCode: 'SARAH-AB23', site: 'https://example.sg' });
+  for (const x of ['https://example.sg/#care', 'https://example.sg/feedback.html?ref=SP-261107-AB12', '?ref=SARAH-AB23']) assert.ok(m.includes(x), x);
+});
+t('feedback: 1-5 stars only, unknown references dropped, photo must be a JPEG', () => {
+  assert.throws(() => validateFeedback({ rating: 6 }), (e) => e.field === 'rating');
+  assert.equal(validateFeedback({ rating: 5, ref: 'not-a-ref' }).ref, '');
+  assert.throws(() => validateFeedback({ rating: 5, photo: 'data:text/html;base64,AAAA' }), (e) => e.field === 'photo');
+  assert.equal(validateFeedback({ rating: 4, photo: 'data:image/jpeg;base64,AAAA' }).photo, 'AAAA');
 });
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));

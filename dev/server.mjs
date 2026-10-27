@@ -1,4 +1,4 @@
-// Local dev server that behaves like Vercel: serves public/ and runs api/request.js.
+// Local dev server that behaves like Vercel: serves public/ and runs the api/ functions.
 // Usage: node dev/server.mjs  (reads .env.local if present)
 import http from 'node:http';
 import fs from 'node:fs';
@@ -15,7 +15,8 @@ if (fs.existsSync(envFile)) {
 }
 const ROUTES = {
   '/api/request': (await import('../api/request.js')).default,
-  '/api/otp': (await import('../api/otp.js')).default,};
+  '/api/otp': (await import('../api/otp.js')).default,
+  '/api/feedback': (await import('../api/feedback.js')).default,};
 const PORT = Number(process.env.PORT || 3000);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 

@@ -1,0 +1,96 @@
+
+<!-- After-party feedback (feedback.html), linked from the WhatsApp message as feedback.html?ref=SP-...
+     Header and footer are copied from markup.html at build time. Sends to /api/feedback, which posts to Telegram. -->
+<div id="view-feedback">
+__HEADER__
+
+<main id="main" class="fb-page">
+  <section class="section fb-wrap">
+    <div class="wrap fb-inner">
+      <form class="fb-card" id="fb-form" novalidate>
+        <p class="eyebrow">After your party</p>
+        <h1>How did it go?</h1>
+        <p class="lead">It takes 15 seconds, and it helps us make every party better.</p>
+
+        <fieldset class="fb-stars" id="fb-stars">
+          <legend>Your rating</legend>
+          <div class="fb-star-row">
+            <input type="radio" name="rating" id="fb-r5" value="5"><label for="fb-r5" title="5 stars: loved it"><span class="vh">5 stars</span>★</label>
+            <input type="radio" name="rating" id="fb-r4" value="4"><label for="fb-r4" title="4 stars"><span class="vh">4 stars</span>★</label>
+            <input type="radio" name="rating" id="fb-r3" value="3"><label for="fb-r3" title="3 stars"><span class="vh">3 stars</span>★</label>
+            <input type="radio" name="rating" id="fb-r2" value="2"><label for="fb-r2" title="2 stars"><span class="vh">2 stars</span>★</label>
+            <input type="radio" name="rating" id="fb-r1" value="1"><label for="fb-r1" title="1 star"><span class="vh">1 star</span>★</label>
+          </div>
+          <p class="fb-star-word" id="fb-star-word" aria-live="polite">Tap a star</p>
+        </fieldset>
+
+        <label class="field">Anything you’d like to tell us? <span class="opt-tag">(optional)</span>
+          <textarea name="comment" id="fb-comment" rows="4" maxlength="1000" placeholder="The kids’ favourite part, or what we could do better"></textarea></label>
+
+        <div class="field fb-photo">
+          <span>Share a photo <span class="opt-tag">(optional)</span></span>
+          <label class="btn btn-ghost fb-photo-btn" for="fb-file"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span id="fb-photo-label">Add a party photo</span></label>
+          <input type="file" id="fb-file" accept="image/*" class="vh">
+          <img id="fb-thumb" alt="Your photo" hidden>
+          <span class="hint">Only our team sees it. We’ll ask before sharing it anywhere.</span>
+        </div>
+
+        <div class="bot" aria-hidden="true"><label>Website<input name="website" class="hp" tabindex="-1" autocomplete="off"></label></div>
+        <div class="form-error" id="fb-error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-primary btn-xl" id="fb-send">Send feedback</button>
+      </form>
+
+      <div class="fb-card fb-done" id="fb-done" hidden tabindex="-1">
+        <span class="sent-icon" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
+        <h1 id="fb-done-h">Thank you!</h1>
+        <p class="lead" id="fb-done-p"></p>
+        <a class="btn btn-ghost" href="./">Back to Confetti Club</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+__FOOTER__
+</div>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var ref = ''; try { ref = (new URLSearchParams(location.search).get('ref') || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 20); } catch (e) {}
+  var WORDS = {1:'Not great', 2:'Could be better', 3:'It was okay', 4:'Really good', 5:'We loved it!'}, photo = '';
+  document.querySelectorAll('#fb-stars input').forEach(function(r){ r.addEventListener('change', function(){ $('fb-star-word').textContent = WORDS[r.value]; $('fb-error').hidden = true; }); });
+
+  // Phone photos are large: resize to about 1000 px and send as JPEG
+  $('fb-file').addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){ var im = new Image(); im.onload = function(){
+      var out = '';
+      [[1000, .75], [900, .6], [700, .55]].some(function(t){ var k = Math.min(1, t[0] / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); out = c.toDataURL('image/jpeg', t[1]); return out.length < 680000; });
+      if (out.length < 680000) { photo = out; $('fb-thumb').src = out; $('fb-thumb').hidden = false; $('fb-photo-label').textContent = 'Change photo'; }
+      else { $('fb-error').hidden = false; $('fb-error').textContent = 'That photo is too large. Please try another one.'; }
+    }; im.src = rd.result; };
+    rd.readAsDataURL(f);
+  });
+
+  $('fb-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var r = document.querySelector('#fb-stars input:checked'), err = $('fb-error'), btn = $('fb-send');
+    if (!r) { err.hidden = false; err.textContent = 'Please tap a star rating first.'; $('fb-r5').focus(); return; }
+    var proto = ''; try { proto = location.protocol; } catch (x) {}
+    if (proto !== 'http:' && proto !== 'https:') { err.hidden = false; err.textContent = 'This is an offline preview, so nothing has been sent.'; return; }
+    btn.disabled = true; btn.textContent = 'Sending…'; err.hidden = true;
+    fetch('/api/feedback', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ref: ref, rating: +r.value, comment: $('fb-comment').value, photo: photo, website: document.querySelector('.hp').value }) })
+      .then(function(res){ return res.json().catch(function(){ return {}; }).then(function(j){ return {s:res.status, b:j}; }); })
+      .then(function(x){
+        if (x.s === 200 && x.b.ok) {
+          var happy = +r.value >= 4;
+          $('fb-done-h').textContent = happy ? 'Thank you! 💖' : 'Thank you for telling us';
+          $('fb-done-p').textContent = happy ? 'We’re so glad everyone enjoyed it. It means a lot to our team.' : 'We’re sorry it wasn’t perfect. Someone from our team will reach out on WhatsApp to make it right.';
+          $('fb-form').hidden = true; $('fb-done').hidden = false; $('fb-done').focus(); return;
+        }
+        throw new Error(x.b && x.b.error || 'We couldn’t send your feedback just now. Please try again in a minute.');
+      })
+      .catch(function(x){ btn.disabled = false; btn.textContent = 'Send feedback'; err.hidden = false; err.textContent = x.message && !/fetch/i.test(x.message) ? x.message : 'We couldn’t reach our server. Please check your connection and try again.'; });
+  });
+})();
+</script>
