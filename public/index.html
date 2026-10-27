@@ -1935,6 +1935,57 @@ footer{background:#efece7;border-top:0}
 @media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:14px;align-items:center;background:linear-gradient(180deg,rgba(12,16,40,.8) 0%,rgba(12,16,40,.6) 60%,rgba(12,16,40,.45) 100%),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}}
 /* v50 head-start link sits under "Send my request" */
 #booking-form .ready-link{margin:18px 0 0}
+/* v51 Request received: "While we confirm" centred in the card; send another request */
+.next-steps .eyebrow{max-width:none;margin-left:auto;margin-right:auto}
+.again-row{width:100%;display:flex;align-items:center;justify-content:center;gap:12px 16px;flex-wrap:wrap;margin-top:6px;padding-top:16px;border-top:1px dashed var(--line-2)}
+.again-row p{margin:0;font-size:.9375rem}
+.wiz-nav #wiz-again{margin-left:auto}
+
+/* Date and time stay inside the card on phones (iOS gives these inputs a fixed width of their own) */
+.field input[type=date],.field input[type=time],.time-range input{min-width:0;max-width:100%;width:100%;-webkit-appearance:none;appearance:none;display:block}
+.field input[type=date]::-webkit-date-and-time-value,.time-range input::-webkit-date-and-time-value{text-align:center}
+.grid2>*,.time-range>label{min-width:0}
+
+/* Time picker on computers: a scroll wheel */
+.tp-wrap{position:relative}
+.tp-native{position:absolute;inset:0;opacity:0;pointer-events:none}
+.tp-face{width:100%;min-height:50px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff;font:inherit;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer;transition:border-color 150ms ease,box-shadow 150ms ease}
+.tp-face .icon{width:18px;height:18px;color:var(--teal-700)}
+.tp-face:hover{border-color:var(--cobalt)}
+.tp-face:focus-visible{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(19,35,95,.14)}
+.tp-face.bad{border-color:#c2384f}
+.tp-pop{position:absolute;z-index:40;top:calc(100% + 8px);left:0;width:260px;padding:12px;border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(19,35,95,.22),0 0 0 1px var(--line);animation:tpIn 160ms ease-out}
+.time-range>label:last-of-type .tp-pop{left:auto;right:0}
+@keyframes tpIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.tp-wheel{position:relative;display:flex;align-items:stretch;gap:4px;height:200px}
+.tp-wheel::before{content:"";position:absolute;left:0;right:0;top:80px;height:40px;border-radius:12px;background:var(--cobalt-50);pointer-events:none}
+.tp-wheel::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#fff 0%,rgba(255,255,255,0) 32%,rgba(255,255,255,0) 68%,#fff 100%)}
+.tp-col{position:relative;flex:1;overflow-y:auto;scroll-snap-type:y mandatory;padding:80px 0;scrollbar-width:none;outline:none;border-radius:12px}
+.tp-col::-webkit-scrollbar{display:none}
+.tp-col:focus-visible{box-shadow:inset 0 0 0 2px var(--cobalt)}
+.tp-opt{height:40px;display:grid;place-items:center;scroll-snap-align:center;font-size:1.125rem;font-weight:600;color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums;transition:color 120ms ease,transform 120ms ease}
+.tp-opt:hover{color:var(--ink)}
+.tp-opt.on{color:var(--cobalt);font-weight:800;transform:scale(1.12)}
+.tp-colon{position:relative;z-index:1;align-self:center;font-weight:800;color:var(--cobalt)}
+.tp-done{width:100%;margin-top:10px;min-height:44px}
+@media (prefers-reduced-motion:reduce){.tp-pop{animation:none}.tp-opt{transition:none}}
+
+/* WhatsApp number with a country code */
+.wa-note{display:flex;gap:8px;align-items:flex-start;margin:2px 0 8px;padding:10px 12px;border-radius:var(--r-sm);background:#e9f7ef;color:#165c38;font-size:.875rem;font-weight:500;line-height:1.45}
+.wa-note .icon{width:16px;height:16px;flex:none;margin-top:2px;color:#1f8a52}
+.tel-row{display:flex;gap:8px;align-items:stretch}
+.tel-row input{flex:1;min-width:0}
+.tel-cc{position:relative;flex:none;display:flex}
+.tel-cc-face{display:flex;align-items:center;gap:6px;padding:0 30px 0 14px;min-height:50px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2313235f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;font-weight:700;color:var(--ink);white-space:nowrap}
+.tel-cc select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:1rem}
+.tel-cc select:focus-visible+.tel-cc-face,.tel-cc:focus-within .tel-cc-face{border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(19,35,95,.14)}
+#phone-hint.ok{color:#0f7a4a;font-weight:600}
+#phone-hint.err{color:var(--rose)}
+@media (max-width:640px){.tel-cc-face{min-height:44px;padding-left:12px}}
+
+/* Referral: $10 off shown on the total */
+.total .was,.mobile-bar .was{font-size:.55em;font-weight:600;opacity:.65;margin-right:4px;text-decoration-thickness:2px}
+.ref-off{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;background:var(--lemon);color:var(--ink);font-size:.75rem;font-weight:700}
 </style>
 </head>
 <body>
@@ -1975,7 +2026,7 @@ footer{background:#efece7;border-top:0}
 </svg>
 
 <a class="skip" href="#main">Skip to content</a>
-<p class="ref-banner" id="ref-banner" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span>A friend sent you <b>$10 off your first hosted party</b>. Plan your party and we’ll take it off your quotation.</span></p>
+<p class="ref-banner" id="ref-banner" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span>A friend sent you <b>$10 off your first hosted party</b>. Plan your party and we’ll take it off your quotation. Their referral code is already filled in at the Request step, so there’s no code to find: the $10 comes off your Squishy DIY bill.</span></p>
 <p class="notice" id="preview-notice">Offline preview. Cakes are priced in your quotation; other partner prices marked “Demo price” are placeholders. No requests are sent.</p>
 
 <!-- ======================================================= LANDING VIEW -->
@@ -2529,7 +2580,10 @@ footer{background:#efece7;border-top:0}
                 <label class="field"><span>Billing email <span class="opt-tag">(optional)</span></span><input name="billingEmail" id="billing-email" type="email" maxlength="254" placeholder="If different from yours"></label>
               </div>
               <label class="field full">Your name<input name="parentName" autocomplete="name" maxlength="100" required></label>
-              <label class="field">Mobile number (WhatsApp)<input name="phone" type="tel" autocomplete="tel" placeholder="8123 4567" pattern="(\+?65)?[ ]?[689][0-9]{3}[ ]?[0-9]{4}" maxlength="16" required><span class="hint">We’ll WhatsApp you to confirm</span></label>
+              <div class="field"><label for="req-phone">WhatsApp number</label>
+                <p class="wa-note"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span>We’ll reach out on <b>WhatsApp</b> to confirm your party, so please use a number that has WhatsApp.</span></p>
+                <div class="tel-row"><span class="tel-cc"><span class="tel-cc-face" id="tel-cc-face" aria-hidden="true">SG +65</span><select name="phoneCountry" id="phone-country" aria-label="Country code" autocomplete="tel-country-code"></select></span><input name="phone" id="req-phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="8123 4567" maxlength="20" required aria-describedby="phone-hint"></div>
+                <span class="hint" id="phone-hint">Singapore mobile numbers have 8 digits.</span></div>
               <div class="field full otp-field" id="otp-field">
                 <label for="req-email">Email address</label>
                 <div class="otp-row"><input name="email" id="req-email" type="email" autocomplete="email" maxlength="254" required aria-describedby="otp-status"><button type="button" class="btn btn-ghost otp-btn" id="otp-send">Send code</button></div>
@@ -2566,12 +2620,14 @@ footer{background:#efece7;border-top:0}
               <button type="button" class="ns-card" data-ready="tab-p-inv"><span class="ns-ic" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"/></svg></span><span><b>Invitation</b><small>Make one and share it on WhatsApp</small></span></button>
             </div>
           </div>
+          <div class="again-row"><p>Planning another party, or want a different date?</p><button type="button" class="btn btn-ghost plan-again">Send another request</button></div>
         </div>
       </section>
 
       <div class="wiz-nav">
         <button type="button" class="btn btn-ghost" id="wiz-back"><svg class="icon flip" aria-hidden="true"><use href="#i-arrow"/></svg>Back</button>
         <button type="button" class="btn btn-primary" id="wiz-next">Next: Squishy DIY <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button type="button" class="btn btn-primary plan-again" id="wiz-again" hidden>Plan another party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
       </div>
     </div>
 
@@ -2581,7 +2637,7 @@ footer{background:#efece7;border-top:0}
         <p class="eyebrow">Your celebration · SGD</p>
         <h2 id="summary-h">Squishy <span id="summary-exp">Duo</span> celebration</h2>
         <p class="summary-meta"><span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><b id="summary-participants">15</b>&nbsp;participants</span><span><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span id="summary-length">2 hours</span></span></p>
-        <div class="total"><div><small>Estimated total</small><strong id="total-price">$0.00</strong></div><div class="per-child"><strong id="per-child">$0.00</strong><small>per person</small></div></div>
+        <div class="total"><div><small>Estimated total</small><strong id="total-price">$0.00</strong><span class="ref-off" id="ref-off" hidden>$10 off with your friend’s referral</span></div><div class="per-child"><strong id="per-child">$0.00</strong><small>per person</small></div></div>
         <p class="summary-hint" id="summary-hint">Your estimate starts when you choose Squishy DIY in step 2. Nothing is added until you choose it.</p>
         <details class="sum-acc" id="sum-acc">
           <summary>See itemised breakdown <span class="acc-meta"><b id="squishy-count">30</b> squishies · <b id="partner-count">0</b> add-ons</span></summary>
@@ -3795,6 +3851,7 @@ footer{background:#efece7;border-top:0}
 
   /* ================= RENDER ================= */
   function render(announce, msg){
+    if (window.syncTimeFaces) window.syncTimeFaces();
     var s = S, n = billable(s.participants), R = recommend(s);
     var shown = s.started;
     var T = totals(s), exp = EXP[s.experience];
@@ -3846,9 +3903,12 @@ footer{background:#efece7;border-top:0}
     if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
     $('pending-note').hidden = !T.pending.length || !shown;
     if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
-    var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—';
-    put('total-price', totalTxt);
-    put('per-child', shown ? money(Math.round(T.total / s.participants)) : '—');
+    var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—', off = shown ? referralOff() : 0;
+    // A friend's code or the capsule QR: show $10 off (the server still prices the full amount; we take it off the quotation)
+    function struck(id){ var e = $(id); e.textContent = ''; e.appendChild(el('s', 'was', money(T.total))); e.appendChild(document.createTextNode(' ' + money(T.total - off) + (T.pending.length ? '+' : ''))); }
+    if (off) struck('total-price'); else put('total-price', totalTxt);
+    $('ref-off').hidden = !off;
+    put('per-child', shown ? money(Math.round((T.total - off) / s.participants)) : '—');
     $('sum-acc').hidden = !shown; $('summary-hint').hidden = shown;
 
     // included
@@ -3888,7 +3948,7 @@ footer{background:#efece7;border-top:0}
     put('review-total', money(T.total) + (T.pending.length ? '+' : ''));
     put('review-note', T.pending.length ? 'Cake prices are added to your quotation.' : '');
     put('mobile-caption', shown ? s.participants + ' participants · ' + exp.short + ' · ' + s.selected.length + ' add-on' + (s.selected.length === 1 ? '' : 's') : 'Your estimate starts at step 2');
-    put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.participants + ' participants');
+    if (off) struck('mobile-price'); else put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.participants + ' participants');
     $('mobile-price').classList.toggle('muted-price', !shown);
     if (announce) put('live', (msg ? msg + ' ' : '') + 'Estimated total ' + money(T.total) + (T.pending.length ? ' plus items pending price' : '') + '.');
   }
@@ -3943,12 +4003,18 @@ footer{background:#efece7;border-top:0}
     $('offer').hidden = false; $('sticker-field').hidden = false;
     if (!REF.code) { $('ref-banner').hidden = false; $('ref-banner').querySelector('span').innerHTML = 'Scanned a squishy capsule? <b>$10 off your first hosted party</b> is added to your request.'; }
   }
+  function referralOff(){
+    var r = $('ref-returning'), c = $('ref-code'); if (!r || !c || typeof REF === 'undefined') return 0;
+    var v = c.value.trim(), code = /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v);
+    return (code || (!v && REF.source === 'capsule')) && !r.checked ? 1000 : 0;
+  }
+  $('ref-returning').addEventListener('change', function(){ refHint(); render(false); });
   function refHint(){
     var v = $('ref-code').value.trim(), ok = !v || /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v), h = $('ref-hint');
-    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? 'Thanks! We’ll take $10 off your quotation once we’ve checked the code.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
+    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? ($('ref-returning').checked ? 'Referral codes are for first parties, so this one won’t apply if you’ve booked before.' : 'Thanks! $10 off is shown in your total. We take it off your quotation once we’ve checked the code.') : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
     h.classList.toggle('err', !ok); $('ref-code').toggleAttribute('aria-invalid', !ok);
   }
-  $('ref-code').addEventListener('input', refHint); refHint();
+  $('ref-code').addEventListener('input', function(){ refHint(); render(false); }); refHint();
 
   initHow();
   buildCards();
@@ -4008,6 +4074,7 @@ footer{background:#efece7;border-top:0}
     var nx = $('wiz-next'), nm = $('wiz-next-m');
     nx.hidden = k >= LAST; nx.firstChild.textContent = k < LAST ? 'Next: ' + STEPS[k] + ' ' : '';
     nm.textContent = k < LAST ? 'Next' : 'Send request'; nm.hidden = k === READY || (k === LAST && !!S.requested);
+    $('wiz-again').hidden = !(k === LAST && S.requested);
     window.scrollTo(0, 0);
     var h = $(k === READY ? 'ws4-h' : k === LAST ? 'ws5-h' : 'ws' + k + '-h'); if (h && focus) h.focus({preventScroll:true});
   }
@@ -4054,6 +4121,66 @@ footer{background:#efece7;border-top:0}
     $('end').value = v; var re = $('req-end'); if (re && document.activeElement !== re) re.value = v;
   }
   $('time').addEventListener('input', function(){ autoEnd(); readForm(); render(false); });
+
+  /* Time picker on computers: a scroll wheel (hour, minutes, am/pm) instead of the browser's box. Phones keep their own
+     wheel. The real <input type="time"> stays underneath and holds the value, so the rest of the page is unchanged. */
+  (function(){
+    var fine = false; try { fine = matchMedia('(hover:hover) and (pointer:fine)').matches; } catch (e) {}
+    if (!fine) return;
+    var pad = function(n){ return (n < 10 ? '0' : '') + n; }, faces = [], pop = null, openFor = null;
+    function label(v){ var m = /^(\d\d):(\d\d)$/.exec(v || ''); if (!m) return 'Choose a time'; var h = +m[1]; return (h % 12 || 12) + ':' + m[2] + ' ' + (h < 12 ? 'am' : 'pm'); }
+    function syncFaces(){ faces.forEach(function(f){ f.b.firstChild.textContent = label(f.i.value); f.b.classList.toggle('bad', f.i.getAttribute('aria-invalid') === 'true'); }); }
+    window.syncTimeFaces = syncFaces;
+    function col(name, items, cur){
+      var c = el('div', 'tp-col'); c.setAttribute('role', 'listbox'); c.setAttribute('aria-label', name); c.tabIndex = 0;
+      items.forEach(function(it){ var o = el('div', 'tp-opt', it[1]); o.dataset.v = it[0]; o.setAttribute('role', 'option'); c.appendChild(o); });
+      return c;
+    }
+    function pick(c, v, smooth){ var o = c.querySelector('[data-v="' + v + '"]') || c.firstChild; c.querySelectorAll('.on').forEach(function(x){ x.classList.remove('on'); x.removeAttribute('aria-selected'); }); o.classList.add('on'); o.setAttribute('aria-selected', 'true'); c.scrollTo({top: o.offsetTop - (c.clientHeight - o.offsetHeight) / 2, behavior: smooth ? 'smooth' : 'auto'}); }
+    function centred(c){ var mid = c.scrollTop + c.clientHeight / 2, best = null, d = 1e9; c.querySelectorAll('.tp-opt').forEach(function(o){ var x = Math.abs(o.offsetTop + o.offsetHeight / 2 - mid); if (x < d) { d = x; best = o; } }); return best; }
+    function close(back){ if (!pop) return; pop.remove(); pop = null; if (back && openFor) openFor.b.focus(); openFor = null; document.removeEventListener('mousedown', outside, true); }
+    function outside(e){ if (pop && !pop.contains(e.target) && !openFor.b.contains(e.target)) close(false); }
+    function open(f){
+      if (openFor === f) { close(true); return; } close(false); openFor = f;
+      var m = /^(\d\d):(\d\d)$/.exec(f.i.value || '') || [0, '14', '00'], h = +m[1], mm = Math.round(+m[2] / 5) * 5 % 60;
+      var hours = [], mins = [];
+      for (var i = 1; i <= 12; i++) hours.push([i, String(i)]);
+      for (var j = 0; j < 60; j += 5) mins.push([j, pad(j)]);
+      var cH = col('Hour', hours), cM = col('Minutes', mins), cA = col('am or pm', [['am','am'], ['pm','pm']]);
+      pop = el('div', 'tp-pop'); pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', f.i.getAttribute('aria-label') || 'Time');
+      var wheel = el('div', 'tp-wheel'); wheel.appendChild(cH); wheel.appendChild(el('span', 'tp-colon', ':')); wheel.appendChild(cM); wheel.appendChild(cA); pop.appendChild(wheel);
+      var done = el('button', 'btn btn-primary tp-done', 'Done'); done.type = 'button'; pop.appendChild(done);
+      f.w.appendChild(pop);
+      pick(cH, h % 12 || 12); pick(cM, mm); pick(cA, h < 12 ? 'am' : 'pm');
+      function commit(){
+        var hh = +cH.querySelector('.on').dataset.v % 12 + (cA.querySelector('.on').dataset.v === 'pm' ? 12 : 0), v = pad(hh) + ':' + pad(+cM.querySelector('.on').dataset.v);
+        if (f.i.value === v) return; f.i.value = v;
+        f.i.dispatchEvent(new Event('input', {bubbles:true})); f.i.dispatchEvent(new Event('change', {bubbles:true})); syncFaces();
+      }
+      [cH, cM, cA].forEach(function(c){
+        var t = null;
+        c.addEventListener('scroll', function(){ clearTimeout(t); t = setTimeout(function(){ var o = centred(c); if (o && !o.classList.contains('on')) { pick(c, o.dataset.v, true); commit(); } }, 110); });
+        c.addEventListener('click', function(e){ var o = e.target.closest('.tp-opt'); if (o) { pick(c, o.dataset.v, true); commit(); } });
+        c.addEventListener('keydown', function(e){
+          if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return; e.preventDefault();
+          var o = c.querySelector('.on'), n = e.key === 'ArrowUp' ? o.previousSibling : o.nextSibling; if (n) { pick(c, n.dataset.v, true); commit(); }
+        });
+      });
+      done.addEventListener('click', function(){ close(true); });
+      pop.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); close(true); } });
+      document.addEventListener('mousedown', outside, true);
+      cH.focus({preventScroll:true});
+    }
+    document.querySelectorAll('.time-range input[type=time]').forEach(function(i){
+      var w = i.parentNode, b = el('button', 'tp-face'); b.type = 'button';
+      b.appendChild(document.createTextNode('')); b.insertAdjacentHTML('beforeend', '<svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>');
+      b.setAttribute('aria-label', (i.getAttribute('aria-label') || 'Time') + ', choose');
+      w.classList.add('tp-wrap'); i.classList.add('tp-native'); i.tabIndex = -1; i.setAttribute('aria-hidden', 'true');
+      w.insertBefore(b, i); var f = {i:i, b:b, w:w}; faces.push(f);
+      b.addEventListener('click', function(e){ e.preventDefault(); open(f); });
+    });
+    syncFaces();
+  })();
   /* ---------- Email verification (6-digit code by email) ---------- */
   var OTP = { email:'', token:'', verified:'', cooldown:0, timer:null };
   function normEmail(v){ return String(v || '').trim().toLowerCase(); }
@@ -4113,29 +4240,60 @@ footer{background:#efece7;border-top:0}
   function showSent(b){
     var co = b.bookingFor === 'company'; $('sent-company').hidden = !co; $('sent-family').hidden = co;
     if (co) put('sent-bill', ($('billing-email').value || $('req-email').value).trim());
-    var nm = $('wiz-next-m'); if (nm) nm.hidden = true;
+    var nm = $('wiz-next-m'); if (nm) nm.hidden = true; $('wiz-again').hidden = false;
     var rs = document.querySelector('#stepper .ready-step'); if (rs) rs.className = 'ready-step open';
   }
-  function phoneDigits(v){ var d = String(v || '').replace(/[^0-9]/g, ''); if (d.length === 10 && d.indexOf('65') === 0) d = d.slice(2); return d; }
+  /* WhatsApp number: country code + local number, checked for length like lib/phone.js (the list is built in from there) */
+  var COUNTRIES = [["SG","Singapore","65",8,8,"89","8123 4567"],["MY","Malaysia","60",9,10,"1","12 345 6789"],["ID","Indonesia","62",9,12,"8","812 3456 7890"],["PH","Philippines","63",10,10,"9","917 123 4567"],["TH","Thailand","66",9,9,"689","81 234 5678"],["VN","Vietnam","84",9,9,"35789","91 234 5678"],["HK","Hong Kong","852",8,8,"4569","5123 4567"],["MO","Macau","853",8,8,"6","6612 3456"],["TW","Taiwan","886",9,9,"9","912 345 678"],["CN","China","86",11,11,"1","131 2345 6789"],["JP","Japan","81",10,10,"789","90 1234 5678"],["KR","South Korea","82",9,10,"1","10 1234 5678"],["IN","India","91",10,10,"6789","98765 43210"],["AU","Australia","61",9,9,"4","412 345 678"],["NZ","New Zealand","64",8,10,"2","21 123 4567"],["AE","United Arab Emirates","971",9,9,"5","50 123 4567"],["GB","United Kingdom","44",10,10,"7","7400 123456"],["DE","Germany","49",10,11,"1","1512 3456789"],["FR","France","33",9,9,"67","6 12 34 56 78"],["US","United States","1",10,10,"","201 555 0123"],["CA","Canada","1",10,10,"","506 234 5678"]];
+  function checkPhone(iso, input){
+    var c = COUNTRIES.filter(function(x){ return x[0] === iso; })[0] || COUNTRIES[0], name = c[1], dial = c[2], min = c[3], max = c[4], starts = c[5];
+    var raw = String(input || ''), d = raw.replace(/\D/g, '');
+    if (/^\s*(\+|00)/.test(raw)) { d = d.replace(/^00/, ''); if (d.indexOf(dial) === 0) d = d.slice(dial.length); }
+    else if (d.indexOf(dial) === 0 && d.length - dial.length >= min && d.length - dial.length <= max) d = d.slice(dial.length);
+    if (d.length > min && d.charAt(0) === '0') d = d.slice(1);
+    var len = min === max ? min + ' digits' : min + ' to ' + max + ' digits', st = starts.split('');
+    var rule = name + ' mobile numbers have ' + len + (st.length ? ' and start with ' + (st.length > 1 ? st.slice(0, -1).join(', ') + ' or ' + st[st.length - 1] : st[0]) : '');
+    if (!d) return {ok:false, rule:rule, error:'Please add your WhatsApp number.'};
+    if (d.length < min || d.length > max || (starts && starts.indexOf(d.charAt(0)) < 0)) return {ok:false, rule:rule, error:rule + ', e.g. ' + c[6] + '.'};
+    var g = d.length === 10 ? d.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3') : d.length === 8 ? d.replace(/(\d{4})(\d{4})/, '$1 $2') : d.replace(/(\d{3})(?=\d{3,}$)/g, '$1 ');
+    return {ok:true, rule:rule, e164:dial + d, pretty:'+' + dial + ' ' + g};
+  }
+  (function(){
+    var sel = $('phone-country'), inp = $('req-phone'), face = $('tel-cc-face'), hint = $('phone-hint');
+    COUNTRIES.forEach(function(c){ var o = el('option', null, c[1] + ' (+' + c[2] + ')'); o.value = c[0]; sel.appendChild(o); });
+    sel.value = 'SG';
+    function sync(final){
+      var c = COUNTRIES.filter(function(x){ return x[0] === sel.value; })[0], r = checkPhone(sel.value, inp.value), v = inp.value.trim();
+      face.textContent = c[0] + ' +' + c[2]; inp.placeholder = c[6];
+      inp.setCustomValidity(!v || r.ok ? '' : r.error);
+      hint.classList.toggle('ok', r.ok); hint.classList.toggle('err', !!v && !r.ok && final);
+      hint.textContent = r.ok ? '✓ We’ll WhatsApp you at ' + r.pretty : v && final ? r.error : r.rule + '.';
+      if (r.ok || !v) inp.removeAttribute('aria-invalid');
+    }
+    sel.addEventListener('change', function(){ sync(!!inp.value.trim()); inp.focus(); });
+    inp.addEventListener('input', function(){ sync(false); });
+    inp.addEventListener('blur', function(){ sync(true); });
+    sync(false);
+  })();
   function sendRequest(){
     bf.querySelectorAll('.err-msg').forEach(function(m){ m.remove(); });
     var bad = [];
     function flag(i, msg){ bad.push(i); if (i.type === 'checkbox') return; i.setAttribute('aria-invalid','true'); var m = el('span','err-msg', msg); m.id = i.name + '-err'; i.setAttribute('aria-describedby', m.id); i.insertAdjacentElement('afterend', m); }
     bf.querySelectorAll('input[required]').forEach(function(i){
-      if (!i.checkValidity()) flag(i, i.validity.valueMissing ? 'Please fill this in.' : i.name === 'postalCode' ? 'Enter a 6-digit Singapore postal code.' : i.name === 'phone' ? 'Enter a Singapore mobile number, e.g. 8123 4567.' : 'Please check this.');
+      if (!i.checkValidity()) flag(i, i.validity.valueMissing ? 'Please fill this in.' : i.name === 'postalCode' ? 'Enter a 6-digit Singapore postal code.' : i.name === 'phone' ? checkPhone($('phone-country').value, i.value).error : 'Please check this.');
     });
     if (!S.timeOk && bad.indexOf($('req-end')) < 0) flag($('req-end'), 'The end time needs to be after the start time.');
     var em = $('req-email'); if (isWebProto() && bad.indexOf(em) < 0 && !(OTP.verified && OTP.email === normEmail(em.value))) { bad.push(em); em.setAttribute('aria-invalid','true'); otpStatus('Please verify your email: tap “Send code”, then enter the code we email you.', 'err'); }
     err.hidden = false;
     track(bad.length ? 'request_invalid' : 'request_submitted', bad.length ? {fields:bad.map(function(i){ return i.name; }).join(',')} : {});
-    if (bad.length) { err.textContent = 'Please check the highlighted details' + (bf.consent.checked ? '.' : ', and tick the contact consent box.'); bad[0].focus(); return; }
+    if (bad.length) { err.textContent = 'Please check the highlighted details' + (bf.consent.checked ? '.' : ', and tick the contact consent box.'); (bad[0].classList.contains('tp-native') ? bad[0].previousSibling : bad[0]).focus(); return; }
     var proto = ''; try { proto = location.protocol; } catch (e) {}
     if (proto !== 'http:' && proto !== 'https:') { err.textContent = 'This is an offline preview, so no request has been sent. Requests are sent from the live website.'; err.focus(); return; }
     var d = new FormData(bf), T = totals(S);
     var payload = {
       v: 1,
       plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
-      contact: { parentName:d.get('parentName'), phone:phoneDigits(d.get('phone')), email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
+      contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: !!bf.consent.checked, website: d.get('website') || '',
       bookingFor: isCompany() ? 'company' : 'family',
       referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', returning:$('ref-returning').checked, sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
@@ -4151,11 +4309,11 @@ footer{background:#efece7;border-top:0}
         if (res.status === 200 && res.body.ok) {
           S.requested = true;
           track('request_sent', {experience:S.experience, participants:S.participants, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
-          put('sent-ref', res.body.ref); put('sent-phone', '+65 ' + payload.contact.phone.replace(/(\d{4})(\d{4})/, '$1 $2'));
+          put('sent-ref', res.body.ref); put('sent-phone', checkPhone(payload.contact.phoneCountry, payload.contact.phone).pretty || payload.contact.phone);
           put('sent-date', new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}));
           put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
           showSent(res.body);
-          $('request-panel').hidden = true; $('sent-card').hidden = false; $('sent-card').focus();
+          $('request-panel').hidden = true; $('sent-card').hidden = false; document.body.classList.add('req-sent'); $('sent-card').focus();
           render(true, 'Request received. Reference ' + res.body.ref + (res.body.bookingFor === 'company' ? '. We’ll send a quotation and invoice once we confirm.' : '. We’ll send a quotation once we confirm.'));
           return;
         }
@@ -4166,6 +4324,12 @@ footer{background:#efece7;border-top:0}
     function fail(msg){ track('request_failed', {reason:msg.slice(0, 60)}); btn.removeAttribute('aria-busy'); btn.disabled = false; btn.textContent = 'Send my request'; err.hidden = false; err.textContent = msg + ' Your request has not been sent.'; err.focus(); }
   }
   document.querySelectorAll('[data-ready]').forEach(function(b){ b.addEventListener('click', function(){ goReady(b.dataset.ready); }); });
+  // Another request: back to step 1 with this plan and the contact details kept, so only what's different needs changing
+  document.querySelectorAll('.plan-again').forEach(function(b){ b.addEventListener('click', function(){
+    S.requested = false; $('sent-card').hidden = true; $('request-panel').hidden = false; document.body.classList.remove('req-sent');
+    var sb = $('booking-submit'); sb.disabled = false; sb.removeAttribute('aria-busy'); sb.textContent = 'Send my request';
+    track('plan_again', {}); go(route(1)); render(false);
+  }); });
 
 
 

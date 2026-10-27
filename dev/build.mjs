@@ -6,13 +6,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { COUNTRIES } from '../lib/phone.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = (f) => fs.readFileSync(path.join(root, 'src', f), 'utf8');
 const b64 = (f) => fs.readFileSync(path.join(root, f)).toString('base64');
 const replaceAll = (s, a, b) => s.split(a).join(b);
 
-const base = src('base.html'), v2 = src('base-v2.html'), js = src('app.js');
+const base = src('base.html'), v2 = src('base-v2.html');
+// The WhatsApp country list comes from lib/phone.js, so the page and the server check numbers the same way.
+const js = src('app.js').replace('/*__COUNTRIES__*/[]', JSON.stringify(COUNTRIES));
+if (!js.includes('["SG","Singapore"')) throw new Error('The country list was not added to app.js');
 
 // The public address. Change it here (or set SITE_URL) when a custom domain is added.
 const SITE = (process.env.SITE_URL || 'https://squishyparty.vercel.app').replace(/\/$/, '');

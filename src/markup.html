@@ -1,6 +1,6 @@
 
 <a class="skip" href="#main">Skip to content</a>
-<p class="ref-banner" id="ref-banner" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span>A friend sent you <b>$10 off your first hosted party</b>. Plan your party and we’ll take it off your quotation.</span></p>
+<p class="ref-banner" id="ref-banner" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span>A friend sent you <b>$10 off your first hosted party</b>. Plan your party and we’ll take it off your quotation. Their referral code is already filled in at the Request step, so there’s no code to find: the $10 comes off your Squishy DIY bill.</span></p>
 <p class="notice" id="preview-notice">Offline preview. Cakes are priced in your quotation; other partner prices marked “Demo price” are placeholders. No requests are sent.</p>
 
 <!-- ======================================================= LANDING VIEW -->
@@ -554,7 +554,10 @@
                 <label class="field"><span>Billing email <span class="opt-tag">(optional)</span></span><input name="billingEmail" id="billing-email" type="email" maxlength="254" placeholder="If different from yours"></label>
               </div>
               <label class="field full">Your name<input name="parentName" autocomplete="name" maxlength="100" required></label>
-              <label class="field">Mobile number (WhatsApp)<input name="phone" type="tel" autocomplete="tel" placeholder="8123 4567" pattern="(\+?65)?[ ]?[689][0-9]{3}[ ]?[0-9]{4}" maxlength="16" required><span class="hint">We’ll WhatsApp you to confirm</span></label>
+              <div class="field"><label for="req-phone">WhatsApp number</label>
+                <p class="wa-note"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><span>We’ll reach out on <b>WhatsApp</b> to confirm your party, so please use a number that has WhatsApp.</span></p>
+                <div class="tel-row"><span class="tel-cc"><span class="tel-cc-face" id="tel-cc-face" aria-hidden="true">SG +65</span><select name="phoneCountry" id="phone-country" aria-label="Country code" autocomplete="tel-country-code"></select></span><input name="phone" id="req-phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="8123 4567" maxlength="20" required aria-describedby="phone-hint"></div>
+                <span class="hint" id="phone-hint">Singapore mobile numbers have 8 digits.</span></div>
               <div class="field full otp-field" id="otp-field">
                 <label for="req-email">Email address</label>
                 <div class="otp-row"><input name="email" id="req-email" type="email" autocomplete="email" maxlength="254" required aria-describedby="otp-status"><button type="button" class="btn btn-ghost otp-btn" id="otp-send">Send code</button></div>
@@ -591,12 +594,14 @@
               <button type="button" class="ns-card" data-ready="tab-p-inv"><span class="ns-ic" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"/></svg></span><span><b>Invitation</b><small>Make one and share it on WhatsApp</small></span></button>
             </div>
           </div>
+          <div class="again-row"><p>Planning another party, or want a different date?</p><button type="button" class="btn btn-ghost plan-again">Send another request</button></div>
         </div>
       </section>
 
       <div class="wiz-nav">
         <button type="button" class="btn btn-ghost" id="wiz-back"><svg class="icon flip" aria-hidden="true"><use href="#i-arrow"/></svg>Back</button>
         <button type="button" class="btn btn-primary" id="wiz-next">Next: Squishy DIY <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button type="button" class="btn btn-primary plan-again" id="wiz-again" hidden>Plan another party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
       </div>
     </div>
 
@@ -606,7 +611,7 @@
         <p class="eyebrow">Your celebration · SGD</p>
         <h2 id="summary-h">Squishy <span id="summary-exp">Duo</span> celebration</h2>
         <p class="summary-meta"><span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><b id="summary-participants">15</b>&nbsp;participants</span><span><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span id="summary-length">2 hours</span></span></p>
-        <div class="total"><div><small>Estimated total</small><strong id="total-price">$0.00</strong></div><div class="per-child"><strong id="per-child">$0.00</strong><small>per person</small></div></div>
+        <div class="total"><div><small>Estimated total</small><strong id="total-price">$0.00</strong><span class="ref-off" id="ref-off" hidden>$10 off with your friend’s referral</span></div><div class="per-child"><strong id="per-child">$0.00</strong><small>per person</small></div></div>
         <p class="summary-hint" id="summary-hint">Your estimate starts when you choose Squishy DIY in step 2. Nothing is added until you choose it.</p>
         <details class="sum-acc" id="sum-acc">
           <summary>See itemised breakdown <span class="acc-meta"><b id="squishy-count">30</b> squishies · <b id="partner-count">0</b> add-ons</span></summary>

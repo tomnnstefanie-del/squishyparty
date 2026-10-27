@@ -1293,3 +1293,54 @@ footer{background:#efece7;border-top:0}
 @media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:14px;align-items:center;background:linear-gradient(180deg,rgba(12,16,40,.8) 0%,rgba(12,16,40,.6) 60%,rgba(12,16,40,.45) 100%),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}}
 /* v50 head-start link sits under "Send my request" */
 #booking-form .ready-link{margin:18px 0 0}
+/* v51 Request received: "While we confirm" centred in the card; send another request */
+.next-steps .eyebrow{max-width:none;margin-left:auto;margin-right:auto}
+.again-row{width:100%;display:flex;align-items:center;justify-content:center;gap:12px 16px;flex-wrap:wrap;margin-top:6px;padding-top:16px;border-top:1px dashed var(--line-2)}
+.again-row p{margin:0;font-size:.9375rem}
+.wiz-nav #wiz-again{margin-left:auto}
+
+/* Date and time stay inside the card on phones (iOS gives these inputs a fixed width of their own) */
+.field input[type=date],.field input[type=time],.time-range input{min-width:0;max-width:100%;width:100%;-webkit-appearance:none;appearance:none;display:block}
+.field input[type=date]::-webkit-date-and-time-value,.time-range input::-webkit-date-and-time-value{text-align:center}
+.grid2>*,.time-range>label{min-width:0}
+
+/* Time picker on computers: a scroll wheel */
+.tp-wrap{position:relative}
+.tp-native{position:absolute;inset:0;opacity:0;pointer-events:none}
+.tp-face{width:100%;min-height:50px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff;font:inherit;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer;transition:border-color 150ms ease,box-shadow 150ms ease}
+.tp-face .icon{width:18px;height:18px;color:var(--teal-700)}
+.tp-face:hover{border-color:var(--cobalt)}
+.tp-face:focus-visible{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(19,35,95,.14)}
+.tp-face.bad{border-color:#c2384f}
+.tp-pop{position:absolute;z-index:40;top:calc(100% + 8px);left:0;width:260px;padding:12px;border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(19,35,95,.22),0 0 0 1px var(--line);animation:tpIn 160ms ease-out}
+.time-range>label:last-of-type .tp-pop{left:auto;right:0}
+@keyframes tpIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.tp-wheel{position:relative;display:flex;align-items:stretch;gap:4px;height:200px}
+.tp-wheel::before{content:"";position:absolute;left:0;right:0;top:80px;height:40px;border-radius:12px;background:var(--cobalt-50);pointer-events:none}
+.tp-wheel::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(#fff 0%,rgba(255,255,255,0) 32%,rgba(255,255,255,0) 68%,#fff 100%)}
+.tp-col{position:relative;flex:1;overflow-y:auto;scroll-snap-type:y mandatory;padding:80px 0;scrollbar-width:none;outline:none;border-radius:12px}
+.tp-col::-webkit-scrollbar{display:none}
+.tp-col:focus-visible{box-shadow:inset 0 0 0 2px var(--cobalt)}
+.tp-opt{height:40px;display:grid;place-items:center;scroll-snap-align:center;font-size:1.125rem;font-weight:600;color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums;transition:color 120ms ease,transform 120ms ease}
+.tp-opt:hover{color:var(--ink)}
+.tp-opt.on{color:var(--cobalt);font-weight:800;transform:scale(1.12)}
+.tp-colon{position:relative;z-index:1;align-self:center;font-weight:800;color:var(--cobalt)}
+.tp-done{width:100%;margin-top:10px;min-height:44px}
+@media (prefers-reduced-motion:reduce){.tp-pop{animation:none}.tp-opt{transition:none}}
+
+/* WhatsApp number with a country code */
+.wa-note{display:flex;gap:8px;align-items:flex-start;margin:2px 0 8px;padding:10px 12px;border-radius:var(--r-sm);background:#e9f7ef;color:#165c38;font-size:.875rem;font-weight:500;line-height:1.45}
+.wa-note .icon{width:16px;height:16px;flex:none;margin-top:2px;color:#1f8a52}
+.tel-row{display:flex;gap:8px;align-items:stretch}
+.tel-row input{flex:1;min-width:0}
+.tel-cc{position:relative;flex:none;display:flex}
+.tel-cc-face{display:flex;align-items:center;gap:6px;padding:0 30px 0 14px;min-height:50px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2313235f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;font-weight:700;color:var(--ink);white-space:nowrap}
+.tel-cc select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:1rem}
+.tel-cc select:focus-visible+.tel-cc-face,.tel-cc:focus-within .tel-cc-face{border-color:var(--cobalt);box-shadow:0 0 0 4px rgba(19,35,95,.14)}
+#phone-hint.ok{color:#0f7a4a;font-weight:600}
+#phone-hint.err{color:var(--rose)}
+@media (max-width:640px){.tel-cc-face{min-height:44px;padding-left:12px}}
+
+/* Referral: $10 off shown on the total */
+.total .was,.mobile-bar .was{font-size:.55em;font-weight:600;opacity:.65;margin-right:4px;text-decoration-thickness:2px}
+.ref-off{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;background:var(--lemon);color:var(--ink);font-size:.75rem;font-weight:700}
