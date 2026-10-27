@@ -1280,3 +1280,6 @@ footer{background:#efece7;border-top:0}
 /* v46 Wax Cracking card: photo mirrored so the turquoise heater sits on the right, clear of the wash behind the text */
 .addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(100deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.7) 36%,rgba(24,32,140,.12) 58%,rgba(24,32,140,0) 70%),url('img/how/wax-full.jpg') right 30%/64% auto no-repeat,#2234b8}
 @media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){padding-bottom:190px;background:linear-gradient(180deg,#2234b8 0%,rgba(24,32,140,.92) 40%,rgba(24,32,140,.25) 56%,rgba(24,32,140,0) 64%),url('img/how/wax-full.jpg') center bottom/100% auto no-repeat,#2234b8}}
+/* v47 in-store card: top-to-bottom wash at every size (as on phones), shop icon bottom-right */
+.retail-photo::before{background:linear-gradient(180deg,rgba(24,32,140,.88) 0%,rgba(24,32,140,.55) 45%,rgba(24,32,140,.08) 100%)}
+.retail-photo .retail-icon{margin-left:auto;align-self:flex-end}
