@@ -784,7 +784,7 @@ html:has(body.planning){scroll-padding-top:150px}
 .ss-sec:first-child{border-top:0;padding-top:0;margin-top:0}
 .ss-item.wide{grid-column:1/-1}
 .ss-item.wide .ss-ph{aspect-ratio:2/1}
-@media (min-width:641px){.retail-photo .retail-bg{object-position:50% 82%}}
+@media (min-width:641px){.retail-photo{min-height:300px;flex-direction:column;align-items:flex-start;justify-content:space-between;flex-wrap:nowrap}.retail-photo .retail-bg{object-position:30% 57%}}
 
 /* v17 basics notes, email verification, PayNow deposit */
 .early-hint{display:flex;align-items:center;gap:6px;margin-top:6px;color:var(--cobalt-700);font-weight:600}
