@@ -46,7 +46,7 @@ Some files are shared hot spots. Only **one open PR at a time** may touch each o
 3. Generated files conflict → regenerate, don't hand-edit.
 
 ## CI (in [PR #2](https://github.com/tomnnstefanie-del/squishyparty/pull/2), issue [#3](https://github.com/tomnnstefanie-del/squishyparty/issues/3))
-- `.github/workflows/ci.yml`, job **`npm run check`**: on every `pull_request` into `main`. `npm ci` → Playwright Chromium → `npm run check` → fails if `public/` or `lib/catalogue.js` don't match the sources.
+- `.github/workflows/ci.yml`, job **`npm run check`**: on every `pull_request` into `main`. `npm ci` → Playwright Chromium → `npm run check` → fails if `public/` or `lib/catalogue.js` don't match the sources (except `public/sitemap.xml`, whose `lastmod` is the build date).
 - `permissions: contents: read`, no secrets, no schedule, no deploy step. The repo is public, so Actions minutes are free.
 - It becomes the default for every branch once PR #2 is merged. Until then only PR #2 has it; other PRs need a rebase on `main` after the merge.
 
