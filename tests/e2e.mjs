@@ -360,7 +360,7 @@ try {
   assert.equal(x.s, 200); const miaRef = x.b.ref, miaCode = /\?ref=([A-Z]+-[A-Z0-9]{4})/.exec(sent().at(-1).text)[1];
   const after = sent().at(-1).reply_markup.inline_keyboard.flat().find((b) => b.text.includes('After the party')).url;
   assert.ok(decodeURIComponent(after).includes('a free squishy at any Tom & Stefanie store')); ok('the after-party message tells families about the thank-you reward');
-  x = await api({ ...base, plan: { ...base.plan, wax: false, addons: [] }, referral: { code: miaCode }, contact: { ...base.contact, parentName: 'Sara Lim' } }, { 'X-Forwarded-For': '10.0.6.2' });
+  x = await api({ ...base, plan: { ...base.plan, wax: false, addons: [] }, referral: { code: miaCode }, emailToken: issueVerified('sara@example.com'), contact: { ...base.contact, parentName: 'Sara Lim', email: 'sara@example.com', phone: '98887777' } }, { 'X-Forwarded-For': '10.0.6.2' });
   const friendRef = x.b.ref, fk = sent().at(-1).reply_markup.inline_keyboard.flat();
   const total = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === friendRef).totalCents;
   await tap(fk.find((b) => b.text.includes('Deposit paid')).url, { amount: '100' });
@@ -381,6 +381,31 @@ try {
   assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'redeemed' })).s, 200);
   rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.ok(rw.status === 'redeemed' && rw.sent.by === 'Tester');
   ok('the reward is marked sent, then redeemed in store, each with who and when');
+
+  // Recognising the same customer without log-ins: verified email or WhatsApp number, and company occasions
+  console.log('returning customers and occasions');
+  const ze = 'zoe@acme.example', reqMsg = (r) => sent().find((m) => m.text && m.text.includes(r) && m.text.includes('New Confetti Club request'));
+  x = await api({ ...base, bookingFor: 'company', corporate: { occasion: 'family-day', yearly: true }, emailToken: issueVerified(ze), contact: { ...base.contact, parentName: 'Zoe Ng', email: ze, phone: '96660001', companyName: 'Zeta Pte Ltd' } }, { 'X-Forwarded-For': '10.0.7.1' });
+  assert.equal(x.s, 200); const zRef = x.b.ref, zMsg = reqMsg(zRef), zCode = /\?ref=([A-Z]+-[A-Z0-9]{4})/.exec(zMsg.text)[1];
+  assert.ok(zMsg.text.includes('Occasion: <b>Family day</b> · held every year') && !zMsg.text.includes('Returning customer'));
+  const zb = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === zRef); assert.ok(zb.occasion === 'family-day' && zb.yearly === true && !zb.returning.length);
+  ok('companies can say what the occasion is and that they hold it every year; Telegram and the dashboard show it');
+  const zl = { contacted: 'x', confirmed: 'x', paid: 'x' }, Stats2 = await import('../lib/stats.js');
+  const ahead = (d) => { const t = new Date(zb.date + 'T00:00:00Z'); t.setUTCFullYear(t.getUTCFullYear() + 1); t.setUTCDate(t.getUTCDate() - d); return t.toISOString().slice(0, 10); };
+  assert.ok(Stats2.todosFor(zb, zl, ahead(80)).some((t) => t.startsWith('Ask Zeta Pte Ltd about booking again: their Family Day, held every year')));
+  assert.ok(!Stats2.todosFor({ ...zb, yearly: false }, zl, ahead(80)).some((t) => t.includes('booking again'))); // not yearly: nearer the time
+  ok('the “book again?” reminder names the occasion, and comes about 13 weeks ahead for a yearly event');
+  x = await api({ ...base, emailToken: issueVerified(ze), contact: { ...base.contact, parentName: 'Zoe Ng', email: ze, phone: '96660002' } }, { 'X-Forwarded-For': '10.0.7.2' });
+  let m2 = reqMsg(x.b.ref);
+  assert.ok(m2.text.includes('Returning customer') && m2.text.includes(zRef) && m2.text.includes('Same email'));
+  assert.deepEqual((await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === x.b.ref).returning, [zRef]);
+  ok('a second request with the same verified email is flagged as a returning customer, with their earlier booking');
+  x = await api({ ...base, referral: { code: zCode }, emailToken: issueVerified('zoe.other@example.com'), contact: { ...base.contact, parentName: 'Z Ng', email: 'zoe.other@example.com', phone: '96660001' } }, { 'X-Forwarded-For': '10.0.7.3' });
+  m2 = reqMsg(x.b.ref);
+  assert.ok(m2.text.includes('their own referral code') && m2.text.includes('Same WhatsApp number'));
+  const sb = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === x.b.ref); assert.ok(sb.selfReferral && sb.discountCents === 0);
+  ok('using your own referral link (same WhatsApp number, different email and name) is caught: no $10 off and no reward');
+
 
   // The daily Telegram bump
   assert.equal((await fetch(BASE + '/api/digest')).status, 401); assert.equal((await fetch(BASE + '/api/digest', { headers: { Authorization: 'Bearer wrong' } })).status, 401);

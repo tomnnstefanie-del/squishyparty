@@ -1730,7 +1730,7 @@
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', billingContact:isCompany() ? (d.get('billingContact') || '').trim() : '', poRef:isCompany() ? (d.get('poRef') || '').trim() : '', billingNotes:isCompany() ? (d.get('billingNotes') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
-      corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked } : null,
+      corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
       referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };

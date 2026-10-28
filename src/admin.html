@@ -228,6 +228,7 @@ __FOOTER__
       .catch(function(){ alert('We couldn’t reach the server.'); });
   }
   var cents = function(v){ var m = /^\s*(\d{1,6})(?:\.(\d{1,2}))?\s*$/.exec(v || ''); return m ? +m[1] * 100 + +(m[2] || '0').padEnd(2, '0') : NaN; };
+  var OCCN = { 'family-day':'Family day', 'team-bonding':'Team bonding', 'year-end':'D&D / year-end', anniversary:'Anniversary', festive:'Festive', other:'Other event' };
   function btnR(txt, fn){ var b = el('button', 'mini', txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function openManage(ref){ managing = ref; renderManage(); var dl = $('ad-manage'); if (!dl.open) dl.showModal(); }
   $('ad-manage').addEventListener('close', function(){ managing = null; });
@@ -418,12 +419,15 @@ __FOOTER__
       money2.textContent = (b.paidCents ? 'Received ' + money(b.paidCents) + ' · balance ' + money(b.balanceCents) : 'Total ' + money(b.totalCents)) + (b.totalCents !== b.originalTotalCents ? ' (quoted ' + money(b.originalTotalCents) + ')' : '');
       c.appendChild(money2);
       var openRev = (b.revisions || []).filter(function(r){ return r.status === 'draft' || r.status === 'sent'; })[0], openChg = (b.changes || []).filter(function(x){ return x.status === 'open'; }).length;
-      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg) {
+      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg || b.occasion || b.yearly || (b.returning || []).length || b.selfReferral) {
         var chips = el('div', 'tb-chips');
         if (openChg) chips.appendChild(el('span', 'tb-chip chg', '✏️ Change requested'));
         if (openRev) chips.appendChild(el('span', 'tb-chip rev', 'R' + openRev.n + (openRev.status === 'draft' ? ' draft' : ' pending acceptance')));
         if (b.procurement) chips.appendChild(el('span', 'tb-chip proc', '📑 Procurement'));
         if (b.poRef) chips.appendChild(el('span', 'tb-chip po', 'PO ' + b.poRef));
+        if (b.occasion || b.yearly) chips.appendChild(el('span', 'tb-chip', (OCCN[b.occasion] || 'Company event') + (b.yearly ? ' · yearly' : '')));
+        if ((b.returning || []).length) chips.appendChild(el('span', 'tb-chip', '🔁 Returning'));
+        if (b.selfReferral) chips.appendChild(el('span', 'tb-chip proc', '⛔ Own referral code'));
         b.vendors.forEach(function(v){ chips.appendChild(el('span', 'tb-chip ' + (v.ok ? 'ok' : 'wait'), (v.ok ? '✓ ' : '… ') + v.name)); });
         c.appendChild(chips);
       }

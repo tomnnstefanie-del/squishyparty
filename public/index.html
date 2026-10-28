@@ -2892,6 +2892,10 @@ footer{background:#efece7;border-top:0}
                 <div class="corp-prefs full">
                   <p class="corp-prefs-h">Corporate booking &amp; billing preferences</p>
                   <p class="corp-prefs-p">Planning a company event? We can help prepare quotations and supporting documents for internal approval and procurement.</p>
+                  <label class="field"><span>What’s the occasion? <span class="opt-tag">(optional)</span></span><select name="corpOccasion" id="corp-occasion">
+                    <option value="">Choose one</option><option value="family-day">Family day</option><option value="team-bonding">Team bonding</option><option value="year-end">D&amp;D / year-end party</option><option value="anniversary">Company anniversary</option><option value="festive">Festive celebration (CNY, Hari Raya, Deepavali, Christmas)</option><option value="other">Something else</option>
+                  </select></label>
+                  <label class="consent corp-opt"><input type="checkbox" name="corpYearly" id="corp-yearly"><span><b>We hold this event every year</b><small>We’ll check in with you before next year’s, so you can book early.</small></span></label>
                   <label class="consent corp-opt"><input type="checkbox" name="corpPackage" id="corp-package" checked><span><b>Request a corporate-friendly quotation</b><small>One consolidated package line, suitable for internal budget approval and company reimbursement. Untick for a full breakdown.</small></span></label>
                   <label class="consent corp-opt"><input type="checkbox" name="corpProcurement" id="corp-procurement"><span><b>I require vendor registration / procurement support</b><small>For companies that need supplier onboarding, purchase orders or supporting business documents.</small></span></label>
                   <p class="corp-note" id="corp-procurement-note" hidden>Our team will assist with the necessary procurement documentation, subject to your company’s requirements. We’ll contact you about them.</p>
@@ -4720,7 +4724,7 @@ footer{background:#efece7;border-top:0}
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', billingContact:isCompany() ? (d.get('billingContact') || '').trim() : '', poRef:isCompany() ? (d.get('poRef') || '').trim() : '', billingNotes:isCompany() ? (d.get('billingNotes') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
-      corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked } : null,
+      corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
       referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };

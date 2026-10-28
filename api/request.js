@@ -14,7 +14,7 @@ import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpErro
 import { checkVerified } from '../lib/otp.js';
 import { mailConfigured, sendMail } from '../lib/mail.js';
 import { confirmationEmail } from '../lib/emails.js';
-import { recordRequest, statsConfigured, vendorsOf } from '../lib/stats.js';
+import { recordRequest, statsConfigured, vendorsOf, matchCustomer } from '../lib/stats.js';
 import { statusLink, changeLink } from '../lib/status-link.js';
 
 const rateLimited = limiter(5, 10 * 60 * 1000); // best-effort, per server instance
@@ -52,7 +52,11 @@ export default async function handler(req, res) {
 
     const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
     const shareCode = makeReferralCode(contact.parentName);
-    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site, corporate: data.corporate });
+    // Same email or WhatsApp as an earlier booking, or as the family whose code they used? (no accounts needed)
+    const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
+    const match = await matchCustomer(contact, usedCode && usedCode.valid ? usedCode.code : '');
+    if (match && match.previous.length) data.referral.returning = true; // a returning customer isn't on their first party
+    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site, corporate: data.corporate, match });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
       const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, shareCode, site }));
@@ -67,11 +71,10 @@ export default async function handler(req, res) {
     console.log('[request] sent', ref);
 
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
-    const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
-    const discountCents = referralDiscount(data.referral, readReferralCode, samePerson, contact.parentName);
+    const discountCents = referralDiscount(data.referral, readReferralCode, (u, n) => !!(match && match.selfReferral) || samePerson(u, n), contact.parentName);
     await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
-      rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor });
+      rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor, match });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {
