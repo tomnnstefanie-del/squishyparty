@@ -6,7 +6,7 @@ import { markStatus, statsConfigured } from '../lib/stats.js';
 import { addPayment, getFull, paidCents, cleanBy, BookingError } from '../lib/bookings.js';
 
 const REF = /^SP-\d{6}-[0-9A-F]{4}$/;
-const LABEL = { contacted: 'contacted', confirmed: 'deposit paid', paid: 'paid in full' };
+const LABEL = { contacted: 'contacted', confirmed: 'deposit paid', paid: 'paid in full', rebook: 'asked about next year' };
 const PAY = { confirmed: 'deposit', paid: 'payment' };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const sgTime = (iso) => new Date(iso).toLocaleString('en-SG', { timeZone: 'Asia/Singapore', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });

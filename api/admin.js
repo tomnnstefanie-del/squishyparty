@@ -7,6 +7,7 @@
 //   POST { action: 'revise', ref, plan, by, note }         -> draft a revision (admin only; priced on the server)
 //   POST { action: 'revision', ref, n, step, vendor, reason, by } -> send (emails R-n) / accept / vendor / apply / withdraw / discard
 //   POST { action: 'change-handled', ref, changeId, by }   -> a customer's change request has been dealt with
+//   POST { action: 'reward', ref (the friend's booking), step: 'sent' | 'redeemed', by } -> referral reward voucher
 // ADMIN_PASSWORD is a Vercel environment variable (12+ characters); without it the dashboard stays locked.
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
@@ -20,6 +21,7 @@ import { sendMail, mailConfigured } from '../lib/mail.js';
 import { revisedQuotationEmail } from '../lib/emails.js';
 import { sendTelegram, sendTelegramDocument } from '../lib/telegram.js';
 import { sendDigest } from './digest.js';
+import { stepReward, listRewards } from '../lib/rewards.js';
 
 const rateLimited = limiter(60, 10 * 60 * 1000); // per instance, on top of the shared lockout
 const REF = /^SP-\d{6}-[0-9A-F]{4}$/;
@@ -66,7 +68,7 @@ export default async function handler(req, res) {
       console.warn('[admin] wrong password'); // no address or password logged
       throw new HttpError(401, 'That password isn’t right.');
     }
-    if (req.method === 'GET') return res.status(200).json({ ok: true, ...(await readStats()), addonList: ADDON_LIST, experiences: EXP_NAME });
+    if (req.method === 'GET') { const st = await readStats(); return res.status(200).json({ ok: true, ...st, rewards: st.connected ? await listRewards() : [], addonList: ADDON_LIST, experiences: EXP_NAME }); }
 
     assertSameOrigin(req);
     const b = await readJson(req, 8 * 1024);
@@ -89,6 +91,11 @@ export default async function handler(req, res) {
           const n = Number(b.n);
           if (b.step === 'send') return res.status(200).json({ ok: true, revision: await sendRevision(ref, n, b.by) });
           return res.status(200).json({ ok: true, revision: await stepRevision(ref, { n, step: b.step, vendor: b.vendor, reason: b.reason, by: b.by }) });
+        }
+        case 'reward': {
+          const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.');
+          const r = await stepReward(ref, b.step, by); if (r.error) throw new HttpError(r.status, r.error);
+          return res.status(200).json({ ok: true, reward: r.reward });
         }
         case 'change-handled': return res.status(200).json({ ok: true, change: await handleChange(ref, { changeId: String(b.changeId || ''), by: b.by }) });
         default: throw new HttpError(400, 'Please refresh and try again.');

@@ -12,6 +12,7 @@ const Ref = await import('../lib/referral.js');
 const { statusLink, checkStatusToken } = await import('../lib/status-link.js');
 const nodeFs = await import('node:fs');
 const nodeZlib = await import('node:zlib');
+const Stats = await import('../lib/stats.js');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
@@ -158,6 +159,14 @@ t('a revision keeps the quoted unit prices for items already on the booking', ()
   rates.exp.both = 2000; // as if the Duo was $20 when quoted
   assert.equal(priceRequest({ ...p, participants: 20 }, rates).squishy[0].cents, 2000 * 20);
   assert.equal(priceRequest({ ...p, participants: 20, experience: 'jelly' }, rates).squishy[0].cents, 1600 * 20); // a new choice uses today's price
+});
+t('companies get a “book again?” reminder about 10 weeks before the anniversary of their event; families don’t', () => {
+  const today = '2027-09-01', life = { contacted: 'x', confirmed: 'x', paid: 'x' };
+  const co = { companyName: 'Acme', date: '2026-10-20', vendors: [] }, fam = { companyName: '', date: '2026-10-20', vendors: [] };
+  assert.ok(Stats.todosFor(co, life, today).some((t) => t.startsWith('Ask Acme about booking again')));
+  assert.ok(!Stats.todosFor(fam, life, today).some((t) => t.includes('booking again')));
+  assert.ok(!Stats.todosFor({ ...co, date: '2026-12-31' }, life, today).some((t) => t.includes('booking again'))); // too early
+  assert.ok(!Stats.todosFor(co, { ...life, rebook: 'x' }, today).some((t) => t.includes('booking again'))); // already asked
 });
 t('WhatsApp link goes to the customer with a greeting', () => { const u = whatsappLink(v.contact.phone, customerGreeting({ ref: 'SP-1', plan: v.plan, contact: v.contact })); assert.ok(u.startsWith('https://wa.me/6581234567?text=Hi%20Sarah')); });
 t('fits in one Telegram message', () => assert.ok(msg.length < 4096));

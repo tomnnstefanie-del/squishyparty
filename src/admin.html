@@ -86,6 +86,13 @@ __HEADER__
           <tbody id="ad-referrers"></tbody>
         </table></div>
 
+        <h2 class="ad-h2">Thank-you rewards for referring families</h2>
+        <p class="ad-fine">When a friend’s party is paid in full, the family who shared their link gets a free squishy at any Tom &amp; Stefanie store. Telegram sends you a WhatsApp message with their voucher; mark it sent, then redeemed in store.</p>
+        <div class="ad-table-wrap"><table class="ad-table ad-rewards">
+          <thead><tr><th>Referring family</th><th>Voucher</th><th>Friend’s booking</th><th>Status</th><th></th></tr></thead>
+          <tbody id="ad-rewards"></tbody>
+        </table></div>
+
         <h2 class="ad-h2">Recent requests</h2>
         <div class="ad-table-wrap"><table class="ad-table">
           <thead><tr><th>Reference</th><th>Sent</th><th>Party date</th><th class="num">People</th><th class="num">Estimate</th><th>Found us via</th><th>Replied after</th><th>Deposit after</th><th>Status</th></tr></thead>
@@ -174,6 +181,19 @@ __FOOTER__
       rb.appendChild(tr);
     });
 
+    var rw = $('ad-rewards'); rw.textContent = '';
+    var rewards = (d.rewards || []).filter(function(r){ return r.status !== 'void'; });
+    if (!rewards.length) { var tr2 = el('tr'); var td2 = cell(tr2, 'No rewards yet. They appear when a referred party is paid in full.', 'ad-empty'); td2.colSpan = 5; rw.appendChild(tr2); }
+    rewards.forEach(function(r){
+      var tr = el('tr'), w = cell(tr, ''); w.appendChild(el('b', null, r.referrerFirst)); w.appendChild(el('small', null, r.referrerRef));
+      cell(tr, r.voucher, 'mono'); cell(tr, r.friendFirst + ' · ' + r.friendRef);
+      cell(tr, r.status === 'owed' ? 'To send' : r.status === 'sent' ? 'Sent ' + when2(r.sent.at) + ' by ' + r.sent.by : 'Redeemed ' + when2(r.redeemed.at) + ' by ' + r.redeemed.by, 'rw-' + r.status);
+      var a = cell(tr, '');
+      if (r.status === 'owed') a.appendChild(btnR('Mark sent', function(){ post({ action:'reward', ref:r.friendRef, step:'sent' }); }));
+      if (r.status === 'sent') a.appendChild(btnR('Redeemed in store', function(){ if (confirm('Mark voucher ' + r.voucher + ' as used?')) post({ action:'reward', ref:r.friendRef, step:'redeemed' }); }));
+      rw.appendChild(tr);
+    });
+
     var rc = $('ad-recent'); rc.textContent = '';
     if (!d.recent.length) { var tr1 = el('tr'); var td1 = cell(tr1, 'No requests yet.', 'ad-empty'); td1.colSpan = 9; rc.appendChild(tr1); }
     d.recent.forEach(function(q){
@@ -208,6 +228,7 @@ __FOOTER__
       .catch(function(){ alert('We couldn’t reach the server.'); });
   }
   var cents = function(v){ var m = /^\s*(\d{1,6})(?:\.(\d{1,2}))?\s*$/.exec(v || ''); return m ? +m[1] * 100 + +(m[2] || '0').padEnd(2, '0') : NaN; };
+  function btnR(txt, fn){ var b = el('button', 'mini', txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function openManage(ref){ managing = ref; renderManage(); var dl = $('ad-manage'); if (!dl.open) dl.showModal(); }
   $('ad-manage').addEventListener('close', function(){ managing = null; });
   function sec(box, title){ var s = el('section', 'mg-sec'); s.appendChild(el('h3', null, title)); box.appendChild(s); return s; }
@@ -352,7 +373,8 @@ __FOOTER__
     var all = (last.bookings || []).filter(function(b){ return b.state !== 'lost' || bookFilter === 'all'; }), today = last.today;
     // To-do list: open steps for every party that isn't lost, soonest party first
     var tl = $('ad-todo'), n = 0; tl.textContent = '';
-    all.filter(function(b){ return b.todos.length && (b.date >= today || b.todos.some(function(t){ return /Payment/.test(t); })); }).forEach(function(b){
+    (last.rewards || []).filter(function(r){ return r.status === 'owed'; }).forEach(function(r){ n++; var li = el('li'), a = el('a'); a.href = '#ad-rewards'; a.appendChild(el('b', null, 'Send ' + r.referrerFirst + ' their free-squishy voucher ' + r.voucher)); a.appendChild(el('small', null, 'Thank-you for referring ' + r.friendFirst + ' · ' + r.referrerRef)); li.appendChild(a); tl.appendChild(li); });
+    all.filter(function(b){ return b.todos.length && (b.date >= today || b.state === 'booked' || b.todos.some(function(t){ return /booking again|overdue/i.test(t); })); }).forEach(function(b){
       b.todos.forEach(function(t){ n++; var li = el('li'), a = el('a', null, ''); a.href = '#bk-' + b.ref; a.appendChild(el('b', null, t)); a.appendChild(el('small', null, who(b) + ' · ' + longDay(b.date) + ' · ' + b.ref)); li.appendChild(a); tl.appendChild(li); });
     });
     if (!n) tl.appendChild(el('li', 'ad-empty', 'Nothing waiting. 🎉'));
@@ -428,6 +450,7 @@ __FOOTER__
         btn.addEventListener('click', function(){ if (!on || confirm('Undo “' + s[1] + '” for ' + b.ref + '?')) mark(b.ref, s[0], btn, on); });
         acts.appendChild(btn);
       });
+      if (b.todos.some(function(t){ return /booking again/.test(t); })) { var rb = el('button', 'mini', 'Asked about next year'); rb.type = 'button'; rb.addEventListener('click', function(){ post({ action:'mark', ref:b.ref, status:'rebook' }); }); acts.appendChild(rb); }
       det.appendChild(acts);
       var mb = el('button', 'btn btn-primary tb-manage', 'Manage: payments & changes'); mb.type = 'button'; mb.addEventListener('click', function(){ openManage(b.ref); }); det.appendChild(mb);
       if (openTiles[b.ref]) det.open = true;

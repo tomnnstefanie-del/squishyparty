@@ -354,6 +354,34 @@ try {
   assert.ok(c1.history.some((h) => h.what.startsWith('Applied R2') && h.by === 'Tester') && c1.history.some((h) => h.what.startsWith('Customer accepted R2')));
   ok('only after the customer accepts and every vendor step is done does R2 replace the booking: original, revised, received and balance all kept');
 
+  // Thank-you reward for the family who referred a friend
+  console.log('referral rewards');
+  x = await api({ ...base, plan: { ...base.plan, wax: false, addons: [] }, contact: { ...base.contact, parentName: 'Mia Tan' } }, { 'X-Forwarded-For': '10.0.6.1' });
+  assert.equal(x.s, 200); const miaRef = x.b.ref, miaCode = /\?ref=([A-Z]+-[A-Z0-9]{4})/.exec(sent().at(-1).text)[1];
+  const after = sent().at(-1).reply_markup.inline_keyboard.flat().find((b) => b.text.includes('After the party')).url;
+  assert.ok(decodeURIComponent(after).includes('a free squishy at any Tom & Stefanie store')); ok('the after-party message tells families about the thank-you reward');
+  x = await api({ ...base, plan: { ...base.plan, wax: false, addons: [] }, referral: { code: miaCode }, contact: { ...base.contact, parentName: 'Sara Lim' } }, { 'X-Forwarded-For': '10.0.6.2' });
+  const friendRef = x.b.ref, fk = sent().at(-1).reply_markup.inline_keyboard.flat();
+  const total = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === friendRef).totalCents;
+  await tap(fk.find((b) => b.text.includes('Deposit paid')).url, { amount: '100' });
+  let rws = (await adm('test-dashboard-pass')).b.rewards; assert.ok(!rws.some((r) => r.friendRef === friendRef)); // not yet paid in full
+  await tap(fk.find((b) => b.text.includes('Paid in full')).url, { amount: ((total - 10000) / 100).toFixed(2) });
+  const rmsg = sent().at(-1); assert.ok(rmsg.text.includes('Referral reward owed') && rmsg.text.includes(miaRef) && rmsg.reply_markup.inline_keyboard.flat()[0].url.startsWith('https://wa.me/'));
+  let rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef);
+  assert.ok(rw && rw.status === 'owed' && rw.referrerRef === miaRef && /^SQ-[A-Z2-9]{4}$/.test(rw.voucher));
+  ok('when a referred friend’s party is paid in full, the referring family is owed a free-squishy voucher, with a ready WhatsApp message in Telegram');
+  const fbk = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === friendRef), lastP = fbk.payments.filter((p) => p.kind !== 'reversal').at(-1);
+  await admPost({ action: 'reverse', ref: friendRef, paymentId: lastP.id, reason: 'Bank transfer bounced' });
+  rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.equal(rw.status, 'void');
+  await admPost({ action: 'payment', ref: friendRef, kind: 'payment', cents: lastP.cents, note: 'paid again' });
+  rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.equal(rw.status, 'owed');
+  ok('an unsent reward is voided if the payment is reversed, and owed again once it’s paid');
+  assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'redeemed' })).s, 409);
+  assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'sent' })).s, 200);
+  assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'redeemed' })).s, 200);
+  rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.ok(rw.status === 'redeemed' && rw.sent.by === 'Tester');
+  ok('the reward is marked sent, then redeemed in store, each with who and when');
+
   // The daily Telegram bump
   assert.equal((await fetch(BASE + '/api/digest')).status, 401); assert.equal((await fetch(BASE + '/api/digest', { headers: { Authorization: 'Bearer wrong' } })).status, 401);
   ok('the daily to-do bump can only be triggered with the cron secret');
