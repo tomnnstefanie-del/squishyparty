@@ -24,10 +24,11 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run check
+      # sitemap.xml is left out: its <lastmod> is the build date, so it changes every day by design.
       - name: Generated files match the sources
         run: |
-          if ! git diff --quiet -- public lib/catalogue.js; then
+          if ! git diff --quiet -- public lib/catalogue.js ':(exclude)public/sitemap.xml'; then
             echo "::error::public/ or lib/catalogue.js is out of date. Run npm run check and commit the result."
-            git diff --stat -- public lib/catalogue.js
+            git diff --stat -- public lib/catalogue.js ':(exclude)public/sitemap.xml'
             exit 1
           fi
