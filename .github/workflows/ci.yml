@@ -1,0 +1,33 @@
+# Runs the same checks as `npm run check` on every pull request into main.
+# No secrets: the tests use a mock Telegram server, a file mailbox and in-memory stats.
+# Not scheduled, and it never deploys: Vercel deploys main by itself after the owner merges.
+name: CI
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  check:
+    name: npm run check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run check
+      - name: Generated files match the sources
+        run: |
+          if ! git diff --quiet -- public lib/catalogue.js; then
+            echo "::error::public/ or lib/catalogue.js is out of date. Run npm run check and commit the result."
+            git diff --stat -- public lib/catalogue.js
+            exit 1
+          fi
