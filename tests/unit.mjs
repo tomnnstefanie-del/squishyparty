@@ -19,7 +19,7 @@ const plan = (o = {}) => ({ participants: 10, experience: 'both', wax: false, ad
 
 console.log('pricing');
 t('Duo, 10 participants = $280 + $150 travel = $430', () => assert.equal(priceRequest(plan()).totalCents, 43000));
-t('Duo + wax duo deal = $480 ($50 for 20 squishies)', () => assert.equal(priceRequest(plan({ wax: true })).totalCents, 48000));
+t('Duo + wax duo deal for 10 = $465 ($3.50 per person for both squishies)', () => assert.equal(priceRequest(plan({ wax: true })).totalCents, 46500));
 t('Jelly, 10 participants = $330; + wax $20 = $350', () => { assert.equal(priceRequest(plan({ experience: 'jelly' })).totalCents, 33000); assert.equal(priceRequest(plan({ experience: 'jelly', wax: true })).totalCents, 35000); });
 t('Crunchy, 10 participants = $350', () => assert.equal(priceRequest(plan({ experience: 'crunchy' })).totalCents, 35000));
 t('Minimum 10: 6 participants priced as 10', () => { const p = priceRequest(plan({ participants: 6 })); assert.equal(p.billableParticipants, 10); assert.equal(p.totalCents, 43000); });

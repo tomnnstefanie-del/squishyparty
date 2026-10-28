@@ -8,7 +8,7 @@
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 250, WAX_DUO_UP = 300, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
   // Bakery logos load from each brand's site; if a logo can't load, the brand name shows instead.
   var LOGOS = { 'Butter Studio':'https://thebutterstudio.com/wp-content/uploads/2024/11/Butterstudio-Logo.png' };
   var BAKERIES = ['Butter Studio'];
@@ -180,7 +180,7 @@
   function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function icon(name){ var ns='http://www.w3.org/2000/svg', s=document.createElementNS(ns,'svg'), u=document.createElementNS(ns,'use'); s.setAttribute('class','icon'); s.setAttribute('aria-hidden','true'); u.setAttribute('href','#'+name); s.appendChild(u); return s; }
   function billable(n){ return Math.max(n, MIN_PAX); }
-  function waxCents(exp, n){ return exp === 'both' ? WAX_DUO * n * 2 : WAX * n * EXP[exp].per; }
+  function waxCents(exp, n){ return exp === 'both' ? WAX_DUO * n : WAX * n * EXP[exp].per; } // Duo: one price per person for both squishies
   function clamp(n, lo, hi){ n = Math.round(Number(n)); return isNaN(n) ? lo : Math.min(hi, Math.max(lo, n)); }
   function squishyCents(exp, n){ return EXP[exp].pax * billable(n); }
   function logoEl(vendor){ vendor = vendor || 'Butter Studio'; var w = el('span','bs-logo'), im = document.createElement('img'), done = false; function fallback(){ if (done) return; done = true; if (im.parentNode) im.replaceWith(el('span','bs-word', vendor)); } if (!LOGOS[vendor]) { w.appendChild(el('span','bs-word', vendor)); return w; } im.alt = vendor; im.decoding = 'async'; im.addEventListener('error', fallback); im.addEventListener('load', function(){ if (im.naturalWidth) done = true; else fallback(); }); im.src = LOGOS[vendor]; setTimeout(function(){ if (!im.complete || !im.naturalWidth) fallback(); }, 6000); w.appendChild(im); return w; }
@@ -199,7 +199,7 @@
     var n = billable(s.participants), e = EXP[s.experience], items = [];
     items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
     items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
-    if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + (n * 2) + ' squishies × $2.50' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + (n * 2) + ' × $2.50' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
+    if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
     items.push({label:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', sub:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', cents:LOGISTICS, ic:'i-users'});
     return items;
   }
@@ -1278,9 +1278,9 @@
     $('exp-panel').classList.toggle('is-duo', dup);
     renderHow(s.experience);
     if (put('exp-total', money(expSum))) { var et = $('exp-total'); et.classList.remove('bump'); void et.offsetWidth; et.classList.add('bump'); }
-    put('wax-quantity', dup ? (n * 2) + ' squishies, two per person, at $2.50 each' : (n * exp0.per) + ' squishies to crack, one per person');
+    put('wax-quantity', dup ? (n * 2) + ' squishies, two per person, at ' + short(WAX_DUO) + ' per person' : (n * exp0.per) + ' squishies to crack, one per person');
     put('wax-price', '+' + money(waxCents(s.experience, n)).replace('.00',''));
-    var up = $('wax-up'); up.hidden = !dup; if (dup) put('wax-up', 'U.P. ' + money(300 * n * 2).replace('.00',''));
+    var up = $('wax-up'); up.hidden = !dup; if (dup) put('wax-up', 'U.P. ' + money(WAX_DUO_UP * n).replace('.00',''));
     put('tier-note', s.participants < MIN_PAX ? 'Minimum 10 participants: for ' + s.participants + ' we charge for 10, and spare materials are yours to keep.' : 'Minimum 10 participants.');
 
     // step 3: suggested add-ons are marked on the vendor cards (see syncStores)

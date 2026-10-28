@@ -176,10 +176,10 @@ try {
   assert.equal(x.s, 400); ok('tampered add-on id is rejected (400)');
   const before = sent().length;
   x = await api(base, { 'X-Forwarded-For': '10.0.0.4' });
-  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 48000);
+  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 46500);
   const last = sent().at(-1).text;
   assert.ok(last.includes('Page showed $0.01'));
-  ok('a fake $0.01 total from the browser is ignored; server prices it at $480 and flags the mismatch');
+  ok('a fake $0.01 total from the browser is ignored; server prices it at $465 and flags the mismatch');
   x = await api({ ...base, wantQuote: true }, { 'X-Forwarded-For': '10.0.0.5' });
   assert.equal(x.s, 200); assert.equal(x.b.quoted, true);
   const qm = mails().at(-1); assert.ok(qm.subject.startsWith('Your Confetti Club Quotation | Q-SP-')); assert.deepEqual(qm.attachments, [`Confetti-Club-Quotation-Q-${x.b.ref}.pdf`]);
@@ -190,17 +190,17 @@ try {
   x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
   assert.equal(x.s, 400); ok('a verified token for a different email is refused');
   x = await api({ ...base, bookingFor: 'company', wantQuote: true, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
-  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 48000);
+  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 46500);
   assert.ok(sent().at(-1).text.includes('CORPORATE BOOKING: yes') && mails().at(-1).text.includes('nothing to pay at this stage') && mails().at(-1).attachments.length === 1 && mails().at(-1).subject.includes('Quotation'));
   ok('company booking: same price, invoice requested on Telegram and in the email');
   x = await api({ ...base, bookingFor: 'company', wantQuote: true, corporate: { procurement: true }, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingContact: 'Finance Team', poRef: 'PO-77', billingNotes: 'Two invoices please' } }, { 'X-Forwarded-For': '10.0.4.1' });
-  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 48000);
+  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 46500);
   const ct = sent().at(-1).text;
   assert.ok(ct.includes('CORPORATE BOOKING: yes') && ct.includes('corporate-friendly package') && ct.includes('PO reference: <b>PO-77</b>') && ct.includes('Finance Team') && ct.includes('Two invoices please') && ct.includes('VENDOR REGISTRATION / PROCUREMENT SUPPORT REQUESTED'));
   assert.ok(mails().at(-1).text.includes('assist with the necessary procurement documentation'));
   ok('corporate options: Telegram flags procurement, PO reference, billing contact and quotation style; the email says our team will help with documents');
   x = await api({ ...base, website: 'http://spam' }, { 'X-Forwarded-For': '10.0.0.5' });
-  assert.equal(x.s, 200); assert.equal(sent().length, before + 4); // the $480 request, the quotation request and two company bookings, nothing from the bot
+  assert.equal(x.s, 200); assert.equal(sent().length, before + 4); // the $465 request, the quotation request and two company bookings, nothing from the bot
   ok('honeypot (bot) submissions are dropped silently');
   const g = await p2.evaluate(async () => (await fetch('/api/request')).status);
   assert.equal(g, 405); ok('GET is refused (405)');
