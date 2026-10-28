@@ -1,6 +1,6 @@
-# Multi-agent workflow (proposal)
+# Multi-agent workflow
 
-> **Proposal, not active.** Nothing in this file is switched on. No GitHub Actions workflow, scheduled run, API key or paid service has been added. Each step marked **Owner** needs the owner to do it or say yes.
+> **Status (28 Oct 2026).** Active: labels, issues #3–#9, branch protection on `main`. Waiting for the owner to merge: CI workflow, PR/issue templates and the worktree helper ([PR #2](https://github.com/tomnnstefanie-del/squishyparty/pull/2)). **Not active:** any scheduled run, AI run, API key or paid service. Each step marked **Owner** needs the owner to do it or say yes.
 
 ## Why this needs care
 Every push to `main` deploys to production on Vercel within a minute, and there is no staging. So the safety rules are:
@@ -13,13 +13,16 @@ Every push to `main` deploys to production on Vercel within a minute, and there 
 ## Running several agents at once without conflicts
 
 ### Isolation
-- Each agent works in its **own git worktree** on its own branch, cut from the latest `main` (or the owner's working branch if the owner says so):
+- Each agent works in its **own git worktree** on its own branch, cut from the latest `origin/main`. The helper in PR #2 does this and shares `node_modules`:
   ```bash
-  git fetch origin
-  git worktree add -b feat/d1-dashboard-filters ../squishyparty-d1 origin/main
+  npm run agent:worktree -- 5 dashboard-filters
   ```
+  This creates `../squishyparty-5-dashboard-filters` on branch `agent/5-dashboard-filters`.
 - Never `git stash`, reset or switch branches in a shared checkout; never edit another agent's worktree.
-- Remove the worktree when the PR is merged or closed: `git worktree remove ../squishyparty-d1`.
+- Remove the worktree when the PR is merged or closed: `npm run agent:worktree -- --remove 5 dashboard-filters`. **Don't** use plain `git worktree remove` on a worktree with a linked `node_modules`: it deletes the real packages through the link (this happened once during setup; fixed in the helper).
+
+### Labels for agent tasks (created)
+`ai-approved` (owner: go ahead) → `ai-in-progress` (agent started) → `needs-review` (PR open, CI green). Issues still waiting on a decision carry `blocked:owner-decision` and are never picked up.
 
 ### Avoiding file collisions
 Some files are shared hot spots. Only **one open PR at a time** may touch each of these:
@@ -34,7 +37,7 @@ Some files are shared hot spots. Only **one open PR at a time** may touch each o
 
 [`issues-draft.md`](issues-draft.md) lists the files each issue may touch. Rule of thumb for parallel batches:
 - **Can run together:** I1 (CI), Q1 (`lib/quote-pdf.js`), D1 (`src/admin.html`), D3 (`lib/digest.js`), docs.
-- **One at a time:** anything touching `src/app.js` (Q2, S1, B1); anything touching `lib/stats.js` (D2, R1).
+- **One at a time:** anything touching `src/app.js` (S1, B1); anything touching `lib/stats.js` (D2, R1).
 - For `styles.css`, the agent picks the next `vNN` number **when rebasing just before the PR**, not at the start.
 
 ### Merge order
@@ -42,44 +45,34 @@ Some files are shared hot spots. Only **one open PR at a time** may touch each o
 2. Other open PRs rebase on the new `main` (`git rebase origin/main`), rerun `npm run check`, push.
 3. Generated files conflict → regenerate, don't hand-edit.
 
-## CI (proposed: issue I1, **Owner** approval O11)
-```yaml
-# .github/workflows/ci.yml  (NOT added yet)
-name: check
-on:
-  pull_request:
-  push:
-    branches-ignore: [main]
-permissions:
-  contents: read
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run check
-      - name: Generated files are up to date
-        run: git diff --exit-code -- public lib/catalogue.js
-```
-- No secrets. Minutes are free on public repos; on a private repo they count against the GitHub plan's free minutes (**Owner** to check).
-- Optionally add `npm audit --omit=dev` as a non-blocking step.
+## CI (in [PR #2](https://github.com/tomnnstefanie-del/squishyparty/pull/2), issue [#3](https://github.com/tomnnstefanie-del/squishyparty/issues/3))
+- `.github/workflows/ci.yml`, job **`npm run check`**: on every `pull_request` into `main`. `npm ci` → Playwright Chromium → `npm run check` → fails if `public/` or `lib/catalogue.js` don't match the sources.
+- `permissions: contents: read`, no secrets, no schedule, no deploy step. The repo is public, so Actions minutes are free.
+- It becomes the default for every branch once PR #2 is merged. Until then only PR #2 has it; other PRs need a rebase on `main` after the merge.
 
-## Protected `main` (**Owner**, in GitHub → Settings → Branches)
-- Require a pull request before merging; require the `check` status; require branches to be up to date.
-- Block force pushes and deletions.
-- Don't give agents' tokens bypass rights. Agents use a token that can push branches and open PRs only.
-- Vercel: keep "production branch = `main`". Agents never use the Vercel CLI to deploy or promote.
+## Protected `main` (configured 28 Oct 2026)
+Set through the GitHub API with the owner's admin token, at the owner's request. Repository → Settings → Branches shows it.
+| Rule | Setting |
+|---|---|
+| Pull request required before merging | yes, **1 approving review**, stale approvals dismissed on new commits |
+| Required status check | `npm run check`, branch must be up to date with `main` |
+| Conversations resolved before merging | yes |
+| Force pushes / branch deletion | blocked |
+| Include administrators | **no** (the owner can bypass, see below) |
+
+**One-account limitation.** GitHub doesn't let anyone approve their own pull request. Today every PR is opened with the owner's account, including PRs made by agents running on the owner's machine, so the 1-review rule can only be met by the owner merging with **"Merge without waiting for requirements to be met (bypass branch protections)"**. That checkbox is the owner's deliberate review step. It also means a tool using the owner's token *could* bypass. To close that gap (**Owner**, recommended before any unattended agent runs):
+1. Create a separate GitHub account for agents (e.g. `confetti-agent`), add it as a collaborator with **Write** (not Admin).
+2. Give agents a fine-grained token for that account, scoped to this repository: Contents read/write, Pull requests read/write, Issues read/write. No Administration, no Workflows unless an issue needs it.
+3. The owner then approves agent PRs normally, and agents cannot bypass protection.
+4. Optionally turn on "Include administrators" once the owner no longer needs to bypass.
+
+Vercel: keep "production branch = `main`". Agents never use the Vercel CLI to deploy or promote.
 
 ## Agent lifecycle for one issue
-1. Owner labels an issue `agent-ok` (and it isn't `blocked:owner-decision`).
-2. Agent creates a worktree + branch `<type>/<issue-id>-<slug>`.
+1. Owner labels an issue `ai-approved` (and it isn't `blocked:owner-decision`).
+2. Agent adds `ai-in-progress`, then runs `npm run agent:worktree -- <issue> <slug>` (branch `agent/<issue>-<slug>`).
 3. Agent reads `CLAUDE.md`, the PRD and the issue; touches only the listed files.
-4. Agent runs `npm run check` locally; pushes the branch; opens a PR linking the issue, describing what changed and what was **not** done.
+4. Agent runs `npm run check` locally; pushes the branch; opens a **draft** PR with "Closes #<issue>", using the PR template; adds `needs-review` when CI is green.
 5. CI runs. Vercel makes a preview URL. Owner checks it on a phone.
 6. Owner merges (or asks for changes). Never the agent.
 
@@ -89,9 +82,9 @@ Staged plan. Each stage needs the **owner's explicit yes** (O12), and can be tur
 | Stage | What it does | Writes | Needs |
 |---|---|---|---|
 | 0 (today) | Nothing scheduled | — | — |
-| 1 · Manual only | A `workflow_dispatch` workflow the owner starts by hand: an AI agent picks **one** `agent-ok` issue and opens a **draft** PR | a branch + draft PR | API key in GitHub secrets, a spend limit at the AI provider |
+| 1 · Manual only | A `workflow_dispatch` workflow the owner starts by hand: an AI agent picks **one** `ai-approved` issue and opens a **draft** PR | a branch + draft PR | API key in GitHub secrets, a spend limit at the AI provider |
 | 2 · Read-only nightly | Scheduled run that only **reports**: failing checks, `npm audit`, stale docs vs code, broken links. Posts one issue comment or a summary | an issue comment | Stage 1 working for 2+ weeks |
-| 3 · Nightly drafts | Scheduled run that may open **at most one draft PR per night** for an `agent-ok` issue | a branch + draft PR | Stage 2 working; owner reviews every PR |
+| 3 · Nightly drafts | Scheduled run that may open **at most one draft PR per night** for an `ai-approved` issue | a branch + draft PR | Stage 2 working; owner reviews every PR |
 | Never | Merging, pushing to `main`, deploying, changing `vercel.json`/secrets/branch protection, messaging customers or partners | — | — |
 
 Guards for any stage:

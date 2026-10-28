@@ -1,6 +1,6 @@
 # Product vision: Confetti Club
 
-> Status: draft for the owner. Written 28 Oct 2026 from the code on `feature/participants-no-deposit` (commit `1c3b485`) plus the release being prepared that day. Anything under "Where we want to go" is a **proposal**, not a feature.
+> Status: draft for the owner. Written 28 Oct 2026 from the code on `main` (commit `718fe5d`). Anything under "Where we want to go" is a **proposal**, not a feature.
 
 ## One line
 Confetti Club (by Tom & Stefanie) lets Singapore families and companies plan a hosted squishy-making party, and the extras around it, in a few minutes, then hands the booking to a real person who confirms it on WhatsApp.
@@ -9,7 +9,7 @@ Confetti Club (by Tom & Stefanie) lets Singapore families and companies plan a h
 | Customer | What they want | How they book today |
 |---|---|---|
 | **Parents** planning a child's birthday (about 10–30 kids) | A fun, hands-on activity that comes to their venue, with the cake, decorations and entertainment sorted in one place | 4-step planner on the home page, WhatsApp follow-up |
-| **Companies** (HR, office managers) planning team bonding or family days | A clear, itemised price they can get approved, invoiced to the company | Same planner, "A company" pre-selected; PDF quotation ticked by default |
+| **Companies** (HR, office managers) planning team bonding or family days | A clear, itemised price they can get approved, invoiced to the company | Same planner, "A company" pre-selected; PDF quotation (package line or itemised), billing contact, PO reference, procurement support option |
 | **Tom & Stefanie team** (the owner) | Every request in one place, nothing forgotten, partners confirmed before the deposit is asked for | Telegram message per request, `/admin.html` dashboard, 9am Telegram to-do |
 | **Partner vendors** (Butter Studio, Bloom, PartyPainters.sg, J Square Photography) | More bookings with little admin | They are contacted by the owner; they have no login or page of their own |
 

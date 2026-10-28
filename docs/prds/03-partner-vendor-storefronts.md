@@ -16,8 +16,8 @@ Each partner has an accurate, approved storefront inside the planner: agreed pri
 - `STORES` in `src/app.js` defines one store sheet per vendor: title, area, tags, pill (e.g. "Styling partner"), "from" price, logo/thumb, hero photo, note, optional `gallery` and colour `palette` (Bloom).
 - `openStore(v)` opens a bottom sheet (`ss-*` classes) with the vendor's items grouped by section; `track('store_opened')` records the open.
 - Add-ons in `P`: Butter Studio 89, Bloom 18, PartyPainters.sg 11, J Square Photography 6, Tom & Stefanie 1 (`s-favours`). Status counts across `P`: **103 `demo`**, 18 `approved`, 4 `partner` (custom cakes, priced in the quote).
-- Butter Studio items are generated from `dev/butter-studio.json` (from their public online menus) by `dev/butter-studio.mjs` 🚧, prices tagged demo "until the partner rate is agreed".
-- Photos: `public/img/bloom/`, `public/img/jsquare/`, `public/img/partypainters/`, `public/img/butter/` 🚧; Butter Studio logo loads from `thebutterstudio.com` (allowed in the CSP `img-src`).
+- Butter Studio items are generated from `dev/butter-studio.json` (from their public online menus) by `dev/butter-studio.mjs`, prices tagged demo "until the partner rate is agreed".
+- Photos: `public/img/bloom/`, `public/img/jsquare/`, `public/img/partypainters/`, `public/img/butter/`; Butter Studio logo loads from `thebutterstudio.com` (allowed in the CSP `img-src`).
 - The server prices only from `lib/catalogue.js`; demo items are flagged `demo:true` in pricing and the PDF says partner estimates are confirmed in the final quote.
 - `stores.html` is **not** a partner storefront: it lists Tom & Stefanie's own physical stores.
 - **Does not exist:** partner logins or edit links, partner-approved flag for photos, lead times per vendor, availability, a standalone public page per partner, partner payouts.

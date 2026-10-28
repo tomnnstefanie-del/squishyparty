@@ -15,11 +15,11 @@ Every open booking shows its single next step; nothing waits more than a day wit
 - **Access:** `/admin.html` → `api/admin.js`, `Authorization: Bearer ADMIN_PASSWORD` (12+ chars, constant-time compare, 10 failures per 15 min per hashed IP stored in Redis, plus a per-instance limiter). `noindex`, `no-store`.
 - **Data:** `lib/stats.js` (Upstash Redis via REST). Per booking: date, time, first name, company name, venue name, first 2 postal digits, participants, total, add-ons, partner vendors. No phone, email or street address. Lifecycle timestamps in `cc:life`.
 - **Stages** (`stageOf`): 🟡 `pending` waiting for vendors → 🟠 `ready` ask for deposit (also when no partner add-ons) → 🔵 `booked` deposit paid (stored as `confirmed`) → 🟢 `paid` paid in full; grey `lost` didn't book.
-- **To-dos** (`todosFor`): reply to the customer; confirm with each vendor; price "In your quote" items; ask for deposit; collect balance ("Balance overdue: the party has passed").
+- **To-dos** (`todosFor`): reply to the customer; help with vendor registration / procurement (companies who ask); confirm with each vendor; price "In your quote" items; ask for deposit; collect balance ("Balance overdue: the party has passed").
 - **Screens** (`src/admin.html`): how-to guide; month calendar; "Still to do"; a card per booking with vendor ticks, Paid, Didn't book and undo; referral totals (capsule QR, friend links), response times, last 14 days, who referred whom, recent requests, activity log.
 - **Actions:** `POST {action:'mark'|'undo', ref, status}` for `contacted`, `confirmed`, `lost`, `paid`, `v0`–`v9`; `POST {action:'digest'}` sends the to-do to Telegram now.
 - **Telegram:** each request message has signed buttons (`lib/status-link.js` → `api/status.js`): Contacted, one per partner vendor, Deposit paid, Paid in full. First tap counts; repeat taps don't move the time.
-- 🚧 **Daily digest:** `api/digest.js` + `lib/digest.js`, Vercel cron `0 1 * * *` (9am Singapore), protected by `CRON_SECRET`: open bookings grouped by stage with one "next step" button each.
+- **Daily digest:** `api/digest.js` + `lib/digest.js`, Vercel cron `0 1 * * *` (9am Singapore), protected by `CRON_SECRET`: open bookings grouped by stage with one "next step" button each.
 - **Retention:** daily counters expire after 120 days; lists are trimmed (500 requests, 1000 events); **booking (`cc:book`) and lifecycle (`cc:life`) records never expire** today.
 - **Does not exist:** deposit amount or due date per booking, notes per booking, search, export, per-staff accounts, audit of who tapped a button, data deletion tool.
 
@@ -50,7 +50,7 @@ Every open booking shows its single next step; nothing waits more than a day wit
 - The digest must stay under Telegram's 4096-character limit (currently cut at 3900).
 
 ## Dependencies
-- Upstash Redis env vars set in Vercel. `CRON_SECRET` for the digest 🚧.
+- Upstash Redis env vars set in Vercel. `CRON_SECRET` for the digest.
 - O1 deposit policy; O8 retention / PDPA.
 
 ## Acceptance criteria

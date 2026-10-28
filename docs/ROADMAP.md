@@ -4,8 +4,7 @@
 > Rule for this file: "Exists" means you can find it in the code today. "Proposed" means it does not exist yet. Never move an item to "Exists" until it is merged to `main`.
 
 ## Status legend
-- ✅ **Exists**: in the code on `feature/participants-no-deposit` / `main`.
-- 🚧 **In the release being prepared** (28 Oct 2026): in the owner's working copy, not yet in a commit when this was written.
+- ✅ **Exists**: in the code on `main` (commit `718fe5d`, 28 Oct 2026).
 - 📝 **Proposed**: a PRD draft exists; needs owner approval before any build.
 - ❓ **Needs owner approval**: a business decision blocks it.
 
@@ -19,25 +18,27 @@
 | Email OTP verification | ✅ | `api/otp.js`, `lib/otp.js` |
 | Telegram notification with WhatsApp buttons | ✅ | `lib/telegram.js` |
 | Confirmation email | ✅ | `lib/emails.js`, `lib/mail.js` |
-| PDF quotation (ticked by default for companies) | ✅ | `lib/quote-pdf.js` |
+| PDF quotation for every request (families: one package line; companies: package or itemised, PO reference, billing contact) | ✅ | `lib/quote-pdf.js` |
+| Company billing options: billing contact, PO reference, billing notes, procurement support (dashboard to-do) | ✅ | `lib/validate.js`, `lib/stats.js` |
 | WhatsApp country codes | ✅ | `lib/phone.js` |
 | Signed referral codes, $10 off for the friend, capsule QR `/c` | ✅ | `lib/referral.js`, `api/scan.js`, `api/event.js` |
 | After-party feedback page | ✅ | `src/feedback.html`, `api/feedback.js` |
 | Password dashboard with stages, referral stats, response times | ✅ | `src/admin.html`, `api/admin.js`, `lib/stats.js` |
 | Signed Telegram status buttons | ✅ | `lib/status-link.js`, `api/status.js` |
-| Daily 9am Telegram to-do digest (Vercel cron) | 🚧 | `api/digest.js`, `lib/digest.js`, `vercel.json` |
-| Butter Studio menu generator | 🚧 | `dev/butter-studio.json`, `dev/butter-studio.mjs` |
+| Daily 9am Telegram to-do digest (Vercel cron) | ✅ | `api/digest.js`, `lib/digest.js`, `vercel.json` |
+| Butter Studio menu generator | ✅ | `dev/butter-studio.json`, `dev/butter-studio.mjs` |
 | "Our stores" page (Tom & Stefanie physical stores) | ✅ | `src/stores.html` |
 | NOMI Clicker Bar | ❓ menu link only, points to `stores.html`; no product, prices or page | `src/markup.html` header |
-| CI on GitHub (`npm run check` on every PR) | 📝 not set up; there is no `.github/` folder | see [`AGENTS_WORKFLOW.md`](AGENTS_WORKFLOW.md) |
+| CI on GitHub (`npm run check` on every PR into `main`) | 📝 in [PR #2](https://github.com/tomnnstefanie-del/squishyparty/pull/2), waiting for the owner to merge | `.github/workflows/ci.yml` |
+| Branch protection on `main` (PR, 1 review, CI check) | ✅ configured 28 Oct 2026 | GitHub settings |
 
 ## Proposed order (Needs owner approval)
 Ordered by value to the owner and how little it depends on undecided business rules.
 
 ### Now (no business decisions needed)
-1. **Safety net:** GitHub Actions CI running `npm run check` on pull requests; branch protection on `main`. ([AGENTS_WORKFLOW.md](AGENTS_WORKFLOW.md))
+1. **Safety net:** CI in PR #2 (merge it), branch protection done. ([AGENTS_WORKFLOW.md](AGENTS_WORKFLOW.md))
 2. **Dashboard polish** that only reflects data already stored ([PRD 02](prds/02-booking-admin-dashboard.md), issues D1–D3).
-3. **Quotation fixes** that need no policy: quote validity date shown, company PO field, re-send a quote from the dashboard ([PRD 01](prds/01-corporate-pdf-quotations.md), issues Q1–Q2).
+3. **Quotation tests** that need no policy: lock in the PO reference and package-line behaviour with tests ([PRD 01](prds/01-corporate-pdf-quotations.md), issue Q2). The validity date (Q1) waits on O2.
 
 ### Next (once the owner decides)
 4. **Deposit policy shown in quotes and on the dashboard**: blocked by the deposit amount and terms ❓.
@@ -64,5 +65,5 @@ Collected from all PRDs. Nothing here has been decided.
 | O8 | PDPA: wording and storage of marketing consent; whether to contact past customers at all | PRD 04, PRD 05 |
 | O9 | Returning-customer offer, if any (amount, conditions) | PRD 05 |
 | O10 | What the NOMI Clicker Bar is, its prices, and whether it joins the planner | Roadmap item 8 |
-| O11 | Whether to enable GitHub Actions CI and branch protection on `main` (free on public repos; check minutes on private) | AGENTS_WORKFLOW |
+| O11 | ~~Enable CI and branch protection~~ approved 28 Oct 2026. Still open: merge PR #2, and whether to create a separate agent account (see AGENTS_WORKFLOW) | AGENTS_WORKFLOW |
 | O12 | Whether to ever enable scheduled AI runs, which provider, and the monthly spend limit | AGENTS_WORKFLOW |

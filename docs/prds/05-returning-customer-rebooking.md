@@ -38,7 +38,7 @@ A past customer can rebook in under a minute from a link the owner sends, with t
 | B-F6 | Birthday reminder list on the dashboard (no automatic sending) | Needs B-F5 and storing a child's birth month: **Needs owner approval** |
 
 ## Constraints
-- PDPA: no marketing messages without consent; consent must be opt-in, separate from the existing contact consent (`consent` in `lib/validate.js`, which only covers replying to the request).
+- PDPA: no marketing messages without consent; consent must be opt-in, separate from the existing contact notice (since `718fe5d` a notice under the form, "By sending this request, you agree we may contact you…"; the page sends `consent: true`), which only covers arranging this party.
 - No personal data in URLs or analytics. The token must not reveal the customer's name.
 - Discontinued add-ons in an old booking are dropped quietly with a note "Some items are no longer available".
 - Prices are always today's prices from `lib/catalogue.js`, never the old quote.

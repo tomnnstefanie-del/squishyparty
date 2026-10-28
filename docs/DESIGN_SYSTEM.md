@@ -1,6 +1,6 @@
 # Design system
 
-> Documents what the page uses today (tokens in `src/base.html`, components in `src/base-v2.html` and `src/styles.css`). It is a reference, not a redesign. New visual work should reuse these tokens; anything new is added as a numbered `/* vNN */` block at the end of `src/styles.css` (v64 is the latest).
+> Documents what the page uses today (tokens in `src/base.html`, components in `src/base-v2.html` and `src/styles.css`). It is a reference, not a redesign. New visual work should reuse these tokens; anything new is added as a numbered `/* vNN */` block at the end of `src/styles.css` (v66 is the latest).
 
 ## Brand
 - **Name:** Confetti Club (by Tom & Stefanie). The activity is "Squishy DIY"; experiences are Jelly, Crunchy and Duo.
@@ -55,7 +55,7 @@ Loaded from Google Fonts in `src/base.html`.
 
 ## Photos
 - Embedded at build time: `src/img/` (hero, experience photos, avatar).
-- Loaded as files: `public/img/` (`how/`, `making/`, `events/`, `cakes/`, `bloom/`, `jsquare/`, `partypainters/`, `butter/` 🚧, `store.jpg`).
+- Loaded as files: `public/img/` (`how/`, `making/`, `events/`, `cakes/`, `bloom/`, `jsquare/`, `partypainters/`, `butter/`, `store.jpg`).
 - Partner photos and logos must have the partner's permission (**Needs owner approval**: see [PRD 03](prds/03-partner-vendor-storefronts.md)). Event photos and reviews must be real.
 
 ## Accessibility basics already followed
