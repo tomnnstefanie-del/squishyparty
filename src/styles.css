@@ -1597,3 +1597,48 @@ footer{background:#efece7;border-top:0}
 .tl-arrow .icon{width:16px;height:16px}
 .tl-vendors{cursor:grab}
 @media (hover:none){.tl-arrow{display:none}.tl-swipe span::after{content:" (swipe)"}}
+/* v68 Manage booking panel: amounts, payments ledger, revisions, history */
+.ad-by{display:inline-flex;align-items:center;gap:6px;font-size:.8125rem;font-weight:700;color:var(--ink-2)}
+.ad-by input{width:140px;min-height:40px;padding:6px 10px;border:1.5px solid var(--line-2);border-radius:999px;font:inherit}
+.tb-money{margin:0;font-size:.75rem;font-weight:700;color:var(--ink-2)}
+.tb-chip.chg{background:#ffe1e8;color:#a3173d}.tb-chip.rev{background:#ede4ff;color:#5b2bb8}
+.tb-manage{min-height:36px;padding:6px 14px;font-size:.78rem;margin-top:4px}
+.ad-dlg{width:min(760px,96vw);max-height:92vh;padding:0;border:0;border-radius:20px;box-shadow:0 30px 80px rgba(19,35,95,.35)}
+.ad-dlg::backdrop{background:rgba(16,23,58,.45)}
+.mg{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.mg-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mg-top h2{margin:0;font-size:1.25rem}
+.mg-sub,.mg-fine{margin:0;font-size:.8125rem;color:var(--muted)}
+.mg-amounts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.mg-amt{padding:10px 12px;border-radius:12px;background:#faf9f6;display:flex;flex-direction:column;gap:2px}
+.mg-amt span{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.mg-amt b{font-size:1.05rem;font-variant-numeric:tabular-nums}
+.mg-amt.rev{background:#ede4ff}.mg-amt.due{background:#fff3d6}
+.mg-sec{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line)}
+.mg-sec h3{margin:0 0 2px;font-size:.95rem}
+.mg-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#faf9f6;font-size:.85rem}
+.mg-row small{display:block;color:var(--muted);font-size:.72rem}
+.mg-row.hot{background:#ffe9ee}.mg-row.struck b{text-decoration:line-through;opacity:.6}.mg-row.rev{background:#f0f0f3}
+.mg-rev{padding:12px;border-radius:12px;background:#f5f0ff;display:flex;flex-direction:column;gap:6px}
+.mg-rev-h{margin:0;font-weight:700;font-size:.85rem}.mg-rev-t{margin:0;font-weight:700}
+.mg-rev ul{margin:0;padding-left:18px;font-size:.85rem}
+.mg-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.mg-steps li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:#fff;font-size:.82rem}
+.mg-steps li.ok{color:#0f6a40}
+.mg-acts,.mg-pay{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mg-pay select,.mg-pay input,.mg-grid input,.mg-grid select,.mg-addons select,.mg-note{min-height:38px;padding:6px 10px;border:1.5px solid var(--line-2);border-radius:10px;font:inherit;font-size:.85rem;background:#fff}
+.mg-pay input{flex:1;min-width:120px}
+.mg .mini{min-height:34px;padding:5px 12px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;font:inherit;font-size:.78rem;font-weight:700;color:var(--ink);cursor:pointer;white-space:nowrap}
+.mg .mini.go{background:var(--ink);border-color:var(--ink);color:#fff}
+.mg .mini:disabled{opacity:.4;cursor:not-allowed}
+.mg-amend summary{cursor:pointer;font-weight:700;font-size:.85rem;color:var(--cobalt);min-height:36px;display:flex;align-items:center}
+.mg-amend details[open]{display:flex;flex-direction:column;gap:10px}
+.mg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.mg-grid label{display:flex;flex-direction:column;gap:3px;font-size:.75rem;font-weight:700;color:var(--ink-2)}
+.mg-addons{display:flex;flex-direction:column;gap:6px}
+.mg-lab{font-size:.75rem;font-weight:700;color:var(--ink-2)}
+.mg-note{width:100%}
+.mg-hist{list-style:none;margin:0;padding:0;max-height:220px;overflow-y:auto;font-size:.8rem}
+.mg-hist li{display:grid;grid-template-columns:110px 90px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}
+.mg-hist time{color:var(--muted)}
+@media (max-width:600px){.mg-hist li{grid-template-columns:1fr}.mg{padding:16px}}

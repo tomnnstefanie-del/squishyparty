@@ -16,8 +16,9 @@ __HEADER__
         <p class="form-error" id="ad-error" role="alert" hidden></p>
       </form>
 
+      <dialog class="ad-dlg" id="ad-manage" aria-labelledby="mg-h"><div class="mg" id="mg"></div></dialog>
       <div id="ad-body" hidden>
-        <div class="ad-bar"><p class="ad-note" id="ad-note"></p><span class="ad-bar-btns"><button class="btn btn-ghost" type="button" id="ad-digest">Send to-do list to Telegram</button><button class="btn btn-ghost" type="button" id="ad-refresh">Refresh</button></span></div>
+        <div class="ad-bar"><p class="ad-note" id="ad-note"></p><span class="ad-bar-btns"><label class="ad-by">Your name <input id="ad-by" maxlength="40" autocomplete="name" placeholder="for the history"></label><button class="btn btn-ghost" type="button" id="ad-digest">Send to-do list to Telegram</button><button class="btn btn-ghost" type="button" id="ad-refresh">Refresh</button></span></div>
 
         <details class="ad-guide" id="ad-guide">
           <summary>How to use this dashboard</summary>
@@ -161,7 +162,7 @@ __FOOTER__
     $('l-rate').textContent = L.requests ? Math.round(L.confirmed / L.requests * 100) + '%' : '–';
     $('l-rate-s').textContent = L.requests ? L.confirmed + ' of ' + L.requests + ' requests' + (L.lost ? ' · ' + L.lost + ' didn’t book' : '') : 'No data yet';
     $('l-wait').textContent = L.waiting || 0; $('l-wait-tile').classList.toggle('on', !!L.waiting);
-    events(); bookings();
+    events(); bookings(); if (managing) renderManage();
 
     var rb = $('ad-referrers'); rb.textContent = '';
     if (!d.referrers.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'No friend links opened yet.', 'ad-empty'); td0.colSpan = 5; rb.appendChild(tr0); }
@@ -193,6 +194,150 @@ __FOOTER__
       }
       rc.appendChild(tr);
     });
+  }
+
+  /* ---------- Manage one booking: amounts, payments, customer changes, revisions, history ---------- */
+  var managing = null;
+  try { $('ad-by').value = sessionStorage.getItem('cc-by') || ''; } catch (e) {}
+  $('ad-by').addEventListener('change', function(){ try { sessionStorage.setItem('cc-by', $('ad-by').value.trim()); } catch (e) {} });
+  function byName(){ var v = $('ad-by').value.trim(); if (!v) { v = (prompt('Your name, for the booking history:') || '').trim(); $('ad-by').value = v; try { sessionStorage.setItem('cc-by', v); } catch (e) {} } return v; }
+  function post(body, done){
+    body.by = body.by || byName(); if (!body.by) return;
+    fetch('/api/admin', { method:'POST', headers:{ Authorization:'Bearer ' + pass, 'Content-Type':'application/json' }, body: JSON.stringify(body) })
+      .then(function(r){ return r.json(); }).then(function(j){ if (!j.ok) { alert(j.error || 'Something went wrong.'); return; } if (done) done(j); load(); })
+      .catch(function(){ alert('We couldn’t reach the server.'); });
+  }
+  var cents = function(v){ var m = /^\s*(\d{1,6})(?:\.(\d{1,2}))?\s*$/.exec(v || ''); return m ? +m[1] * 100 + +(m[2] || '0').padEnd(2, '0') : NaN; };
+  function openManage(ref){ managing = ref; renderManage(); var dl = $('ad-manage'); if (!dl.open) dl.showModal(); }
+  $('ad-manage').addEventListener('close', function(){ managing = null; });
+  function sec(box, title){ var s = el('section', 'mg-sec'); s.appendChild(el('h3', null, title)); box.appendChild(s); return s; }
+  function btn(txt, cls, fn){ var b = el('button', 'mini' + (cls ? ' ' + cls : ''), txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
+  function renderManage(){
+    var box = $('mg'); if (!managing || !last) return; box.textContent = '';
+    var b = (last.bookings || []).filter(function(x){ return x.ref === managing; })[0]; if (!b) { $('ad-manage').close(); return; }
+    var top = el('div', 'mg-top'); var h = el('h2', null, who(b) + ' · ' + shortDay(b.date)); h.id = 'mg-h'; top.appendChild(h);
+    top.appendChild(btn('Close', '', function(){ $('ad-manage').close(); })); box.appendChild(top);
+    box.appendChild(el('p', 'mg-sub', b.ref + ' · ' + STAGE[b.state] + ' · confirmed version ' + (b.version > 1 ? 'R' + b.version : 'original')));
+    var revs = b.revisions || [], open = revs.filter(function(r){ return r.status === 'draft' || r.status === 'sent'; })[0];
+
+    // Amounts
+    var am = el('div', 'mg-amounts');
+    function tileA(k, v, cls){ var d = el('div', 'mg-amt' + (cls ? ' ' + cls : '')); d.appendChild(el('span', null, k)); d.appendChild(el('b', null, v)); am.appendChild(d); }
+    tileA('Original quote', money(b.originalTotalCents));
+    tileA('Confirmed booking', money(b.totalCents));
+    if (open) tileA('Revision R' + open.n + (open.status === 'draft' ? ' (draft)' : ' (pending)'), money(open.totalCents), 'rev');
+    tileA('Received', money(b.paidCents || 0));
+    tileA('Remaining balance', money(b.balanceCents), b.balanceCents > 0 && b.paidCents ? 'due' : '');
+    box.appendChild(am);
+    if (b.discountCents) box.appendChild(el('p', 'mg-fine', 'Friend’s referral: $10 off is taken off the quotation total.'));
+
+    // Customer change requests
+    var chg = b.changes || [];
+    if (chg.length) {
+      var cs = sec(box, 'Customer change requests');
+      chg.slice().reverse().forEach(function(c){
+        var r = el('div', 'mg-row' + (c.status === 'open' ? ' hot' : ''));
+        var t = el('div'); t.appendChild(el('b', null, '“' + c.text + '”')); t.appendChild(el('small', null, when2(c.at) + (c.handled ? ' · handled by ' + c.handled.by : ''))); r.appendChild(t);
+        if (c.status === 'open') r.appendChild(btn('Mark handled', '', function(){ post({ action:'change-handled', ref:b.ref, changeId:c.id }); }));
+        cs.appendChild(r);
+      });
+    }
+
+    // Revision
+    var rs = sec(box, 'Changes to the booking');
+    if (open) {
+      var card = el('div', 'mg-rev');
+      card.appendChild(el('p', 'mg-rev-h', 'Revision R' + open.n + ' · ' + (open.status === 'draft' ? 'draft, not sent yet' : 'sent, pending customer acceptance') + ' · by ' + open.createdBy + ', ' + when2(open.createdAt)));
+      var ul = el('ul'); open.diff.forEach(function(d){ ul.appendChild(el('li', null, d)); }); card.appendChild(ul);
+      card.appendChild(el('p', 'mg-rev-t', 'Total ' + money(open.prevTotalCents) + ' → ' + money(open.totalCents) + (b.paidCents ? ' · received ' + money(b.paidCents) + ' · new balance ' + money(open.totalCents - b.paidCents) : '')));
+      if (open.note) card.appendChild(el('p', 'mg-fine', 'Note: ' + open.note));
+      var ra = el('div', 'mg-acts');
+      if (open.status === 'draft') {
+        ra.appendChild(btn('Review & send revised quotation', 'go', function(){
+          if (confirm('Send revised quotation R' + open.n + ' to the customer?\n\n' + open.diff.join('\n') + '\n\nNew total ' + money(open.totalCents) + (b.paidCents ? ', balance ' + money(open.totalCents - b.paidCents) : '') + '\n\nThe confirmed booking stays as it is until they accept and you apply it.'))
+            post({ action:'revision', ref:b.ref, n:open.n, step:'send' });
+        }));
+        ra.appendChild(btn('Discard draft', '', function(){ if (confirm('Discard draft R' + open.n + '?')) post({ action:'revision', ref:b.ref, n:open.n, step:'discard' }); }));
+      } else {
+        var steps = el('ul', 'mg-steps');
+        var acc = el('li', open.accepted ? 'ok' : ''); acc.appendChild(el('span', null, open.accepted ? '✓ Customer accepted · ' + open.accepted.by + ', ' + when2(open.accepted.at) : 'Customer acceptance'));
+        if (!open.accepted) acc.appendChild(btn('Customer accepted', '', function(){ if (confirm('Record that the customer accepted R' + open.n + '?')) post({ action:'revision', ref:b.ref, n:open.n, step:'accept' }); }));
+        steps.appendChild(acc);
+        open.vendors.forEach(function(v){
+          var li = el('li', v.done ? 'ok' : ''), lab = v.action === 'cancel' ? v.name + ' told the items are cancelled' : v.name + ' re-confirmed';
+          li.appendChild(el('span', null, v.done ? '✓ ' + lab + ' · ' + v.done.by + ', ' + when2(v.done.at) : lab));
+          if (!v.done) li.appendChild(btn('Done', '', function(){ post({ action:'revision', ref:b.ref, n:open.n, step:'vendor', vendor:v.name }); }));
+          steps.appendChild(li);
+        });
+        card.appendChild(steps);
+        var ready = open.accepted && open.vendors.every(function(v){ return v.done; });
+        var ap = btn('Apply R' + open.n + ' to the booking', 'go', function(){ if (confirm('Replace the confirmed booking with R' + open.n + '? The new total becomes ' + money(open.totalCents) + '.')) post({ action:'revision', ref:b.ref, n:open.n, step:'apply' }); });
+        ap.disabled = !ready; ap.title = ready ? '' : 'Needs the customer’s acceptance and every vendor step first'; ra.appendChild(ap);
+        ra.appendChild(btn('Withdraw', '', function(){ var why = prompt('Why is R' + open.n + ' withdrawn? (e.g. customer kept the original booking)'); if (why) post({ action:'revision', ref:b.ref, n:open.n, step:'withdraw', reason:why }); }));
+      }
+      card.appendChild(ra); rs.appendChild(card);
+    } else if (b.state !== 'lost' && b.plan) {
+      rs.appendChild(amendForm(b));
+    } else if (!b.plan) rs.appendChild(el('p', 'mg-fine', 'This booking was sent before amendments were available, so it can’t be revised here.'));
+    revs.filter(function(r){ return r !== open; }).slice().reverse().forEach(function(r){
+      rs.appendChild(el('p', 'mg-fine', 'R' + r.n + ' ' + r.status + (r.status === 'applied' ? ' by ' + r.appliedBy + ', ' + when2(r.appliedAt) : r.withdrawn ? ' by ' + r.withdrawn.by + ': ' + r.withdrawn.reason : '') + ' · ' + r.diff.join('; ')));
+    });
+
+    // Payments ledger
+    var ps = sec(box, 'Payments');
+    var pays = b.payments || [];
+    if (!pays.length) ps.appendChild(el('p', 'mg-fine', 'No payments recorded yet.'));
+    pays.forEach(function(p){
+      var r = el('div', 'mg-row' + (p.reversed ? ' struck' : '') + (p.kind === 'reversal' ? ' rev' : ''));
+      var t = el('div'); t.appendChild(el('b', null, (p.kind === 'reversal' ? 'Reversal ' : p.kind === 'deposit' ? 'Deposit ' : 'Payment ') + money(p.cents)));
+      t.appendChild(el('small', null, when2(p.at) + ' · ' + p.by + (p.note ? ' · ' + p.note : '') + (p.reversed ? ' · reversed' : ''))); r.appendChild(t);
+      if (p.kind !== 'reversal' && !p.reversed) r.appendChild(btn('Reverse', '', function(){ var why = prompt('Reverse ' + p.kind + ' of ' + money(p.cents) + '? Give the reason (e.g. recorded twice):'); if (why) post({ action:'reverse', ref:b.ref, paymentId:p.id, reason:why }); }));
+      ps.appendChild(r);
+    });
+    if (b.state !== 'lost') {
+      var pf = el('div', 'mg-pay');
+      var kind = el('select'); [['deposit', 'Deposit'], ['payment', 'Payment']].forEach(function(o){ var op = el('option', null, o[1]); op.value = o[0]; kind.appendChild(op); });
+      kind.value = b.paidCents > 0 ? 'payment' : 'deposit';
+      var amt = el('input'); amt.placeholder = 'Amount, e.g. 150.00'; amt.inputMode = 'decimal'; if (b.paidCents > 0 && b.balanceCents > 0) amt.value = (b.balanceCents / 100).toFixed(2);
+      var note = el('input'); note.placeholder = 'Note (optional), e.g. PayNow ref';
+      pf.appendChild(kind); pf.appendChild(amt); pf.appendChild(note);
+      pf.appendChild(btn('Record payment', 'go', function(){ var c = cents(amt.value); if (!(c > 0)) { alert('Enter the amount received, e.g. 150.00'); return; } post({ action:'payment', ref:b.ref, kind:kind.value, cents:c, note:note.value }); }));
+      ps.appendChild(pf);
+    }
+
+    // History
+    var hs = sec(box, 'History');
+    var hl = el('ol', 'mg-hist'); (b.history || []).forEach(function(x){ var li = el('li'); li.appendChild(el('time', null, when2(x.at))); li.appendChild(el('b', null, x.by)); li.appendChild(el('span', null, x.what)); hl.appendChild(li); });
+    if (!(b.history || []).length) hl.appendChild(el('li', 'mg-fine', 'Nothing yet.'));
+    hs.appendChild(hl);
+  }
+  function amendForm(b){
+    var f = el('div', 'mg-amend'), p = b.plan, adds = p.addons.slice();
+    var d = el('details'); d.appendChild(el('summary', null, 'Amend this booking (creates a draft revision)')); f.appendChild(d);
+    var g = el('div', 'mg-grid');
+    function field(lab, inp){ var l = el('label'); l.appendChild(el('span', null, lab)); l.appendChild(inp); g.appendChild(l); return inp; }
+    function input(type, v){ var i = el('input'); i.type = type; i.value = v; return i; }
+    var pax = field('Participants', input('number', p.participants)); pax.min = 1;
+    var date = field('Date', input('date', p.date)), st = field('Start', input('time', p.start)), en = field('End', input('time', p.end));
+    var ex = el('select'); Object.keys(last.experiences || {}).forEach(function(k){ var o = el('option', null, last.experiences[k]); o.value = k; ex.appendChild(o); }); ex.value = p.experience; field('Squishy DIY', ex);
+    var wx = input('checkbox', ''); wx.checked = !!p.wax; field('Wax Cracking', wx);
+    d.appendChild(g);
+    var al = el('div', 'mg-addons'); d.appendChild(al);
+    var byId = {}; (last.addonList || []).forEach(function(a){ byId[a.id] = a; });
+    function drawAdds(){ al.textContent = ''; al.appendChild(el('span', 'mg-lab', 'Add-ons'));
+      if (!adds.length) al.appendChild(el('p', 'mg-fine', 'None'));
+      adds.forEach(function(id, i){ var a = byId[id] || {name:id, vendor:''}; var r = el('div', 'mg-row'); r.appendChild(el('span', null, a.name + ' · ' + a.vendor)); r.appendChild(btn('Remove', '', function(){ adds.splice(i, 1); drawAdds(); })); al.appendChild(r); });
+      var sel = el('select'); var o0 = el('option', null, 'Add an add-on…'); o0.value = ''; sel.appendChild(o0);
+      var groups = {}; (last.addonList || []).forEach(function(a){ if (adds.indexOf(a.id) < 0) (groups[a.vendor] = groups[a.vendor] || []).push(a); });
+      Object.keys(groups).forEach(function(v){ var og = document.createElement('optgroup'); og.label = v; groups[v].forEach(function(a){ var o = el('option', null, a.name + (a.price != null ? ' · ' + money(a.price) : ' · priced in quote')); o.value = a.id; og.appendChild(o); }); sel.appendChild(og); });
+      sel.addEventListener('change', function(){ if (sel.value) { adds.push(sel.value); drawAdds(); } }); al.appendChild(sel); }
+    drawAdds();
+    var note = el('input'); note.placeholder = 'Note (optional), e.g. customer WhatsApp 3 Nov'; note.className = 'mg-note'; d.appendChild(note);
+    d.appendChild(btn('Create draft revision', 'go', function(){
+      post({ action:'revise', ref:b.ref, note:note.value, plan:{ participants:+pax.value, date:date.value, start:st.value, end:en.value, experience:ex.value, wax:wx.checked, addons:adds } });
+    }));
+    d.appendChild(el('p', 'mg-fine', 'Priced on the server. Items already quoted keep their original price; new items use today’s price. Nothing is sent until you review it.'));
+    return f;
   }
 
   /* ---------- Bookings: calendar, to-dos and one card per party ---------- */
@@ -247,8 +392,14 @@ __FOOTER__
       if (b.todos.length) { next.appendChild(el('span', 'tb-next-k', 'Next')); next.appendChild(document.createTextNode(b.todos[0] + (b.todos.length > 1 ? '  +' + (b.todos.length - 1) + ' more' : ''))); }
       else next.textContent = b.state === 'lost' ? 'Didn’t book' : '✓ Nothing pending';
       c.appendChild(next);
-      if (b.vendors.length || b.procurement || b.poRef) {
+      var money2 = el('p', 'tb-money');
+      money2.textContent = (b.paidCents ? 'Received ' + money(b.paidCents) + ' · balance ' + money(b.balanceCents) : 'Total ' + money(b.totalCents)) + (b.totalCents !== b.originalTotalCents ? ' (quoted ' + money(b.originalTotalCents) + ')' : '');
+      c.appendChild(money2);
+      var openRev = (b.revisions || []).filter(function(r){ return r.status === 'draft' || r.status === 'sent'; })[0], openChg = (b.changes || []).filter(function(x){ return x.status === 'open'; }).length;
+      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg) {
         var chips = el('div', 'tb-chips');
+        if (openChg) chips.appendChild(el('span', 'tb-chip chg', '✏️ Change requested'));
+        if (openRev) chips.appendChild(el('span', 'tb-chip rev', 'R' + openRev.n + (openRev.status === 'draft' ? ' draft' : ' pending acceptance')));
         if (b.procurement) chips.appendChild(el('span', 'tb-chip proc', '📑 Procurement'));
         if (b.poRef) chips.appendChild(el('span', 'tb-chip po', 'PO ' + b.poRef));
         b.vendors.forEach(function(v){ chips.appendChild(el('span', 'tb-chip ' + (v.ok ? 'ok' : 'wait'), (v.ok ? '✓ ' : '… ') + v.name)); });
@@ -267,22 +418,18 @@ __FOOTER__
       });
       if ((b.inHouse || []).length) det.appendChild(el('p', 'tb-line muted', 'Our own: ' + b.inHouse.join(', ')));
       if (b.todos.length > 1) { var td = el('ul', 'tb-todos'); b.todos.forEach(function(t){ td.appendChild(el('li', null, t)); }); det.appendChild(td); }
-      var acts = el('div', 'tb-acts'), L = b.life || {};
-      var vendorsDone = b.vendors.every(function(v){ return v.ok; });
+      var acts = el('div', 'tb-acts'), L = b.life || {}, hasPay = (b.payments || []).length > 0;
       [['contacted', 'Contacted'], ['confirmed', 'Deposit paid'], ['paid', 'Paid in full'], ['lost', 'Didn’t book']].forEach(function(s){
-        // Only the steps that make sense now (a ticked one can always be undone)
-        if (!L[s[0]]) {
-          if (L.lost && s[0] !== 'lost') return;
-          if (s[0] === 'confirmed' && !vendorsDone) return;
-          if (s[0] === 'paid' && !L.confirmed) return;
-          if (s[0] === 'lost' && L.confirmed) return;
-        }
+        // Payments are recorded with amounts in Manage; here only older ticks without a payment record can be undone
+        if (s[0] === 'confirmed' || s[0] === 'paid') { if (!L[s[0]] || hasPay) return; }
+        else if (!L[s[0]]) { if (L.lost && s[0] !== 'lost') return; if (s[0] === 'lost' && L.confirmed) return; }
         var on = !!L[s[0]], btn = el('button', 'mini' + (on ? ' on' : ''), (on ? '✓ ' : '') + s[1]); btn.type = 'button';
         btn.title = on ? 'Recorded ' + when2(L[s[0]]) + '. Click to undo.' : 'Mark as ' + s[1].toLowerCase();
         btn.addEventListener('click', function(){ if (!on || confirm('Undo “' + s[1] + '” for ' + b.ref + '?')) mark(b.ref, s[0], btn, on); });
         acts.appendChild(btn);
       });
       det.appendChild(acts);
+      var mb = el('button', 'btn btn-primary tb-manage', 'Manage: payments & changes'); mb.type = 'button'; mb.addEventListener('click', function(){ openManage(b.ref); }); det.appendChild(mb);
       if (openTiles[b.ref]) det.open = true;
       det.addEventListener('toggle', function(){ openTiles[b.ref] = det.open; });
       c.appendChild(det); box.appendChild(c);

@@ -102,6 +102,7 @@ const stores = subPage('stores.html', { title: 'Our Stores | Confetti Club by To
 const feedback = subPage('feedback.html', { title: 'How was your party? | Confetti Club', ogTitle: 'How was your party? | Confetti Club', noindex: true,
   desc: 'Tell us how your Confetti Club party went. It takes 15 seconds.' });
 // Private referral dashboard (password in Vercel), also kept out of search results.
+subPage('change.html', { title: 'Request a change | Confetti Club', ogTitle: 'Confetti Club', noindex: true, desc: 'Ask to change your Confetti Club booking.' });
 subPage('admin.html', { title: 'Dashboard | Confetti Club', ogTitle: 'Confetti Club', noindex: true, desc: 'Private dashboard.' });
 
 if (process.argv.includes('--preview')) {

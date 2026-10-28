@@ -4,7 +4,7 @@
 // Secrets stay here and only come from environment variables.
 import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
-import { priceRequest } from '../lib/pricing.js';
+import { priceRequest, ratesOf } from '../lib/pricing.js';
 import { CATALOGUE } from '../lib/catalogue.js';
 import { makeReferralCode, readReferralCode, samePerson } from '../lib/referral.js';
 import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
@@ -15,7 +15,7 @@ import { checkVerified } from '../lib/otp.js';
 import { mailConfigured, sendMail } from '../lib/mail.js';
 import { confirmationEmail } from '../lib/emails.js';
 import { recordRequest, statsConfigured, vendorsOf } from '../lib/stats.js';
-import { statusLink } from '../lib/status-link.js';
+import { statusLink, changeLink } from '../lib/status-link.js';
 
 const rateLimited = limiter(5, 10 * 60 * 1000); // best-effort, per server instance
 const EXP_NAMES = Object.fromEntries(Object.entries(CATALOGUE.EXP).map(([k, e]) => [k, e.name]));
@@ -69,7 +69,9 @@ export default async function handler(req, res) {
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
     const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
-    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate });
+    const discountCents = referralDiscount(data.referral, readReferralCode, samePerson, contact.parentName);
+    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
+      rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {
@@ -84,7 +86,6 @@ export default async function handler(req, res) {
     let quote = null;
     {
       try {
-        const discountCents = referralDiscount(data.referral, readReferralCode, samePerson, contact.parentName);
         const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents,
           detailed: !!data.corporate?.detailed, experienceName: EXP_NAMES[data.plan.experience],
           contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
@@ -95,7 +96,7 @@ export default async function handler(req, res) {
 
     // The confirmation email is a courtesy: if it fails, the request has still reached you.
     let emailed = true;
-    try { await sendMail({ to: contact.email, ...confirmationEmail({ ref, plan: data.plan, contact, price, quote, corporate: data.corporate }) }); }
+    try { await sendMail({ to: contact.email, ...confirmationEmail({ ref, plan: data.plan, contact, price, quote, corporate: data.corporate, changeUrl: statsConfigured() ? changeLink(site, ref) : '' }) }); }
     catch (e) { emailed = false; console.error('[request] confirmation email failed', ref, e.message); }
 
     return res.status(200).json({ ok: true, ref, emailed, quoted: !!(quote && emailed), bookingFor: data.bookingFor, totalCents: price.totalCents });

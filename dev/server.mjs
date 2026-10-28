@@ -21,6 +21,7 @@ const ROUTES = {
   '/api/admin': (await import('../api/admin.js')).default,
   '/api/status': (await import('../api/status.js')).default,
   '/api/digest': (await import('../api/digest.js')).default,
+  '/api/change': (await import('../api/change.js')).default,
   '/c': (await import('../api/scan.js')).default, // same as the vercel.json rewrite: the capsule QR sticker
 };
 const PORT = Number(process.env.PORT || 3000);

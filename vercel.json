@@ -38,7 +38,7 @@
       ]
     },
     {
-      "source": "/(admin|feedback).html",
+      "source": "/(admin|feedback|change).html",
       "headers": [
         {
           "key": "X-Robots-Tag",

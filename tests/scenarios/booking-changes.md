@@ -1,9 +1,9 @@
 # Booking changes: scenarios to test ("eval set")
 
-What should happen when a customer changes their mind after sending a request. **None of this is built yet.**
-Today a change means a new request (a second booking on the dashboard) or a manual note. This file is the
-spec for an "Amend booking" feature; each scenario becomes an end-to-end test once the rules marked
-**Owner decision** are agreed.
+What should happen when a customer changes their mind after sending a request. The admin-only amendment workflow
+(revisions, review, acceptance, vendor re-confirmation, apply; payments ledger with reversals) is **built**: see
+`lib/bookings.js` and the "booking changes" end-to-end tests. Scenarios 1–9, 13 and 16 are handled by a revision.
+Still to decide or build: 10–12 (cancellations and refunds stay manual for now, duplicate detection) and 15 (cut-off).
 
 ## How a change would be recorded (proposed)
 - An **Amend** button in the booking's Details on the dashboard: participants, date and time, experience,
@@ -36,7 +36,7 @@ spec for an "Amend booking" feature; each scenario becomes an end-to-end test on
 | 16 | Changes the venue address | Any time | Logged; travel fee unchanged (one fee in Singapore); vendors that deliver back to waiting |
 
 ## Owner decisions needed before building
-1. Price lock: keep the quoted prices for items already on the quote, or re-price at today's prices?
+1. ~~Price lock~~ Decided: items already quoted keep their price; new items use today's price.
 2. Deposit refund and cancellation policy (scenario 11).
 3. Cut-off for reducing participants or removing add-ons (scenario 15).
-4. Who can amend: only you on the dashboard (recommended to start), or customers through a link in their email?
+4. ~~Who can amend~~ Decided: customers request through their email link; only the team reviews and applies.

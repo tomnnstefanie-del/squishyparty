@@ -1,0 +1,52 @@
+
+<!-- Request a change (change.html), linked from the confirmation email as change.html?ref=SP-…&t=…
+     Header and footer are copied from markup.html at build time. Sends to /api/change; the team reviews it. -->
+<div id="view-change">
+__HEADER__
+
+<main id="main" class="fb-page">
+  <section class="section fb-wrap">
+    <div class="wrap fb-inner">
+      <form class="fb-card" id="ch-form" novalidate>
+        <p class="eyebrow">Your booking <span id="ch-ref"></span></p>
+        <h1>Request a change</h1>
+        <p class="lead">Tell us what you’d like to change, like the number of guests, the date or an add-on. Our team will check with our partners and send you a revised quotation to accept. Your booking stays as it is until then.</p>
+        <label class="field">What would you like to change?
+          <textarea name="text" id="ch-text" rows="5" maxlength="1000" required placeholder="e.g. We’re now 18 children instead of 15, and we’d like to remove the balloon arch."></textarea></label>
+        <div class="form-error" id="ch-error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-primary btn-xl" id="ch-send">Send my request</button>
+        <p class="hint">Something urgent? WhatsApp us instead and we’ll sort it out.</p>
+      </form>
+      <div class="fb-card fb-done" id="ch-done" hidden tabindex="-1">
+        <span class="sent-icon" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span>
+        <h1>Thanks, we’ve got it</h1>
+        <p class="lead">Our team will look at your change and reach out on WhatsApp. If anything changes in price, we’ll email you a revised quotation to accept first.</p>
+        <a class="btn btn-ghost" href="./">Back to Confetti Club</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+__FOOTER__
+</div>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); }, q = {};
+  try { new URLSearchParams(location.search).forEach(function(v, k){ q[k] = v; }); } catch (e) {}
+  var ref = String(q.ref || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 20), t = String(q.t || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 64);
+  $('ch-ref').textContent = ref;
+  $('ch-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var err = $('ch-error'), btn = $('ch-send'), text = $('ch-text').value.trim();
+    if (text.length < 3) { err.hidden = false; err.textContent = 'Please tell us what you’d like to change.'; $('ch-text').focus(); return; }
+    btn.disabled = true; btn.textContent = 'Sending…'; err.hidden = true;
+    fetch('/api/change', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ref: ref, t: t, text: text }) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {s:r.status, b:j}; }); })
+      .then(function(x){
+        if (x.s === 200 && x.b.ok) { $('ch-form').hidden = true; $('ch-done').hidden = false; $('ch-done').focus(); return; }
+        throw new Error(x.b && x.b.error || 'We couldn’t send your request just now. Please try again, or WhatsApp us.');
+      })
+      .catch(function(x){ btn.disabled = false; btn.textContent = 'Send my request'; err.hidden = false; err.textContent = x.message && !/fetch/i.test(x.message) ? x.message : 'We couldn’t reach our server. Please check your connection and try again.'; });
+  });
+})();
+</script>

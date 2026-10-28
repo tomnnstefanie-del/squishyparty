@@ -233,7 +233,7 @@ try {
   const st = (await adm('test-dashboard-pass')).b;
   assert.equal(st.totals.capsuleScans - before0.capsuleScans, 1); assert.equal(st.totals.linkOpens - before0.linkOpens, 1);
   assert.equal(st.totals.viaFriend - before0.viaFriend, 1); assert.equal(st.totals.viaCapsule - before0.viaCapsule, 1);
-  const rr = st.referrers.find((r) => r.code === friendCode); assert.ok(rr && rr.opens === 1 && rr.requests === 1 && rr.brought.length === 1);
+  const rfr = st.referrers.find((r) => r.code === friendCode); assert.ok(rfr && rfr.opens === 1 && rfr.requests === 1 && rfr.brought.length === 1);
   assert.ok(st.recent.some((q) => q.via === 'friend' && q.code === friendCode) && !JSON.stringify(st).includes('a@example.com') && !JSON.stringify(st).includes('91234567'));
   ok('QR scans, friend-link opens (once per device) and the requests each brought show on the dashboard, with no contact details');
   const dp = await browser.newPage(); await dp.goto(BASE + '/admin.html'); await dp.fill('#ad-pass', 'test-dashboard-pass'); await dp.click('#ad-login button');
@@ -246,14 +246,16 @@ try {
   const lastRef = new URL(contactedUrl).searchParams.get('ref');
   const local = (u) => BASE + new URL(u).pathname + new URL(u).search;
   // A Telegram button opens a confirm page; the Confirm button posts the same fields back
-  const tap = (u) => { const x = new URL(u); return fetch(BASE + x.pathname, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: x.searchParams.toString() }); };
+  const tap = (u, extra = {}) => { const x = new URL(u); for (const [k, v] of Object.entries({ by: 'Tester', ...extra })) x.searchParams.set(k, v); return fetch(BASE + x.pathname, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: x.searchParams.toString() }); };
+  const admPost = (body) => p2.evaluate(async (body) => { const r = await fetch('/api/admin', { method: 'POST', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json' }, body: JSON.stringify({ by: 'Tester', ...body }) }); return { s: r.status, b: await r.json() }; }, body);
   const forged = new URL(local(contactedUrl)); forged.searchParams.set('ref', 'SP-261107-0000');
   assert.equal((await fetch(forged)).status, 400); ok('a status link with a changed reference is refused');
   let sr = await fetch(local(contactedUrl)); assert.equal(sr.status, 200); assert.ok((await sr.text()).includes('Yes, confirm'));
   assert.ok(!(await adm('test-dashboard-pass')).b.recent.find((q) => q.ref === new URL(contactedUrl).searchParams.get('ref')).life.contacted);
   ok('opening a Telegram button only shows a Confirm page; nothing changes until Confirm is tapped');
   sr = await tap(contactedUrl); assert.equal(sr.status, 200); assert.ok((await sr.text()).includes('marked contacted'));
-  sr = await tap(confirmedUrl); assert.equal(sr.status, 200);
+  assert.equal((await tap(confirmedUrl)).status, 400); // a payment needs its amount
+  sr = await tap(confirmedUrl, { amount: '100.00', note: 'PayNow' }); assert.equal(sr.status, 200); assert.ok((await sr.text()).includes('$100.00 recorded'));
   const st2 = (await adm('test-dashboard-pass')).b;
   const life = st2.recent.find((q) => q.ref === lastRef).life; assert.ok(life.contacted && life.confirmed);
   assert.ok(st2.lifecycle.toContact.n >= 1 && st2.lifecycle.toConfirm.n >= 1 && st2.events.some((e) => e.type === 'confirmed' && e.ref === lastRef) && st2.events.some((e) => e.type === 'scan'));
@@ -278,7 +280,7 @@ try {
   assert.deepEqual(b1.vendors.map((v) => v.name), ['Bloom', 'J Square Photography']);
   for (const tdo of ['Reply to the customer', 'Confirm with Bloom', 'Confirm with J Square Photography']) assert.ok(b1.todos.includes(tdo), tdo);
   ok('the dashboard lists the booking with its date, time, venue, add-ons, both vendors waiting and what we still need to do');
-  const early = await tap(tgBtn('Deposit paid').url); assert.equal(early.status, 409); assert.ok((await early.text()).includes('confirmed yet'));
+  const early = await tap(tgBtn('Deposit paid').url, { amount: '100' }); assert.equal(early.status, 409); assert.ok((await early.text()).includes('confirmed yet'));
   assert.equal((await book()).state, 'pending'); ok('“Deposit paid” is refused while a vendor is still to confirm');
   assert.equal((await tap(tgBtn('Bloom confirmed').url)).status, 200);
   b1 = await book(); assert.ok(b1.vendors[0].ok && !b1.vendors[1].ok && !b1.todos.includes('Confirm with Bloom') && b1.todos.includes('Confirm with J Square Photography'));
@@ -286,21 +288,71 @@ try {
   await tap(tgBtn('J Square Photography confirmed').url);
   b1 = await book(); assert.ok(b1.state === 'ready' && b1.todos.includes('WhatsApp the customer to ask for the deposit'));
   ok('once every vendor has confirmed, the booking turns orange: “WhatsApp the customer to ask for the deposit”');
-  await tap(tgBtn('Deposit paid').url);
-  b1 = await book(); assert.ok(b1.state === 'booked' && !b1.paid && b1.todos.length === 1 && b1.todos[0] === 'Collect the balance');
-  ok('“💵 Deposit paid” turns it blue; the only thing left is “Collect the balance”');
-  assert.ok((await (await tap(tgBtn('Paid in full').url)).text()).includes('marked paid in full'));
-  b1 = await book(); assert.ok(b1.state === 'paid' && b1.todos.length === 0);
-  ok('“💰 Paid in full” turns it green and clears the to-do list');
-  const un = await p2.evaluate(async (ref) => (await fetch('/api/admin', { method: 'POST', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'undo', ref, status: 'paid' }) })).status, bref);
-  assert.equal(un, 200); b1 = await book(); assert.ok(b1.state === 'booked' && b1.todos.includes('Collect the balance'));
-  ok('a mistaken tick can be undone from the dashboard');
+  const depPage = await (await fetch(local(tgBtn('Deposit paid').url))).text(); assert.ok(depPage.includes('Amount received') && depPage.includes('Your name'));
+  await tap(tgBtn('Deposit paid').url, { amount: '200' });
+  b1 = await book(); assert.ok(b1.state === 'booked' && !b1.paid && b1.paidCents === 20000 && b1.balanceCents === b1.totalCents - 20000 && b1.todos.length === 1 && b1.todos[0].startsWith('Collect the balance'));
+  ok('“💵 Deposit paid” asks for the amount and name, turns it blue, and shows the balance left to collect');
+  const payPage = await (await fetch(local(tgBtn('Paid in full').url))).text(); assert.ok(payPage.includes(`value="${(b1.balanceCents / 100).toFixed(2)}"`));
+  assert.ok((await (await tap(tgBtn('Paid in full').url, { amount: (b1.balanceCents / 100).toFixed(2) })).text()).includes('recorded'));
+  b1 = await book(); assert.ok(b1.state === 'paid' && b1.balanceCents === 0 && b1.todos.length === 0);
+  ok('“💰 Paid in full” is prefilled with the balance; recording it turns the booking green');
+  const un = await admPost({ action: 'undo', ref: bref, status: 'paid' }); assert.equal(un.s, 409);
+  const lastPay = b1.payments.at(-1);
+  assert.equal((await admPost({ action: 'reverse', ref: bref, paymentId: lastPay.id, reason: '' })).s, 400);
+  const rv = await admPost({ action: 'reverse', ref: bref, paymentId: lastPay.id, reason: 'Recorded twice' }); assert.equal(rv.s, 200);
+  b1 = await book(); assert.ok(b1.state === 'booked' && b1.paidCents === 20000 && b1.payments.length === 3 && b1.payments.find((p) => p.id === lastPay.id).reversed && b1.history.some((h) => h.what.includes('Recorded twice') && h.by === 'Tester'));
+  assert.equal((await admPost({ action: 'reverse', ref: bref, paymentId: lastPay.id, reason: 'again' })).s, 409);
+  ok('payments can’t be unticked: they are reversed with a reason, kept in the ledger, and logged with who did it');
   const bp = await browser.newPage(); await bp.goto(BASE + '/admin.html'); await bp.fill('#ad-pass', 'test-dashboard-pass'); await bp.click('#ad-login button');
   await bp.waitForSelector('#ad-body:not([hidden])');
   assert.ok((await bp.textContent('#ad-books')).includes(bref)); assert.ok((await bp.textContent('#ad-todo')).includes('Collect the balance'));
+  await bp.click(`#bk-${bref} .tb-more summary`); await bp.click(`#bk-${bref} .tb-manage`); await bp.waitForSelector('#ad-manage[open]');
+  assert.ok((await bp.textContent('#mg')).includes('Remaining balance') && (await bp.textContent('#mg')).includes('Recorded twice'));
   await bp.goto(BASE + '/admin.html'); await bp.waitForSelector('#ad-body:not([hidden])'); // the password is remembered for this tab
   await bp.close();
-  ok('the dashboard page shows the booking card and the to-do list');
+  ok('the dashboard page shows the booking card, the to-do list and the Manage panel with amounts and history');
+
+  // Changes after booking: the customer asks, the team drafts and reviews a revision, it only replaces the booking once accepted
+  console.log('booking changes');
+  const { changeLink } = await import('../lib/status-link.js');
+  x = await api({ ...base, plan: { ...base.plan, participants: 10, wax: false, addons: ['bl-arch'] } }, { 'X-Forwarded-For': '10.0.5.1' });
+  assert.equal(x.s, 200); const cref = x.b.ref;
+  assert.ok(mails().at(-1).text.includes('/change.html?ref=' + cref)); ok('the confirmation email has the customer’s own “Request a change” link');
+  const cbook = async () => (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === cref);
+  const ck = sent().at(-1).reply_markup.inline_keyboard.flat();
+  await tap(ck.find((b) => b.text.includes('Bloom confirmed')).url); await tap(ck.find((b) => b.text.includes('Deposit paid')).url, { amount: '100' });
+  let c1 = await cbook(); const orig = c1.totalCents; assert.ok(c1.state === 'booked' && c1.paidCents === 10000);
+  const cl = new URL(changeLink('http://x', cref));
+  const chBad = await p2.evaluate(async (ref) => (await fetch('/api/change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref, t: 'nope', text: 'More kids' }) })).status, cref);
+  assert.equal(chBad, 400);
+  const chOk = await p2.evaluate(async ([ref, t]) => (await fetch('/api/change', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref, t, text: 'We are now 15 kids, and no balloon arch please. Can we add photos?' }) })).status, [cref, cl.searchParams.get('t')]);
+  assert.equal(chOk, 200); assert.ok(sent().at(-1).text.includes('Change requested') && sent().at(-1).text.includes('15 kids'));
+  c1 = await cbook(); assert.ok(c1.changes.length === 1 && c1.todos.some((t) => t.startsWith('Customer asked for a change')) && c1.totalCents === orig);
+  ok('a customer’s change request reaches Telegram and the dashboard, and changes nothing by itself');
+  const newPlan = { participants: 15, experience: 'both', wax: false, addons: ['js-photo-1'], date: base.plan.date, start: '10:00', end: '12:00' };
+  assert.equal((await admPost({ action: 'revise', ref: cref, by: '', plan: newPlan })).s, 400);
+  let rvr = await admPost({ action: 'revise', ref: cref, plan: newPlan, note: 'WhatsApp 3 Nov' }); assert.equal(rvr.s, 200);
+  const rev = rvr.b.revision; assert.ok(rev.n === 2 && rev.status === 'draft' && rev.diff.includes('Participants: 10 → 15') && rev.diff.some((d) => d.startsWith('Removed: ') && d.includes('balloon arch (Bloom)')) && rev.diff.some((d) => d.startsWith('Added:')));
+  assert.deepEqual(rev.vendors.map((v) => v.name + ':' + v.action).sort(), ['Bloom:cancel', 'J Square Photography:confirm']);
+  c1 = await cbook(); assert.ok(c1.totalCents === orig && c1.todos.includes('Review and send revised quotation R2'));
+  assert.equal((await admPost({ action: 'revise', ref: cref, plan: { ...newPlan, participants: 16 } })).s, 409);
+  ok('a draft revision is priced on the server, lists what changed and which vendors to re-confirm or cancel, and leaves the confirmed booking alone');
+  assert.equal((await admPost({ action: 'revision', ref: cref, n: 2, step: 'apply' })).s, 409);
+  rvr = await admPost({ action: 'revision', ref: cref, n: 2, step: 'send' }); assert.equal(rvr.s, 200);
+  const rm = mails().at(-1); assert.ok(rm.subject === `Your revised Confetti Club quotation | Q-${cref}-R2` && rm.attachments[0] === `Confetti-Club-Quotation-Q-${cref}-R2.pdf` && rm.text.includes('Deposit received') && rm.text.includes('until you accept'));
+  c1 = await cbook(); assert.ok(c1.totalCents === orig && c1.todos.includes('Waiting for the customer to accept R2') && c1.todos.includes('Tell Bloom their items are cancelled (R2)'));
+  ok('after review, the revised quotation R2 is emailed as “pending your acceptance”; the booking is still unchanged');
+  assert.equal((await admPost({ action: 'revision', ref: cref, n: 2, step: 'apply' })).s, 409);
+  await admPost({ action: 'revision', ref: cref, n: 2, step: 'accept' });
+  assert.equal((await admPost({ action: 'revision', ref: cref, n: 2, step: 'apply' })).s, 409); // vendors still to do
+  await admPost({ action: 'revision', ref: cref, n: 2, step: 'vendor', vendor: 'Bloom' });
+  await admPost({ action: 'revision', ref: cref, n: 2, step: 'vendor', vendor: 'J Square Photography' });
+  rvr = await admPost({ action: 'revision', ref: cref, n: 2, step: 'apply' }); assert.equal(rvr.s, 200);
+  c1 = await cbook();
+  assert.ok(c1.version === 2 && c1.participants === 15 && c1.totalCents === rev.totalCents && c1.originalTotalCents === orig && c1.paidCents === 10000 && c1.balanceCents === rev.totalCents - 10000);
+  assert.deepEqual(c1.vendors.map((v) => v.name + ':' + !!v.ok), ['J Square Photography:true']);
+  assert.ok(c1.history.some((h) => h.what.startsWith('Applied R2') && h.by === 'Tester') && c1.history.some((h) => h.what.startsWith('Customer accepted R2')));
+  ok('only after the customer accepts and every vendor step is done does R2 replace the booking: original, revised, received and balance all kept');
 
   // The daily Telegram bump
   assert.equal((await fetch(BASE + '/api/digest')).status, 401); assert.equal((await fetch(BASE + '/api/digest', { headers: { Authorization: 'Bearer wrong' } })).status, 401);
@@ -310,7 +362,7 @@ try {
   assert.ok(dm.text.includes('Confetti Club to-do') && dm.text.includes('Deposit paid, balance to collect') && dm.text.includes('Collect the balance'));
   const payBtn = dk.find((b) => b.text.startsWith('💰 Paid in full') && b.url.includes(bref)); assert.ok(payBtn && dk.some((b) => b.text.includes('Open the dashboard')));
   ok('the bump lists pending bookings by stage, with a button for each one’s next step');
-  await tap(payBtn.url); assert.equal((await book()).state, 'paid');
+  await tap(payBtn.url, { amount: ((await book()).balanceCents / 100).toFixed(2) }); assert.equal((await book()).state, 'paid');
   ok('tapping a button in the bump updates the dashboard');
   const sn = await p2.evaluate(async () => (await fetch('/api/admin', { method: 'POST', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'digest' }) })).json());
   assert.ok(sn.ok && sent().at(-1).text.includes('Confetti Club to-do')); ok('“Send to-do list to Telegram” on the dashboard sends it straight away');
