@@ -15,7 +15,8 @@
     "test": "node tests/unit.mjs && node tests/e2e.mjs",
     "test:click": "node dev/build.mjs --preview && node tests/clickthrough.mjs",
     "check": "npm run build && npm run catalogue && npm test && npm run test:click",
-    "chat-id": "node dev/get-chat-id.mjs"
+    "chat-id": "node dev/get-chat-id.mjs",
+    "agent:worktree": "node dev/agent-worktree.mjs"
   },
   "dependencies": {
     "nodemailer": "10.2.1"
