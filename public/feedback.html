@@ -2231,6 +2231,15 @@ footer{background:#efece7;border-top:0}
 .corp-prefs .grid2{margin-top:4px}
 .tb-chip.proc{background:#ede4ff;color:#5b2bb8}.tb-chip.po{background:#eef0f6;color:var(--ink-2)}
 .consent-note{display:block;margin-top:18px}
+/* v67 Home partner strip: arrows and drag on computers */
+.tl-swipe{gap:8px}
+.tl-swipe span{margin-right:4px}
+.tl-arrow{width:36px;height:36px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.tl-arrow:hover:not(:disabled){border-color:var(--cobalt);color:var(--cobalt)}
+.tl-arrow:disabled{opacity:.35;cursor:default}
+.tl-arrow .icon{width:16px;height:16px}
+.tl-vendors{cursor:grab}
+@media (hover:none){.tl-arrow{display:none}.tl-swipe span::after{content:" (swipe)"}}
 </style>
 </head>
 <body>

@@ -1432,6 +1432,20 @@
     document.addEventListener('click', function(e){ if (m.open && !m.contains(e.target)) m.open = false; });
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && m.open) { m.open = false; m.querySelector('summary').focus(); } });
   })();
+
+  // Partner strip on the home page: arrows and click-and-drag for computers (phones swipe)
+  (function(){
+    var vs = $('tl-vendors'), pv = $('tl-prev'), nx = $('tl-next'); if (!vs || !pv) return;
+    function step(dir){ var c = vs.firstElementChild; var w = c ? c.getBoundingClientRect().width + 12 : 300; vs.scrollBy({left: dir * w, behavior: 'smooth'}); }
+    function sync(){ pv.disabled = vs.scrollLeft < 4; nx.disabled = vs.scrollLeft + vs.clientWidth > vs.scrollWidth - 4; }
+    pv.addEventListener('click', function(){ step(-1); }); nx.addEventListener('click', function(){ step(1); });
+    vs.addEventListener('scroll', sync, {passive:true}); window.addEventListener('resize', sync); setTimeout(sync, 300);
+    var down = null, moved = false;
+    vs.addEventListener('pointerdown', function(e){ if (e.pointerType !== 'mouse') return; down = {x:e.clientX, l:vs.scrollLeft}; moved = false; vs.style.scrollSnapType = 'none'; });
+    window.addEventListener('pointermove', function(e){ if (!down) return; var dx = e.clientX - down.x; if (Math.abs(dx) > 4) moved = true; vs.scrollLeft = down.l - dx; });
+    window.addEventListener('pointerup', function(){ if (!down) return; down = null; vs.style.scrollSnapType = ''; });
+    vs.addEventListener('click', function(e){ if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  })();
   initHow();
   buildCards();
   buildInvite();

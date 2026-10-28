@@ -35,6 +35,7 @@ export default async function handler(req, res) {
       if (!['mark', 'undo'].includes(b.action) || !REF.test(String(b.ref || '')) || !validStatus(b.status)) throw new HttpError(400, 'Please refresh and try again.');
       const r = await markStatus(b.ref, b.status, b.action === 'undo');
       if (!r) throw new HttpError(404, 'That request isn’t in the dashboard.');
+      if (r.refused) throw new HttpError(409, r.refused);
       return res.status(200).json({ ok: true, life: r.life });
     }
     return res.status(200).json({ ok: true, ...(await readStats()) });

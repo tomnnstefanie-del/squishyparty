@@ -268,8 +268,15 @@ __FOOTER__
       if ((b.inHouse || []).length) det.appendChild(el('p', 'tb-line muted', 'Our own: ' + b.inHouse.join(', ')));
       if (b.todos.length > 1) { var td = el('ul', 'tb-todos'); b.todos.forEach(function(t){ td.appendChild(el('li', null, t)); }); det.appendChild(td); }
       var acts = el('div', 'tb-acts'), L = b.life || {};
+      var vendorsDone = b.vendors.every(function(v){ return v.ok; });
       [['contacted', 'Contacted'], ['confirmed', 'Deposit paid'], ['paid', 'Paid in full'], ['lost', 'Didn’t book']].forEach(function(s){
-        if (s[0] === 'paid' && !L.confirmed) return;
+        // Only the steps that make sense now (a ticked one can always be undone)
+        if (!L[s[0]]) {
+          if (L.lost && s[0] !== 'lost') return;
+          if (s[0] === 'confirmed' && !vendorsDone) return;
+          if (s[0] === 'paid' && !L.confirmed) return;
+          if (s[0] === 'lost' && L.confirmed) return;
+        }
         var on = !!L[s[0]], btn = el('button', 'mini' + (on ? ' on' : ''), (on ? '✓ ' : '') + s[1]); btn.type = 'button';
         btn.title = on ? 'Recorded ' + when2(L[s[0]]) + '. Click to undo.' : 'Mark as ' + s[1].toLowerCase();
         btn.addEventListener('click', function(){ if (!on || confirm('Undo “' + s[1] + '” for ' + b.ref + '?')) mark(b.ref, s[0], btn, on); });
