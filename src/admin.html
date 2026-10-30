@@ -62,10 +62,15 @@ __HEADER__
           <thead><tr><th>Touchpoint</th><th>Visits / scans</th><th>Requests</th><th>Paid parties</th><th>New customers</th><th>Cost</th><th>CAC</th></tr></thead>
           <tbody id="sc-touch"></tbody>
         </table></div>
-        <h3 class="sc-h3">Referrals &amp; repeat bookings</h3>
-        <p class="ad-fine">Where friends drop off, step by step:</p>
-        <div class="sc-funnel sc-4" id="sc-refdrop"></div>
-        <div class="sc-kpis sc-4" id="sc-repeat"></div>
+        <h3 class="sc-h3">Referrals <small>(families sharing their link with friends)</small></h3>
+        <div class="sc-group" id="sc-ref-group">
+          <p class="ad-fine sc-gl">Where friends drop off, step by step</p>
+          <div class="sc-funnel sc-4" id="sc-refdrop"></div>
+          <p class="ad-fine sc-gl">What those referrals add up to</p>
+          <div class="sc-kpis sc-3" id="sc-repeat"></div>
+        </div>
+        <h3 class="sc-h3">Repeat bookings <small>(companies holding the same event every year)</small></h3>
+        <div class="sc-group sc-group-co" id="sc-co-group"><div class="sc-kpis sc-2" id="sc-company"></div></div>
         <h3 class="sc-h3">Week by week <small>(by the week the request came in)</small></h3>
         <div class="ad-table-wrap"><table class="ad-table sc-table">
           <thead><tr><th>Week</th><th>Visits</th><th>Requests</th><th>Paid parties</th><th>New</th><th>Avg revenue</th><th>Contribution / party</th><th>CAC</th><th>ROI</th></tr></thead>
@@ -315,7 +320,9 @@ __FOOTER__
     kpi(rb, 'Referral rate', p0(R.ratePct), R.withFriend + ' of ' + R.completed + ' families brought a friend who paid' + (R.targetPct != null ? ' · target ' + R.targetPct + '%' : ''), 'Families who brought a paying friend ÷ families with a link');
     kpi(rb, 'Viral coefficient (K)', s.kpis.kFactor == null ? '–' : String(s.kpis.kFactor), 'Extra customers each customer brings. 0.2 = 1 free customer for every 5', 'Friends’ paid parties ÷ other paid parties', 'hot');
     kpi(rb, 'Reward redemption', p0(W.ratePct), W.redeemed + ' redeemed of ' + W.sent + ' sent' + (W.owed ? ' · ' + W.owed + ' to send' : ''), 'Redeemed ÷ vouchers sent');
-    kpi(rb, 'Company rebooking', p0(C.rebookPct), C.returning + ' of ' + C.bookings + ' company requests from returning clients' + (C.targetPct != null ? ' · target ' + C.targetPct + '%' : ''), '“Every year” ticked: ' + p0(C.yearlyPct) + ' (' + C.yearly + ' of ' + C.bookings + ')');
+    var cb = $('sc-company'); cb.textContent = '';
+    kpi(cb, 'Said they hold it every year', p0(C.yearlyPct), C.yearly + ' of ' + C.bookings + ' company requests ticked “We hold this event every year”', 'The early signal during the pilot');
+    kpi(cb, 'Company rebooking', p0(C.rebookPct), C.returning + ' of ' + C.bookings + ' company requests from returning clients' + (C.targetPct != null ? ' · target ' + C.targetPct + '%' : ''), 'Returning clients ÷ company requests (shows over 12 months)');
     var wb = $('sc-weeks'); wb.textContent = '';
     s.weeks.forEach(function(w){ var tr = el('tr'); cell(tr, wk(w)); cell(tr, w.visits, 'num'); cell(tr, w.requests, 'num'); cell(tr, w.paid, 'num'); cell(tr, w.newCustomers, 'num');
       cell(tr, m0(w.avgRevenueCents), 'num'); cell(tr, m0(w.contributionPerPartyCents), 'num'); cell(tr, m0(w.cacCents), 'num'); cell(tr, p0(w.roiPct), 'num'); wb.appendChild(tr); });
