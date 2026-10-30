@@ -54,7 +54,7 @@ __HEADER__
         <h2 class="ad-h2">Scorecard</h2>
         <p class="ad-fine sc-win" id="sc-win"></p>
         <p class="sc-warn" id="sc-warn" hidden>Add your costs under <b>Costs &amp; targets</b> below to see contribution, CAC and ROI.</p>
-        <div class="sc-kpis" id="sc-kpis"></div>
+        <div class="sc-kpis sc-6" id="sc-kpis"></div>
         <h3 class="sc-h3">Acquisition funnel</h3>
         <div class="sc-funnel" id="sc-funnel"></div>
         <h3 class="sc-h3">Which touchpoint brought each paid party</h3>
@@ -63,7 +63,9 @@ __HEADER__
           <tbody id="sc-touch"></tbody>
         </table></div>
         <h3 class="sc-h3">Referrals &amp; repeat bookings</h3>
-        <div class="sc-kpis sc-3" id="sc-repeat"></div>
+        <p class="ad-fine">Where friends drop off, step by step:</p>
+        <div class="sc-funnel sc-4" id="sc-refdrop"></div>
+        <div class="sc-kpis sc-4" id="sc-repeat"></div>
         <h3 class="sc-h3">Week by week <small>(by the week the request came in)</small></h3>
         <div class="ad-table-wrap"><table class="ad-table sc-table">
           <thead><tr><th>Week</th><th>Visits</th><th>Requests</th><th>Paid parties</th><th>New</th><th>Avg revenue</th><th>Contribution / party</th><th>CAC</th><th>ROI</th></tr></thead>
@@ -88,7 +90,7 @@ __HEADER__
             <fieldset><legend>Marketing programme (whole pilot)</legend>
               <label>Capsule QR sticker printing ($)<input name="capsulePrintCents" data-money inputmode="decimal"></label>
               <label>In-store QR printing ($)<input name="outletPrintCents" data-money inputmode="decimal"></label>
-              <label>Social / ads spend ($)<input name="adSpendCents" data-money inputmode="decimal"></label>
+              <label>Search &amp; social ads spend ($)<input name="adSpendCents" data-money inputmode="decimal"></label>
               <label>Programme staff time ($)<input name="programmeStaffCents" data-money inputmode="decimal"></label>
               <label>Other marketing costs ($)<input name="otherCents" data-money inputmode="decimal"></label>
             </fieldset>
@@ -100,11 +102,15 @@ __HEADER__
           <summary>How each number is worked out</summary>
           <ul class="sc-formulas">
             <li><b>Paid party</b>: a request in the window with a deposit recorded. <b>New customer</b>: a paid party not flagged as a returning customer (same email or WhatsApp as an earlier booking).</li>
-            <li><b>Conversion</b> at each funnel step = this step ÷ the step before. Visits are counted once per browser session; QR scans and friend-link opens count as visits for their touchpoint.</li>
+            <li><b>Reached the site</b> = visits (once per browser session) + QR scans + friend-link opens. <b>Conversion</b> at each step = this step ÷ the step before, so you can see where people drop off.</li>
+            <li><b>Touchpoints</b>: retail store QR (<code>?src=outlet</code>), capsule QR (one generic code), search / social / direct (everything else), friend’s WhatsApp referral link (each family’s own code).</li>
             <li><b>Average revenue per party</b> = quoted value of paid parties ÷ paid parties (split into squishy activity and add-ons).</li>
             <li><b>Contribution per party</b> = revenue − kits (cost × participants) − facilitator staff − partner costs (partner add-ons × partner %) − $10 discount − free-squishy reward.</li>
-            <li><b>CAC by touchpoint</b> = that touchpoint’s cost ÷ its new customers. Capsule = sticker printing + $10 discounts; family link = $10 discounts + rewards; in-store = QR printing; social = ad spend.</li>
-            <li><b>Marketing ROI</b> = (contribution before marketing costs from parties brought by a touchpoint − programme cost) ÷ programme cost. Programme cost = printing + ads + programme staff + other + $10 discounts + rewards.</li>
+            <li><b>Gross profit per party</b> = revenue − kits − staff − partner costs. This is the value of one customer (most families book once a year).</li>
+            <li><b>CAC</b> = all marketing costs ÷ new customers. <b>By touchpoint</b>: that touchpoint’s cost ÷ its new customers. Capsule = sticker printing + $10 discounts; friend link = $10 discounts + rewards; retail = QR printing; search / social = ad spend.</li>
+            <li><b>LTV : CAC</b> = gross profit per party ÷ CAC. 3 : 1 or more means each $1 spent on marketing brings back $3 of profit.</li>
+            <li><b>Marketing ROI</b> = (gross profit of paid parties − marketing cost) ÷ marketing cost. Marketing cost = printing + ads + programme staff + other + $10 discounts + rewards.</li>
+            <li><b>Viral coefficient (K)</b> = friends’ paid parties ÷ other paid parties. K of 0.2 means every 5 customers bring 1 more for free.</li>
             <li><b>Referral rate</b> = parties paid in full whose family link brought at least one friend’s paid party ÷ parties paid in full. <b>Reward redemption</b> = vouchers redeemed ÷ vouchers sent.</li>
             <li><b>Company yearly rate</b> = company requests that ticked “every year” ÷ company requests. <b>Rebooking</b> = company requests from returning clients ÷ company requests.</li>
           </ul>
@@ -290,19 +296,24 @@ __FOOTER__
     var kb = $('sc-kpis'); kb.textContent = '';
     kpi(kb, 'Paid parties', String(K.paidParties), K.newCustomers + ' new customers' + (K.targetParties ? ' · target ' + K.targetParties + ' (' + Math.round(K.newCustomers / K.targetParties * 100) + '%)' : ''), 'Deposit recorded');
     kpi(kb, 'Avg revenue / party', m0(K.avgRevenueCents), K.paidParties ? 'Squishy ' + m0(M.squishyCents / K.paidParties) + ' · add-ons ' + m0(M.addonCents / K.paidParties) : '', 'Value of paid parties ÷ paid parties');
-    kpi(kb, 'Contribution / party', m0(K.contributionPerPartyCents), s.costsSet ? '' : 'Add costs below', 'Revenue − kits − staff − partners − discount − reward');
-    kpi(kb, 'CAC (best touchpoint)', K.bestCac ? m0(K.bestCac.cents) : '–', K.bestCac ? K.bestCac.touch : 'No touchpoint costs yet', 'Touchpoint cost ÷ its new customers');
-    kpi(kb, 'Marketing ROI', p0(K.roiPct), M.programmeCents ? 'Programme cost ' + m0(M.programmeCents) : '', '(Contribution − programme cost) ÷ programme cost', 'hot');
+    kpi(kb, 'Gross profit / party', m0(K.ltvCents), s.costsSet ? 'After discount & reward: ' + m0(K.contributionPerPartyCents) : 'Add costs below', 'Revenue − kits − staff − partner costs');
+    kpi(kb, 'Cost to get a customer (CAC)', m0(K.blendedCacCents), K.bestCac ? 'Cheapest: ' + K.bestCac.touch + ' ' + m0(K.bestCac.cents) : 'No marketing costs yet', 'All marketing costs ÷ new customers');
+    kpi(kb, 'LTV : CAC', K.ltvCac == null ? '–' : K.ltvCac + ' : 1', K.ltvCac == null ? 'Needs costs and a paid party' : K.ltvCac >= 3 ? 'Healthy (3 : 1 or more)' : 'Below 3 : 1: costs too high or price too low', 'Gross profit per party ÷ CAC', 'hot');
+    kpi(kb, 'Marketing ROI', p0(K.roiPct), M.programmeCents ? 'Programme cost ' + m0(M.programmeCents) : '', '(Gross profit − marketing cost) ÷ marketing cost');
     var fb = $('sc-funnel'); fb.textContent = '';
     s.funnel.forEach(function(f){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step)); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); fb.appendChild(st); });
     var tb = $('sc-touch'); tb.textContent = '';
-    s.touch.filter(function(t){ return t.visits || t.requests || t.costCents; }).forEach(function(t){
+    s.touch.forEach(function(t){
       var tr = el('tr'); cell(tr, t.label); cell(tr, t.visits, 'num'); cell(tr, t.requests, 'num'); cell(tr, t.paid, 'num'); cell(tr, t.newCustomers, 'num' + (t.newCustomers ? ' ad-win' : ''));
       cell(tr, t.costCents ? m0(t.costCents) : '—', 'num'); cell(tr, m0(t.cacCents), 'num'); tb.appendChild(tr);
     });
     if (!tb.children.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'Nothing in this window yet.', 'ad-empty'); td0.colSpan = 7; tb.appendChild(tr0); }
     var R = s.referral, W = s.rewards, C = s.company, rb = $('sc-repeat'); rb.textContent = '';
-    kpi(rb, 'Referral rate', p0(R.ratePct), R.withFriend + ' of ' + R.completed + ' parties paid in full brought a friend' + (R.targetPct != null ? ' · target ' + R.targetPct + '%' : ''), 'Link opens ' + R.opens + ' → requests ' + R.requests + ' → paid ' + R.paid);
+    var rd = $('sc-refdrop'); rd.textContent = '';
+    R.dropoff.forEach(function(f){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step));
+      if (f.perFamily != null) st.appendChild(el('small', null, f.perFamily + ' opens per family')); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); rd.appendChild(st); });
+    kpi(rb, 'Referral rate', p0(R.ratePct), R.withFriend + ' of ' + R.completed + ' families brought a friend who paid' + (R.targetPct != null ? ' · target ' + R.targetPct + '%' : ''), 'Families who brought a paying friend ÷ families with a link');
+    kpi(rb, 'Viral coefficient (K)', s.kpis.kFactor == null ? '–' : String(s.kpis.kFactor), 'Extra customers each customer brings. 0.2 = 1 free customer for every 5', 'Friends’ paid parties ÷ other paid parties', 'hot');
     kpi(rb, 'Reward redemption', p0(W.ratePct), W.redeemed + ' redeemed of ' + W.sent + ' sent' + (W.owed ? ' · ' + W.owed + ' to send' : ''), 'Redeemed ÷ vouchers sent');
     kpi(rb, 'Company rebooking', p0(C.rebookPct), C.returning + ' of ' + C.bookings + ' company requests from returning clients' + (C.targetPct != null ? ' · target ' + C.targetPct + '%' : ''), '“Every year” ticked: ' + p0(C.yearlyPct) + ' (' + C.yearly + ' of ' + C.bookings + ')');
     var wb = $('sc-weeks'); wb.textContent = '';

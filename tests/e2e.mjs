@@ -433,7 +433,7 @@ try {
   const ev = (body, ip) => p2.evaluate(async ([body, ip]) => (await fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: JSON.stringify(body) })).status, [body, ip]);
   assert.equal(await ev({ type: 'visit', source: 'outlet' }, '10.0.8.1'), 200); assert.equal(await ev({ type: 'visit', source: '<script>' }, '10.0.8.1'), 200);
   let sc = (await adm('test-dashboard-pass')).b.scorecard;
-  assert.ok(sc && sc.touch.find((t) => t.key === 'outlet').visits >= 1 && sc.funnel[0].step === 'Visits & scans' && !sc.costsSet);
+  assert.ok(sc && sc.touch.find((t) => t.key === 'outlet').visits >= 1 && sc.funnel[0].step === 'Reached the site' && !sc.costsSet);
   assert.equal((await admPost({ action: 'settings', settings: { targetParties: 12, kitCents: 450, staffCents: 8000, rewardCents: 600, capsulePrintCents: 5000 } })).s, 200);
   assert.equal((await admPost({ action: 'settings', by: '', settings: {} })).s, 400);
   sc = (await adm('test-dashboard-pass')).b.scorecard;

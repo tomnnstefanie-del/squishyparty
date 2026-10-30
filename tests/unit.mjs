@@ -183,13 +183,17 @@ t('scorecard: paid parties, revenue, contribution, CAC by touchpoint and ROI fol
   assert.equal(s.kpis.avgRevenueCents, Math.round((40000 + 30000 + 60000) / 3));
   // A: 40000 − 10×500 − 5000 − 80% of 10000 − 1000 = 21000; B: 30000 − 5000 − 5000 − 1000 − 600 = 18400; C: 60000 − 10000 − 5000 = 45000
   assert.equal(s.money.contributionCents, 21000 + 18400 + 45000);
-  const cap = s.touch.find((t) => t.key === 'capsule'), fr = s.touch.find((t) => t.key === 'friend'), so = s.touch.find((t) => t.key === 'social');
+  const cap = s.touch.find((t) => t.key === 'capsule'), fr = s.touch.find((t) => t.key === 'friend'), so = s.touch.find((t) => t.key === 'organic');
+  assert.deepEqual(s.touch.map((t) => t.key), ['outlet', 'capsule', 'organic', 'friend']); // always the four pilot touchpoints
   assert.deepEqual([cap.visits, cap.paid, cap.newCustomers, cap.costCents, cap.cacCents], [30, 1, 1, 2000 + 1000, 3000]);
   assert.deepEqual([fr.visits, fr.costCents, fr.cacCents], [4, 1000 + 600, 1600]);
-  assert.deepEqual([so.visits, so.requests, so.paid, so.cacCents], [6, 1, 0, null]); // ad spend but no paid party yet
-  assert.deepEqual(s.kpis.bestCac, { touch: 'Family referral link', cents: 1600 });
-  // ROI: attributed (A capsule, B friend) before marketing costs = (40000−5000−5000−8000) + (30000−5000−5000) = 42000; programme = 2000+3000 + 2000 discounts + 600 reward = 7600
-  assert.equal(s.money.programmeCents, 7600); assert.equal(s.kpis.roiPct, Math.round((42000 - 7600) / 7600 * 100));
+  assert.deepEqual([so.visits, so.requests, so.paid, so.newCustomers, so.costCents, so.cacCents], [16, 2, 1, 0, 3000, null]); // search/social/direct: C (returning) paid, D didn't
+  assert.deepEqual(s.kpis.bestCac, { touch: 'Friend’s WhatsApp referral link', cents: 1600 });
+  // Gross profit (before marketing costs): A 22000 + B 20000 + C 45000 = 87000; programme = 2000+3000 + 2000 discounts + 600 reward = 7600
+  assert.equal(s.money.programmeCents, 7600); assert.equal(s.kpis.roiPct, Math.round((87000 - 7600) / 7600 * 100));
+  assert.equal(s.kpis.blendedCacCents, 3800); assert.equal(s.kpis.ltvCents, 29000); assert.equal(s.kpis.ltvCac, 7.6); // 29000 ÷ 3800
+  assert.equal(s.kpis.kFactor, 0.5); // 1 friend's paid party ÷ 2 other paid parties
+  assert.deepEqual(s.referral.dropoff.map((d) => d.n), [1, 4, 1, 1]); assert.equal(s.referral.dropoff[1].perFamily, 4); assert.equal(s.referral.dropoff[2].ratePct, 25);
   assert.deepEqual(s.funnel.map((f) => f.n), [50, 4, 3, 1, 1]); assert.equal(s.funnel[2].ratePct, 75);
   assert.deepEqual([s.referral.completed, s.referral.withFriend, s.referral.ratePct], [1, 1, 100]); // A's family brought B
   assert.deepEqual([s.company.bookings, s.company.yearlyPct, s.company.rebookPct], [1, 100, 100]);
