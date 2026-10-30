@@ -8,7 +8,8 @@
 //   POST { action: 'revision', ref, n, step, vendor, reason, by } -> send (emails R-n) / accept / vendor / apply / withdraw / discard
 //   POST { action: 'change-handled', ref, changeId, by }   -> a customer's change request has been dealt with
 //   POST { action: 'reward', ref (the friend's booking), step: 'sent' | 'redeemed', by } -> referral reward voucher
-//   POST { action: 'settings', settings, by }              -> costs and targets for the scorecard (lib/scorecard.js)
+//   POST { action: 'settings', settings, reason, by }      -> costs and targets for the scorecard (lib/scorecard.js); targets
+//                                                            are fixed while the pilot runs, so a change then needs a reason
 // ADMIN_PASSWORD is a Vercel environment variable (12+ characters); without it the dashboard stays locked.
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
@@ -74,7 +75,11 @@ export default async function handler(req, res) {
     assertSameOrigin(req);
     const b = await readJson(req, 8 * 1024);
     if (b.action === 'digest') { const r = await sendDigest(); if (!r.sent) throw new HttpError(503, r.reason); return res.status(200).json({ ok: true, count: r.count }); }
-    if (b.action === 'settings') { const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.'); return res.status(200).json({ ok: true, settings: await saveSettings(b.settings || {}, by) }); }
+    if (b.action === 'settings') {
+      const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.');
+      const r = await saveSettings(b.settings || {}, by, b.reason); if (r.error) throw new HttpError(r.status, r.error);
+      return res.status(200).json({ ok: true, settings: r.settings });
+    }
     const ref = String(b.ref || '');
     if (!REF.test(ref)) throw new HttpError(400, 'Please refresh and try again.');
     try {

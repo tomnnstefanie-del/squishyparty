@@ -2322,6 +2322,22 @@ footer{background:#efece7;border-top:0}
 .sc-group .sc-kpis{margin-top:0}.sc-gl{margin:2px 0 8px;font-weight:700;color:#8a4b45}.sc-group .sc-funnel.sc-4{margin-bottom:6px}
 .sc-group-co{background:#f3f5fb;box-shadow:inset 0 0 0 1.5px #dde2f0}.sc-kpis.sc-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:900px){.sc-kpis.sc-2{grid-template-columns:1fr}}
+/* v71 Scorecard targets: markers next to every number, the targets form, lock notice and change log */
+.sc-tg{display:inline-block;align-self:flex-start;font-size:.75rem;font-weight:700;border-radius:999px;padding:3px 9px;background:#eef0f5;color:#47506a;margin:2px 0}
+.sc-tg.st-ok{background:#e3f3ea;color:#17603d}.sc-tg.st-close{background:#fff3d6;color:#7a5600}.sc-tg.st-off{background:#fde4e2;color:#a3231a}
+.sc-k.hot .sc-tg{background:rgba(255,255,255,.14);color:#fff}.sc-k.hot .sc-tg.st-ok{background:#9fe0b8;color:#0d3b24}.sc-k.hot .sc-tg.st-close{background:#ffd84d;color:#3d2c00}.sc-k.hot .sc-tg.st-off{background:#ff9b93;color:#4a0d08}
+.sc-step .sc-tg{background:rgba(255,255,255,.92);margin-top:6px}
+.cac-ok{color:#17603d;font-weight:700}.cac-close{color:#7a5600;font-weight:700}.cac-off{color:#a3231a;font-weight:700}
+.sc-cac-note{margin:-4px 0 8px}
+.sc-form legend small{font-weight:500;color:var(--muted)}
+.sc-cac-line{margin:0;font-size:.8125rem;color:#17603d;font-weight:600}
+.sc-lock{margin:0;padding:10px 14px;border-radius:12px;background:#eef0f8;color:#1d2b4f;font-size:.875rem;font-weight:600}
+.sc-reason{display:flex;flex-direction:column;gap:4px;font-size:.8125rem;font-weight:600}
+.sc-reason small{font-weight:500;color:var(--muted)}
+.sc-reason input{min-height:40px;padding:8px 10px;border:1.5px solid var(--line-2,#ccd);border-radius:10px;font:inherit;font-weight:400}
+.sc-log h4{font-size:.875rem;margin:6px 0}.sc-log ul{list-style:none;display:grid;gap:8px;margin:0;padding:0}
+.sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
+.sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2440,6 +2456,7 @@ footer{background:#efece7;border-top:0}
         <h3 class="sc-h3">Acquisition funnel</h3>
         <div class="sc-funnel" id="sc-funnel"></div>
         <h3 class="sc-h3">Which touchpoint brought each paid party</h3>
+        <p class="ad-fine sc-cac-note" id="sc-cac-note"></p>
         <div class="ad-table-wrap"><table class="ad-table sc-table">
           <thead><tr><th>Touchpoint</th><th>Visits / scans</th><th>Requests</th><th>Paid parties</th><th>New customers</th><th>Cost</th><th>CAC</th></tr></thead>
           <tbody id="sc-touch"></tbody>
@@ -2461,13 +2478,14 @@ footer{background:#efece7;border-top:0}
         <details class="ad-guide sc-set" id="sc-set">
           <summary>Costs &amp; targets</summary>
           <form class="sc-form" id="sc-form">
-            <fieldset><legend>Pilot and targets</legend>
+            <fieldset><legend>Pilot dates</legend>
               <label>Pilot start<input type="date" name="pilotStart"></label>
               <label>Pilot end<input type="date" name="pilotEnd"></label>
-              <label>Target: new paid parties<input type="number" name="targetParties" min="0" step="1" inputmode="numeric"></label>
-              <label>Target: referral rate (%)<input type="number" name="targetReferralPct" min="0" max="100" step="1" inputmode="numeric"></label>
-              <label>Target: company rebooking (%)<input type="number" name="targetRebookPct" min="0" max="100" step="1" inputmode="numeric"></label>
             </fieldset>
+            <fieldset id="sc-tfields"><legend>Targets <small>(set before the pilot, then fixed)</small></legend></fieldset>
+            <p class="sc-cac-line" id="sc-cac-line"></p>
+            <p class="sc-lock" id="sc-lock" hidden></p>
+            <label class="sc-reason">Reason for changing a target <small>(needed while the pilot runs)</small><input id="sc-reason" maxlength="300" placeholder="e.g. Day 30 checkpoint: real costs higher than planned"></label>
             <fieldset><legend>Cost of each party</legend>
               <label>Squishy kit, per child ($)<input name="kitCents" data-money inputmode="decimal" placeholder="e.g. 4.50"></label>
               <label>Facilitator staff, per party ($)<input name="staffCents" data-money inputmode="decimal" placeholder="e.g. 120"></label>
@@ -2483,6 +2501,7 @@ footer{background:#efece7;border-top:0}
             </fieldset>
             <p class="ad-fine" id="sc-saved"></p>
             <button class="btn btn-primary" type="submit">Save costs &amp; targets</button>
+            <div class="sc-log" id="sc-log"></div>
           </form>
         </details>
         <details class="ad-guide">
@@ -2702,49 +2721,82 @@ footer{background:#efece7;border-top:0}
   /* ---------- Scorecard: acquisition, referrals and repeat bookings, revenue and ROI (lib/scorecard.js) ---------- */
   var m0 = function(c){ return c == null ? '–' : (c < 0 ? '−' : '') + '$' + Math.round(Math.abs(c) / 100).toLocaleString('en-SG'); };
   var p0 = function(v){ return v == null ? '–' : v + '%'; };
-  function kpi(box, label, value, sub, formula, cls){
+  function kpi(box, label, value, sub, formula, cls, mark){
     var k = el('div', 'sc-k' + (cls ? ' ' + cls : '')); k.appendChild(el('span', 'sc-l', label)); k.appendChild(el('b', null, value));
-    if (sub) k.appendChild(el('small', null, sub)); if (formula) k.appendChild(el('em', null, formula)); box.appendChild(k);
+    if (mark) k.appendChild(mark); if (sub) k.appendChild(el('small', null, sub)); if (formula) k.appendChild(el('em', null, formula)); box.appendChild(k);
   }
+  // Target markers: ✓ on target, ≈ within 20%, ✗ further away (lib/scorecard.js statusOf)
+  var UNIT = {}, sc = null;
+  function fmtT(key, v){ var u = UNIT[key] != null ? UNIT[key] : ''; return u === '%' ? v + '%' : u === '$' ? '$' + v : u === ': 1' ? v + ' : 1' : String(v); }
+  function mark(c, key, what){
+    if (!c || c.target == null) return null;
+    var t = (c.dir === 'le' ? '≤ ' : '≥ ') + (what || fmtT(key, c.target));
+    var txt = c.status === 'ok' ? '✓ On target · ' + t : c.status === 'close' ? '≈ Close · target ' + t : c.status === 'off' ? '✗ Off target · ' + t : 'Target ' + t;
+    var m = el('span', 'sc-tg' + (c.status ? ' st-' + c.status : ''), txt); m.title = c.status ? 'Actual ' + c.actual + ' against a target of ' + t : 'No actual number yet'; return m;
+  }
+  var ck = function(key){ return mark(sc.checks[key], key); };
   var scDirty = false;
   function scorecard(s){
-    var K = s.kpis, M = s.money, wk = function(w){ return fmtDate(w.from) + ' – ' + fmtDate(w.to); };
+    sc = s; (s.targetDefs || []).forEach(function(d){ UNIT[d.key] = d.unit; });
+    var K = s.kpis, M = s.money, wk = function(w){ return fmtDate(w.from) + ' – ' + fmtDate(w.to); }, CC = s.cacCeiling || {};
     $('sc-win').textContent = (s.settings.pilotStart ? 'Pilot: ' : 'Last 6 weeks: ') + fmtDate(s.window.from) + ' – ' + fmtDate(s.window.to) + ' · ' + s.window.days + ' days · updates automatically';
     $('sc-warn').hidden = s.costsSet;
     var kb = $('sc-kpis'); kb.textContent = '';
-    kpi(kb, 'Paid parties', String(K.paidParties), K.newCustomers + ' new customers' + (K.targetParties ? ' · target ' + K.targetParties + ' (' + Math.round(K.newCustomers / K.targetParties * 100) + '%)' : ''), 'Deposit recorded');
-    kpi(kb, 'Avg revenue / party', m0(K.avgRevenueCents), K.paidParties ? 'Squishy ' + m0(M.squishyCents / K.paidParties) + ' · add-ons ' + m0(M.addonCents / K.paidParties) : '', 'Value of paid parties ÷ paid parties');
-    kpi(kb, 'Gross profit / party', m0(K.ltvCents), s.costsSet ? 'After discount & reward: ' + m0(K.contributionPerPartyCents) : 'Add costs below', 'Revenue − kits − staff − partner costs');
-    kpi(kb, 'Cost to get a customer (CAC)', m0(K.blendedCacCents), K.bestCac ? 'Cheapest: ' + K.bestCac.touch + ' ' + m0(K.bestCac.cents) : 'No marketing costs yet', 'All marketing costs ÷ new customers');
-    kpi(kb, 'LTV : CAC', K.ltvCac == null ? '–' : K.ltvCac + ' : 1', K.ltvCac == null ? 'Needs costs and a paid party' : K.ltvCac >= 3 ? 'Healthy (3 : 1 or more)' : 'Below 3 : 1: costs too high or price too low', 'Gross profit per party ÷ CAC', 'hot');
-    kpi(kb, 'Marketing ROI', p0(K.roiPct), M.programmeCents ? 'Programme cost ' + m0(M.programmeCents) : '', '(Gross profit − marketing cost) ÷ marketing cost');
+    kpi(kb, 'Paid parties', String(K.paidParties), K.newCustomers + ' new customers', 'Deposit recorded', '', ck('targetParties'));
+    kpi(kb, 'Avg revenue / party', m0(K.avgRevenueCents), K.paidParties ? 'Squishy ' + m0(M.squishyCents / K.paidParties) + ' · add-ons ' + m0(M.addonCents / K.paidParties) : '', 'Value of paid parties ÷ paid parties', '', ck('targetAvgRev'));
+    var gm = s.checks.targetMarginPct;
+    kpi(kb, 'Gross profit / party', m0(K.ltvCents), s.costsSet ? (s.checks.marginPct != null ? s.checks.marginPct + '% of revenue · ' : '') + 'after discount & reward: ' + m0(K.contributionPerPartyCents) : 'Add costs below', 'Revenue − kits − staff − partner costs', '', mark(gm, 'targetMarginPct', gm && gm.target + '% of revenue'));
+    kpi(kb, 'Cost to get a customer (CAC)', m0(K.blendedCacCents), K.bestCac ? 'Cheapest: ' + K.bestCac.touch + ' ' + m0(K.bestCac.cents) : 'No marketing costs yet', 'All marketing costs ÷ new customers', '', mark(s.checks.cac, 'cac', m0(CC.cents)));
+    kpi(kb, 'LTV : CAC', K.ltvCac == null ? '–' : K.ltvCac + ' : 1', K.ltvCac == null ? 'Needs costs and a paid party' : '', 'Gross profit per party ÷ CAC', 'hot', ck('targetLtvCac'));
+    kpi(kb, 'Marketing ROI', p0(K.roiPct), M.programmeCents ? 'Programme cost ' + m0(M.programmeCents) : '', '(Gross profit − marketing cost) ÷ marketing cost', '', ck('targetRoiPct'));
     var fb = $('sc-funnel'); fb.textContent = '';
-    s.funnel.forEach(function(f){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step)); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); fb.appendChild(st); });
+    var FK = [null, 'targetVisitReqPct', 'targetReqDepPct', 'targetDepFullPct', null];
+    s.funnel.forEach(function(f, i){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step)); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); var m = FK[i] && ck(FK[i]); if (m) st.appendChild(m); fb.appendChild(st); });
+    $('sc-cac-note').textContent = CC.cents != null ? 'CAC target for every touchpoint: ≤ ' + m0(CC.cents) + ' = ' + (CC.fromActual ? 'actual' : 'planned') + ' gross profit per party (' + m0(CC.grossProfitCents) + ') ÷ ' + s.targets.targetLtvCac + ', so LTV : CAC stays at ' + s.targets.targetLtvCac + ' : 1.' : '';
     var tb = $('sc-touch'); tb.textContent = '';
     s.touch.forEach(function(t){
       var tr = el('tr'); cell(tr, t.label); cell(tr, t.visits, 'num'); cell(tr, t.requests, 'num'); cell(tr, t.paid, 'num'); cell(tr, t.newCustomers, 'num' + (t.newCustomers ? ' ad-win' : ''));
-      cell(tr, t.costCents ? m0(t.costCents) : '—', 'num'); cell(tr, m0(t.cacCents), 'num'); tb.appendChild(tr);
+      cell(tr, t.costCents ? m0(t.costCents) : '—', 'num'); var cc = cell(tr, (t.cacStatus === 'ok' ? '✓ ' : t.cacStatus === 'close' ? '≈ ' : t.cacStatus === 'off' ? '✗ ' : '') + m0(t.cacCents), 'num' + (t.cacStatus ? ' cac-' + t.cacStatus : '')); tb.appendChild(tr);
     });
     if (!tb.children.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'Nothing in this window yet.', 'ad-empty'); td0.colSpan = 7; tb.appendChild(tr0); }
     var R = s.referral, W = s.rewards, C = s.company, rb = $('sc-repeat'); rb.textContent = '';
     var rd = $('sc-refdrop'); rd.textContent = '';
-    R.dropoff.forEach(function(f){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step));
-      if (f.perFamily != null) st.appendChild(el('small', null, f.perFamily + ' opens per family')); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); rd.appendChild(st); });
-    kpi(rb, 'Referral rate', p0(R.ratePct), R.withFriend + ' of ' + R.completed + ' families brought a friend who paid' + (R.targetPct != null ? ' · target ' + R.targetPct + '%' : ''), 'Families who brought a paying friend ÷ families with a link');
-    kpi(rb, 'Viral coefficient (K)', s.kpis.kFactor == null ? '–' : String(s.kpis.kFactor), 'Extra customers each customer brings. 0.2 = 1 free customer for every 5', 'Friends’ paid parties ÷ other paid parties', 'hot');
-    kpi(rb, 'Reward redemption', p0(W.ratePct), W.redeemed + ' redeemed of ' + W.sent + ' sent' + (W.owed ? ' · ' + W.owed + ' to send' : ''), 'Redeemed ÷ vouchers sent');
+    var DK = [null, 'targetOpensPerFamily', 'targetOpenQuotePct', 'targetQuotePaidPct'];
+    R.dropoff.forEach(function(f, i){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step));
+      if (f.perFamily != null) st.appendChild(el('small', null, f.perFamily + ' opens per family')); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); var m = DK[i] && ck(DK[i]); if (m) st.appendChild(m); rd.appendChild(st); });
+    kpi(rb, 'Referral rate', p0(R.ratePct), R.withFriend + ' of ' + R.completed + ' families brought a friend who paid', 'Families who brought a paying friend ÷ families with a link', '', ck('targetReferralPct'));
+    kpi(rb, 'Viral coefficient (K)', s.kpis.kFactor == null ? '–' : String(s.kpis.kFactor), 'Extra customers each customer brings. 0.2 = 1 free customer for every 5', 'Friends’ paid parties ÷ other paid parties', 'hot', ck('targetK'));
+    kpi(rb, 'Reward redemption', p0(W.ratePct), W.redeemed + ' redeemed of ' + W.sent + ' sent' + (W.owed ? ' · ' + W.owed + ' to send' : ''), 'Redeemed ÷ vouchers sent', '', ck('targetRedeemPct'));
     var cb = $('sc-company'); cb.textContent = '';
-    kpi(cb, 'Said they hold it every year', p0(C.yearlyPct), C.yearly + ' of ' + C.bookings + ' company requests ticked “We hold this event every year”', 'The early signal during the pilot');
-    kpi(cb, 'Company rebooking', p0(C.rebookPct), C.returning + ' of ' + C.bookings + ' company requests from returning clients' + (C.targetPct != null ? ' · target ' + C.targetPct + '%' : ''), 'Returning clients ÷ company requests (shows over 12 months)');
+    kpi(cb, 'Said they hold it every year', p0(C.yearlyPct), C.yearly + ' of ' + C.bookings + ' company requests ticked “We hold this event every year”', 'The early signal during the pilot', '', ck('targetYearlyPct'));
+    kpi(cb, 'Company rebooking', p0(C.rebookPct), C.returning + ' of ' + C.bookings + ' company requests from returning clients', 'Returning clients ÷ company requests (shows over 12 months)', '', ck('targetRebookPct'));
     var wb = $('sc-weeks'); wb.textContent = '';
     s.weeks.forEach(function(w){ var tr = el('tr'); cell(tr, wk(w)); cell(tr, w.visits, 'num'); cell(tr, w.requests, 'num'); cell(tr, w.paid, 'num'); cell(tr, w.newCustomers, 'num');
       cell(tr, m0(w.avgRevenueCents), 'num'); cell(tr, m0(w.contributionPerPartyCents), 'num'); cell(tr, m0(w.cacCents), 'num'); cell(tr, p0(w.roiPct), 'num'); wb.appendChild(tr); });
     if (!scDirty) {
-      var f = $('sc-form'), S = s.settings || {};
-      Array.prototype.forEach.call(f.elements, function(i){ if (!i.name) return; var v = S[i.name]; i.value = v == null ? '' : i.hasAttribute('data-money') ? String(v / 100) : v; });
-      $('sc-saved').textContent = S.savedAt ? 'Last saved ' + when(S.savedAt) + ' by ' + S.savedBy : 'Not saved yet.';
+      var f = $('sc-form'), S = s.settings || {}, tf = $('sc-tfields');
+      Array.prototype.slice.call(tf.querySelectorAll('label')).forEach(function(l){ tf.removeChild(l); });
+      (s.targetDefs || []).forEach(function(d){
+        var l = el('label', null, d.label + ' (' + (d.dir === 'le' ? '≤' : '≥') + (d.unit === '$' ? ' $' : d.unit === '%' ? ' %' : d.unit === ': 1' ? ' x : 1' : '') + ')'), i = el('input');
+        i.type = 'number'; i.name = d.key; i.min = '0'; i.step = 'any'; i.placeholder = String(d.default); l.appendChild(i); tf.appendChild(l);
+      });
+      Array.prototype.forEach.call(f.elements, function(i){ if (!i.name) return; var v = i.name in s.targets ? s.targets[i.name] : S[i.name]; i.value = v == null ? '' : i.hasAttribute('data-money') ? String(v / 100) : v; });
+      $('sc-reason').value = '';
+      $('sc-saved').textContent = S.savedAt ? 'Last saved ' + when(S.savedAt) + ' by ' + S.savedBy : 'Not saved yet. The targets shown are the plan’s defaults.';
+    }
+    $('sc-cac-line').textContent = 'CAC target (calculated, not entered): ≤ ' + m0(CC.cents) + ' = gross profit per party ÷ the LTV : CAC target.';
+    var lk = $('sc-lock'); lk.hidden = !s.locked;
+    lk.textContent = s.locked ? '🔒 Targets are fixed while the pilot runs (' + fmtDate(S0(s).pilotStart) + ' – ' + fmtDate(S0(s).pilotEnd) + '). To change one at a checkpoint, give the reason below; every change is logged. Costs can be updated any time.' : '';
+    var lg = $('sc-log'); lg.textContent = '';
+    if ((s.targetLog || []).length) {
+      lg.appendChild(el('h4', null, 'Target changes'));
+      var ul = el('ul'); s.targetLog.forEach(function(e){
+        var li = el('li'); li.appendChild(el('b', null, when2(e.at) + ' · ' + e.by)); if (e.reason) li.appendChild(el('span', 'sc-why', '“' + e.reason + '”'));
+        e.changed.forEach(function(c){ li.appendChild(el('small', null, c.label + ': ' + (c.from == null ? 'default' : fmtT(c.key, c.from)) + ' → ' + (c.to == null ? 'default' : fmtT(c.key, c.to)))); });
+        ul.appendChild(li); }); lg.appendChild(ul);
     }
   }
+  var S0 = function(s){ return s.settings || {}; };
   $('sc-form').addEventListener('input', function(){ scDirty = true; });
   $('sc-form').addEventListener('submit', function(e){
     e.preventDefault(); var out = {}, bad = '';
@@ -2754,7 +2806,7 @@ footer{background:#efece7;border-top:0}
       else out[i.name] = i.type === 'date' ? i.value : Number(i.value);
     });
     if (bad) { alert('Please check: ' + bad); return; }
-    post({ action:'settings', settings: out }, function(){ scDirty = false; });
+    post({ action:'settings', settings: out, reason: $('sc-reason').value.trim() }, function(){ scDirty = false; });
   });
 
   /* ---------- Manage one booking: amounts, payments, customer changes, revisions, history ---------- */

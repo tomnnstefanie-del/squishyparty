@@ -444,6 +444,21 @@ try {
   assert.equal(scd.bookings.find((q) => q.ref === x.b.ref).source, 'outlet'); assert.ok(scd.scorecard.touch.find((t) => t.key === 'outlet').requests >= 1);
   ok('the dashboard scorecard counts visits by source, credits each request to its touchpoint, and works out contribution, CAC and ROI once costs are saved');
 
+  // Targets are fixed while the pilot runs: a change then needs a reason and is logged; costs can still change
+  const sgDay = (n) => new Date(Date.now() + 8 * 3600e3 + n * 864e5).toISOString().slice(0, 10);
+  // its own address, so the dashboard's per-address rate limit isn't shared with the checks above
+  const admT = (body) => p2.evaluate(async (body) => { const r = await fetch('/api/admin', { method: body ? 'POST' : 'GET', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json', 'X-Forwarded-For': '10.0.9.9' }, body: body ? JSON.stringify({ by: 'Tester', ...body }) : undefined }); return { s: r.status, b: await r.json() }; }, body);
+  const base2 = { pilotStart: sgDay(-3), pilotEnd: sgDay(40), targetParties: 3, kitCents: 450, staffCents: 8000 };
+  assert.equal((await admT({ action: 'settings', settings: base2 })).s, 200); // starting the pilot
+  let tr = await admT({ action: 'settings', settings: { ...base2, targetParties: 5 } });
+  assert.equal(tr.s, 409); assert.ok(/reason/i.test(tr.b.error));
+  assert.equal((await admT({ action: 'settings', settings: { ...base2, kitCents: 500 } })).s, 200); // a cost change needs no reason
+  assert.equal((await admT({ action: 'settings', settings: { ...base2, kitCents: 500, targetParties: 5 }, reason: 'Day 30 checkpoint: strong demand' })).s, 200);
+  const scl = (await admT()).b.scorecard;
+  assert.ok(scl.locked && scl.targets.targetParties === 5 && scl.checks.targetParties.target === 5 && scl.cacCeiling.cents > 0);
+  assert.equal(scl.targetLog[0].reason, 'Day 30 checkpoint: strong demand'); assert.deepEqual(scl.targetLog[0].changed.map((c) => [c.key, c.from, c.to]), [['targetParties', 3, 5]]);
+  ok('targets are fixed while the pilot runs: changing one needs a checkpoint reason and is logged with who and why; costs can still be updated');
+
   console.log('not configured');
   const env2 = { ...env, PORT: '3101' }; delete env2.TELEGRAM_BOT_TOKEN;
   await start('dev/server.mjs', env2);

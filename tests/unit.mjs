@@ -202,6 +202,28 @@ t('scorecard: paid parties, revenue, contribution, CAC by touchpoint and ROI fol
   const bare = Score.buildScorecard({ books, life, codes: {}, rewards: [], days: {}, settings: {}, today: '2026-10-28' });
   assert.ok(!bare.costsSet && bare.kpis.contributionPerPartyCents === null && bare.kpis.roiPct === null && bare.window.from === '2026-09-17');
 });
+t('scorecard targets: plan defaults until changed, markers on/close/off, and a CAC ceiling worked out from gross profit', () => {
+  assert.deepEqual([Score.statusOf(2.5, 2, 'ge'), Score.statusOf(1.7, 2, 'ge'), Score.statusOf(1, 2, 'ge'), Score.statusOf(null, 2, 'ge')], ['ok', 'close', 'off', null]);
+  assert.deepEqual([Score.statusOf(70, 80, 'le'), Score.statusOf(90, 80, 'le'), Score.statusOf(120, 80, 'le')], ['ok', 'close', 'off']);
+  const T = Score.targetsOf({ targetParties: 5 });
+  assert.equal(T.targetParties, 5); assert.equal(T.targetAvgRev, 400); assert.equal(T.targetLtvCac, 3); assert.equal(T.targetK, 0.2);
+  assert.deepEqual(Score.cleanSettings({ targetK: '0.25', targetAvgRev: 'x', targetMarginPct: 150 }), { targetK: 0.25 }); // decimals allowed, bad values dropped
+  const at = (d) => d + 'T02:00:00.000Z';
+  const books = [{ ref: 'A', at: at('2026-10-05'), date: '2026-10-10', participants: 10, totalCents: 33000, via: '', source: 'outlet', lines: { squishyCents: 33000, addons: [] } }];
+  const settings = { pilotStart: '2026-10-01', pilotEnd: '2026-11-11', kitCents: 450, staffCents: 6000, outletPrintCents: 3000 };
+  const s = Score.buildScorecard({ books, life: { A: { confirmed: 'x' } }, codes: {}, rewards: [], days: { '2026-10-05': { visit_outlet: 40 } }, settings, today: '2026-10-28' });
+  // gross profit 33000 − 4500 − 6000 = 22500; CAC ceiling = 22500 ÷ 3 = 7500; actual CAC 3000 → on target
+  assert.deepEqual(s.cacCeiling, { cents: 7500, fromActual: true, grossProfitCents: 22500 });
+  assert.equal(s.checks.cac.status, 'ok'); assert.equal(s.touch.find((t) => t.key === 'outlet').cacStatus, 'ok');
+  assert.equal(s.checks.targetAvgRev.status, 'close'); // $330 against $400 is within 20%
+  assert.equal(s.checks.targetVisitReqPct.status, 'ok'); // 1 request from 40 visits = 3% ≥ 2%
+  assert.equal(s.checks.targetParties.status, 'off'); // 1 of 3
+  assert.equal(s.checks.targetK.status, 'off'); // no friend's party yet: K is 0
+  assert.equal(s.checks.targetRedeemPct.status, null); // no vouchers sent yet: no verdict
+  assert.ok(Score.pilotLocked(settings, '2026-10-28') && !Score.pilotLocked(settings, '2026-11-12') && !Score.pilotLocked({}, '2026-10-28'));
+  // before any costs, the ceiling comes from the plan: $400 × 60% ÷ 3 = $80
+  assert.deepEqual(Score.buildScorecard({ books: [], life: {}, codes: {}, rewards: [], days: {}, settings: {}, today: '2026-10-28' }).cacCeiling, { cents: 8000, fromActual: false, grossProfitCents: 24000 });
+});
 t('companies get a “book again?” reminder about 10 weeks before the anniversary of their event; families don’t', () => {
   const today = '2027-09-01', life = { contacted: 'x', confirmed: 'x', paid: 'x' };
   const co = { companyName: 'Acme', date: '2026-10-20', vendors: [] }, fam = { companyName: '', date: '2026-10-20', vendors: [] };
