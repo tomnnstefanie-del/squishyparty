@@ -8,11 +8,12 @@
 //   POST { action: 'revision', ref, n, step, vendor, reason, by } -> send (emails R-n) / accept / vendor / apply / withdraw / discard
 //   POST { action: 'change-handled', ref, changeId, by }   -> a customer's change request has been dealt with
 //   POST { action: 'reward', ref (the friend's booking), step: 'sent' | 'redeemed', by } -> referral reward voucher
+//   POST { action: 'settings', settings, by }              -> costs and targets for the scorecard (lib/scorecard.js)
 // ADMIN_PASSWORD is a Vercel environment variable (12+ characters); without it the dashboard stays locked.
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
 import { clientIp, limiter, fail, HttpError, readJson, assertSameOrigin } from '../lib/http.js';
-import { readStats, markStatus, tooManyFailures, validStatus } from '../lib/stats.js';
+import { readStats, markStatus, tooManyFailures, validStatus, saveSettings } from '../lib/stats.js';
 import { addPayment, reversePayment, createRevision, stepRevision, handleChange, getFull, paidCents, cleanBy, BookingError } from '../lib/bookings.js';
 import { validateRequest } from '../lib/validate.js';
 import { ADDON_LIST, EXP_NAME } from '../lib/pricing.js';
@@ -73,6 +74,7 @@ export default async function handler(req, res) {
     assertSameOrigin(req);
     const b = await readJson(req, 8 * 1024);
     if (b.action === 'digest') { const r = await sendDigest(); if (!r.sent) throw new HttpError(503, r.reason); return res.status(200).json({ ok: true, count: r.count }); }
+    if (b.action === 'settings') { const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.'); return res.status(200).json({ ok: true, settings: await saveSettings(b.settings || {}, by) }); }
     const ref = String(b.ref || '');
     if (!REF.test(ref)) throw new HttpError(400, 'Please refresh and try again.');
     try {

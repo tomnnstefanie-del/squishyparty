@@ -1405,6 +1405,8 @@
     }
     if (src) { saved.source = src; saved.at = saved.at || Date.now(); track('arrived_from', {source:src}); }
     try { if (code || src) localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    // One visit per browser session for the dashboard scorecard, counted by source only (friend links count as link opens)
+    if (!code && isWeb()) { try { if (!sessionStorage.getItem('cc-visit')) { sessionStorage.setItem('cc-visit', '1'); fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'visit', source:src || saved.source || 'direct'})}).catch(function(){}); } } catch (e) {} }
     return saved;
   })();
   if (REF.code) { $('ref-banner').hidden = false; $('ref-code').value = REF.code; }

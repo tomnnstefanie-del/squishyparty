@@ -13,6 +13,7 @@ const { statusLink, checkStatusToken } = await import('../lib/status-link.js');
 const nodeFs = await import('node:fs');
 const nodeZlib = await import('node:zlib');
 const Stats = await import('../lib/stats.js');
+const Score = await import('../lib/scorecard.js');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
@@ -159,6 +160,43 @@ t('a revision keeps the quoted unit prices for items already on the booking', ()
   rates.exp.both = 2000; // as if the Duo was $20 when quoted
   assert.equal(priceRequest({ ...p, participants: 20 }, rates).squishy[0].cents, 2000 * 20);
   assert.equal(priceRequest({ ...p, participants: 20, experience: 'jelly' }, rates).squishy[0].cents, 1600 * 20); // a new choice uses today's price
+});
+t('scorecard: paid parties, revenue, contribution, CAC by touchpoint and ROI follow the slide formulas', () => {
+  const at = (d) => d + 'T02:00:00.000Z', L = (squishy, addons) => ({ squishyCents: squishy, addons });
+  const books = [
+    // capsule family, 10 kids, $300 squishy + $100 partner cake, $10 off, paid in full
+    { ref: 'A', at: at('2026-10-05'), date: '2026-10-10', participants: 10, totalCents: 40000, discountCents: 1000, via: 'capsule', source: 'capsule', lines: L(30000, [{ vendor: 'Butter Studio', cents: 10000 }]) },
+    // friend of A's family, 10 kids, $300, $10 off, deposit only
+    { ref: 'B', at: at('2026-10-12'), date: '2026-11-20', participants: 10, totalCents: 30000, discountCents: 1000, via: 'friend', code: 'ANN-AB12', lines: L(30000, []) },
+    // returning company, direct, deposit
+    { ref: 'C', at: at('2026-10-13'), date: '2026-11-25', participants: 20, totalCents: 60000, via: '', source: '', companyName: 'Acme', yearly: true, returning: ['OLD'], lines: L(60000, []) },
+    // request that didn't book
+    { ref: 'D', at: at('2026-10-14'), date: '2026-11-30', participants: 8, totalCents: 24000, via: '', source: 'instagram', lines: L(24000, []) },
+  ];
+  const life = { A: { confirmed: 'x', paid: 'x' }, B: { confirmed: 'x' }, C: { confirmed: 'x' }, D: { lost: 'x' } };
+  const settings = Score.cleanSettings({ pilotStart: '2026-10-01', pilotEnd: '2026-10-21', targetParties: 4, kitCents: 500, staffCents: 5000, partnerCostPct: 80, rewardCents: 600, capsulePrintCents: 2000, adSpendCents: 3000, junk: 'x', staffCentsx: 1 });
+  assert.equal(settings.junk, undefined);
+  const days = { '2026-10-05': { capsule_scan: 30, visit_direct: 10 }, '2026-10-12': { link_open: 4, visit_instagram: 6 } };
+  const s = Score.buildScorecard({ books, life, codes: { 'ANN-AB12': { ref: 'A' } }, rewards: [{ friendRef: 'B', status: 'owed', at: at('2026-10-12') }], days, settings, today: '2026-10-28' });
+  assert.deepEqual([s.window.from, s.window.to, s.window.days, s.weeks.length], ['2026-10-01', '2026-10-21', 21, 3]);
+  assert.equal(s.kpis.paidParties, 3); assert.equal(s.kpis.newCustomers, 2); // C is a returning client
+  assert.equal(s.kpis.avgRevenueCents, Math.round((40000 + 30000 + 60000) / 3));
+  // A: 40000 − 10×500 − 5000 − 80% of 10000 − 1000 = 21000; B: 30000 − 5000 − 5000 − 1000 − 600 = 18400; C: 60000 − 10000 − 5000 = 45000
+  assert.equal(s.money.contributionCents, 21000 + 18400 + 45000);
+  const cap = s.touch.find((t) => t.key === 'capsule'), fr = s.touch.find((t) => t.key === 'friend'), so = s.touch.find((t) => t.key === 'social');
+  assert.deepEqual([cap.visits, cap.paid, cap.newCustomers, cap.costCents, cap.cacCents], [30, 1, 1, 2000 + 1000, 3000]);
+  assert.deepEqual([fr.visits, fr.costCents, fr.cacCents], [4, 1000 + 600, 1600]);
+  assert.deepEqual([so.visits, so.requests, so.paid, so.cacCents], [6, 1, 0, null]); // ad spend but no paid party yet
+  assert.deepEqual(s.kpis.bestCac, { touch: 'Family referral link', cents: 1600 });
+  // ROI: attributed (A capsule, B friend) before marketing costs = (40000−5000−5000−8000) + (30000−5000−5000) = 42000; programme = 2000+3000 + 2000 discounts + 600 reward = 7600
+  assert.equal(s.money.programmeCents, 7600); assert.equal(s.kpis.roiPct, Math.round((42000 - 7600) / 7600 * 100));
+  assert.deepEqual(s.funnel.map((f) => f.n), [50, 4, 3, 1, 1]); assert.equal(s.funnel[2].ratePct, 75);
+  assert.deepEqual([s.referral.completed, s.referral.withFriend, s.referral.ratePct], [1, 1, 100]); // A's family brought B
+  assert.deepEqual([s.company.bookings, s.company.yearlyPct, s.company.rebookPct], [1, 100, 100]);
+  assert.deepEqual(s.weeks.map((w) => w.paid), [1, 2, 0]);
+  // Without kit and staff costs, contribution and ROI aren't guessed
+  const bare = Score.buildScorecard({ books, life, codes: {}, rewards: [], days: {}, settings: {}, today: '2026-10-28' });
+  assert.ok(!bare.costsSet && bare.kpis.contributionPerPartyCents === null && bare.kpis.roiPct === null && bare.window.from === '2026-09-17');
 });
 t('companies get a “book again?” reminder about 10 weeks before the anniversary of their event; families don’t', () => {
   const today = '2027-09-01', life = { contacted: 'x', confirmed: 'x', paid: 'x' };

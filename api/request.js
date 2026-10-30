@@ -74,7 +74,7 @@ export default async function handler(req, res) {
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
     const discountCents = referralDiscount(data.referral, readReferralCode, (u, n) => !!(match && match.selfReferral) || samePerson(u, n), contact.parentName);
     await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
-      rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor, match });
+      rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor, match, source: data.referral.source });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {

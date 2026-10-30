@@ -2289,6 +2289,32 @@ footer{background:#efece7;border-top:0}
 .ad-rewards{min-width:720px}
 .ad-rewards td small{display:block;color:var(--muted)}
 .rw-owed{color:#a3173d;font-weight:700}.rw-sent{color:#1d4ea8;font-weight:600}.rw-redeemed{color:#0f6a40;font-weight:600}
+/* v70 Dashboard scorecard */
+.sc-win{margin-top:-4px}
+.sc-warn{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:#fff5d6;color:#6b4e00;font-size:.875rem}
+.sc-h3{margin:22px 0 10px;font-size:1rem}.sc-h3 small{font-weight:500;color:var(--muted)}
+.sc-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:12px}
+.sc-kpis.sc-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sc-k{display:flex;flex-direction:column;gap:4px;padding:16px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.sc-k .sc-l{font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#c2453c}
+.sc-k b{font-size:1.9rem;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.sc-k small{font-size:.8125rem;color:var(--muted)}
+.sc-k em{font-style:normal;font-size:.75rem;color:var(--muted);background:#fbeceb;border-radius:8px;padding:4px 8px;margin-top:4px}
+.sc-k.hot{background:#1d2b4f;box-shadow:none}.sc-k.hot b,.sc-k.hot .sc-l{color:#ffd84d}.sc-k.hot small{color:#cfd6ea}.sc-k.hot em{background:rgba(255,255,255,.1);color:#cfd6ea}
+.sc-funnel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.sc-step{display:flex;flex-direction:column;gap:2px;padding:12px 14px;background:#f28b82;color:#fff;border-radius:12px}
+.sc-step:nth-child(2){background:#ee7a70}.sc-step:nth-child(3){background:#e2665c}.sc-step:nth-child(4){background:#d1584f}.sc-step:nth-child(5){background:#c94c43}
+.sc-step b{font-size:1.6rem;line-height:1.1}.sc-step span{font-weight:700;font-size:.875rem}.sc-step small{font-size:.75rem;opacity:.9}
+.sc-table{min-width:720px}
+.sc-set{margin-top:18px}
+.sc-form{display:grid;gap:14px;margin-top:12px}
+.sc-form fieldset{border:0;min-width:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.sc-form legend{font-weight:800;font-size:.875rem;margin-bottom:6px}
+.sc-form label{display:flex;flex-direction:column;gap:4px;font-size:.8125rem;font-weight:600}
+.sc-form input{min-height:40px;padding:8px 10px;border:1.5px solid var(--line-2,#ccd);border-radius:10px;font:inherit;font-weight:400}
+.sc-form .btn{justify-self:start}
+.sc-formulas{margin:10px 0 0 18px;display:grid;gap:6px;font-size:.875rem}
+@media (max-width:900px){.sc-kpis,.sc-funnel{grid-template-columns:repeat(2,minmax(0,1fr))}.sc-kpis.sc-3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>

@@ -51,6 +51,65 @@ __HEADER__
         </div>
         <div class="ad-books" id="ad-books"></div>
 
+        <h2 class="ad-h2">Scorecard</h2>
+        <p class="ad-fine sc-win" id="sc-win"></p>
+        <p class="sc-warn" id="sc-warn" hidden>Add your costs under <b>Costs &amp; targets</b> below to see contribution, CAC and ROI.</p>
+        <div class="sc-kpis" id="sc-kpis"></div>
+        <h3 class="sc-h3">Acquisition funnel</h3>
+        <div class="sc-funnel" id="sc-funnel"></div>
+        <h3 class="sc-h3">Which touchpoint brought each paid party</h3>
+        <div class="ad-table-wrap"><table class="ad-table sc-table">
+          <thead><tr><th>Touchpoint</th><th>Visits / scans</th><th>Requests</th><th>Paid parties</th><th>New customers</th><th>Cost</th><th>CAC</th></tr></thead>
+          <tbody id="sc-touch"></tbody>
+        </table></div>
+        <h3 class="sc-h3">Referrals &amp; repeat bookings</h3>
+        <div class="sc-kpis sc-3" id="sc-repeat"></div>
+        <h3 class="sc-h3">Week by week <small>(by the week the request came in)</small></h3>
+        <div class="ad-table-wrap"><table class="ad-table sc-table">
+          <thead><tr><th>Week</th><th>Visits</th><th>Requests</th><th>Paid parties</th><th>New</th><th>Avg revenue</th><th>Contribution / party</th><th>CAC</th><th>ROI</th></tr></thead>
+          <tbody id="sc-weeks"></tbody>
+        </table></div>
+        <details class="ad-guide sc-set" id="sc-set">
+          <summary>Costs &amp; targets</summary>
+          <form class="sc-form" id="sc-form">
+            <fieldset><legend>Pilot and targets</legend>
+              <label>Pilot start<input type="date" name="pilotStart"></label>
+              <label>Pilot end<input type="date" name="pilotEnd"></label>
+              <label>Target: new paid parties<input type="number" name="targetParties" min="0" step="1" inputmode="numeric"></label>
+              <label>Target: referral rate (%)<input type="number" name="targetReferralPct" min="0" max="100" step="1" inputmode="numeric"></label>
+              <label>Target: company rebooking (%)<input type="number" name="targetRebookPct" min="0" max="100" step="1" inputmode="numeric"></label>
+            </fieldset>
+            <fieldset><legend>Cost of each party</legend>
+              <label>Squishy kit, per child ($)<input name="kitCents" data-money inputmode="decimal" placeholder="e.g. 4.50"></label>
+              <label>Facilitator staff, per party ($)<input name="staffCents" data-money inputmode="decimal" placeholder="e.g. 120"></label>
+              <label>Partner cost (% of partner price we pay)<input type="number" name="partnerCostPct" min="0" max="100" step="1" placeholder="100"></label>
+              <label>Free-squishy reward, each ($)<input name="rewardCents" data-money inputmode="decimal" placeholder="e.g. 6"></label>
+            </fieldset>
+            <fieldset><legend>Marketing programme (whole pilot)</legend>
+              <label>Capsule QR sticker printing ($)<input name="capsulePrintCents" data-money inputmode="decimal"></label>
+              <label>In-store QR printing ($)<input name="outletPrintCents" data-money inputmode="decimal"></label>
+              <label>Social / ads spend ($)<input name="adSpendCents" data-money inputmode="decimal"></label>
+              <label>Programme staff time ($)<input name="programmeStaffCents" data-money inputmode="decimal"></label>
+              <label>Other marketing costs ($)<input name="otherCents" data-money inputmode="decimal"></label>
+            </fieldset>
+            <p class="ad-fine" id="sc-saved"></p>
+            <button class="btn btn-primary" type="submit">Save costs &amp; targets</button>
+          </form>
+        </details>
+        <details class="ad-guide">
+          <summary>How each number is worked out</summary>
+          <ul class="sc-formulas">
+            <li><b>Paid party</b>: a request in the window with a deposit recorded. <b>New customer</b>: a paid party not flagged as a returning customer (same email or WhatsApp as an earlier booking).</li>
+            <li><b>Conversion</b> at each funnel step = this step ÷ the step before. Visits are counted once per browser session; QR scans and friend-link opens count as visits for their touchpoint.</li>
+            <li><b>Average revenue per party</b> = quoted value of paid parties ÷ paid parties (split into squishy activity and add-ons).</li>
+            <li><b>Contribution per party</b> = revenue − kits (cost × participants) − facilitator staff − partner costs (partner add-ons × partner %) − $10 discount − free-squishy reward.</li>
+            <li><b>CAC by touchpoint</b> = that touchpoint’s cost ÷ its new customers. Capsule = sticker printing + $10 discounts; family link = $10 discounts + rewards; in-store = QR printing; social = ad spend.</li>
+            <li><b>Marketing ROI</b> = (contribution before marketing costs from parties brought by a touchpoint − programme cost) ÷ programme cost. Programme cost = printing + ads + programme staff + other + $10 discounts + rewards.</li>
+            <li><b>Referral rate</b> = parties paid in full whose family link brought at least one friend’s paid party ÷ parties paid in full. <b>Reward redemption</b> = vouchers redeemed ÷ vouchers sent.</li>
+            <li><b>Company yearly rate</b> = company requests that ticked “every year” ÷ company requests. <b>Rebooking</b> = company requests from returning clients ÷ company requests.</li>
+          </ul>
+        </details>
+
         <h2 class="ad-h2">Referrals</h2>
         <div class="ad-compare">
           <article class="ad-src ad-capsule">
@@ -169,7 +228,7 @@ __FOOTER__
     $('l-rate').textContent = L.requests ? Math.round(L.confirmed / L.requests * 100) + '%' : '–';
     $('l-rate-s').textContent = L.requests ? L.confirmed + ' of ' + L.requests + ' requests' + (L.lost ? ' · ' + L.lost + ' didn’t book' : '') : 'No data yet';
     $('l-wait').textContent = L.waiting || 0; $('l-wait-tile').classList.toggle('on', !!L.waiting);
-    events(); bookings(); if (managing) renderManage();
+    events(); bookings(); if (managing) renderManage(); if (d.scorecard) scorecard(d.scorecard);
 
     var rb = $('ad-referrers'); rb.textContent = '';
     if (!d.referrers.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'No friend links opened yet.', 'ad-empty'); td0.colSpan = 5; rb.appendChild(tr0); }
@@ -215,6 +274,57 @@ __FOOTER__
       rc.appendChild(tr);
     });
   }
+
+  /* ---------- Scorecard: acquisition, referrals and repeat bookings, revenue and ROI (lib/scorecard.js) ---------- */
+  var m0 = function(c){ return c == null ? '–' : (c < 0 ? '−' : '') + '$' + Math.round(Math.abs(c) / 100).toLocaleString('en-SG'); };
+  var p0 = function(v){ return v == null ? '–' : v + '%'; };
+  function kpi(box, label, value, sub, formula, cls){
+    var k = el('div', 'sc-k' + (cls ? ' ' + cls : '')); k.appendChild(el('span', 'sc-l', label)); k.appendChild(el('b', null, value));
+    if (sub) k.appendChild(el('small', null, sub)); if (formula) k.appendChild(el('em', null, formula)); box.appendChild(k);
+  }
+  var scDirty = false;
+  function scorecard(s){
+    var K = s.kpis, M = s.money, wk = function(w){ return fmtDate(w.from) + ' – ' + fmtDate(w.to); };
+    $('sc-win').textContent = (s.settings.pilotStart ? 'Pilot: ' : 'Last 6 weeks: ') + fmtDate(s.window.from) + ' – ' + fmtDate(s.window.to) + ' · ' + s.window.days + ' days · updates automatically';
+    $('sc-warn').hidden = s.costsSet;
+    var kb = $('sc-kpis'); kb.textContent = '';
+    kpi(kb, 'Paid parties', String(K.paidParties), K.newCustomers + ' new customers' + (K.targetParties ? ' · target ' + K.targetParties + ' (' + Math.round(K.newCustomers / K.targetParties * 100) + '%)' : ''), 'Deposit recorded');
+    kpi(kb, 'Avg revenue / party', m0(K.avgRevenueCents), K.paidParties ? 'Squishy ' + m0(M.squishyCents / K.paidParties) + ' · add-ons ' + m0(M.addonCents / K.paidParties) : '', 'Value of paid parties ÷ paid parties');
+    kpi(kb, 'Contribution / party', m0(K.contributionPerPartyCents), s.costsSet ? '' : 'Add costs below', 'Revenue − kits − staff − partners − discount − reward');
+    kpi(kb, 'CAC (best touchpoint)', K.bestCac ? m0(K.bestCac.cents) : '–', K.bestCac ? K.bestCac.touch : 'No touchpoint costs yet', 'Touchpoint cost ÷ its new customers');
+    kpi(kb, 'Marketing ROI', p0(K.roiPct), M.programmeCents ? 'Programme cost ' + m0(M.programmeCents) : '', '(Contribution − programme cost) ÷ programme cost', 'hot');
+    var fb = $('sc-funnel'); fb.textContent = '';
+    s.funnel.forEach(function(f){ var st = el('div', 'sc-step'); st.appendChild(el('b', null, String(f.n))); st.appendChild(el('span', null, f.step)); if (f.ratePct != null) st.appendChild(el('small', null, f.ratePct + '% of previous')); fb.appendChild(st); });
+    var tb = $('sc-touch'); tb.textContent = '';
+    s.touch.filter(function(t){ return t.visits || t.requests || t.costCents; }).forEach(function(t){
+      var tr = el('tr'); cell(tr, t.label); cell(tr, t.visits, 'num'); cell(tr, t.requests, 'num'); cell(tr, t.paid, 'num'); cell(tr, t.newCustomers, 'num' + (t.newCustomers ? ' ad-win' : ''));
+      cell(tr, t.costCents ? m0(t.costCents) : '—', 'num'); cell(tr, m0(t.cacCents), 'num'); tb.appendChild(tr);
+    });
+    if (!tb.children.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'Nothing in this window yet.', 'ad-empty'); td0.colSpan = 7; tb.appendChild(tr0); }
+    var R = s.referral, W = s.rewards, C = s.company, rb = $('sc-repeat'); rb.textContent = '';
+    kpi(rb, 'Referral rate', p0(R.ratePct), R.withFriend + ' of ' + R.completed + ' parties paid in full brought a friend' + (R.targetPct != null ? ' · target ' + R.targetPct + '%' : ''), 'Link opens ' + R.opens + ' → requests ' + R.requests + ' → paid ' + R.paid);
+    kpi(rb, 'Reward redemption', p0(W.ratePct), W.redeemed + ' redeemed of ' + W.sent + ' sent' + (W.owed ? ' · ' + W.owed + ' to send' : ''), 'Redeemed ÷ vouchers sent');
+    kpi(rb, 'Company rebooking', p0(C.rebookPct), C.returning + ' of ' + C.bookings + ' company requests from returning clients' + (C.targetPct != null ? ' · target ' + C.targetPct + '%' : ''), '“Every year” ticked: ' + p0(C.yearlyPct) + ' (' + C.yearly + ' of ' + C.bookings + ')');
+    var wb = $('sc-weeks'); wb.textContent = '';
+    s.weeks.forEach(function(w){ var tr = el('tr'); cell(tr, wk(w)); cell(tr, w.visits, 'num'); cell(tr, w.requests, 'num'); cell(tr, w.paid, 'num'); cell(tr, w.newCustomers, 'num');
+      cell(tr, m0(w.avgRevenueCents), 'num'); cell(tr, m0(w.contributionPerPartyCents), 'num'); cell(tr, m0(w.cacCents), 'num'); cell(tr, p0(w.roiPct), 'num'); wb.appendChild(tr); });
+    if (!scDirty) {
+      var f = $('sc-form'), S = s.settings || {};
+      Array.prototype.forEach.call(f.elements, function(i){ if (!i.name) return; var v = S[i.name]; i.value = v == null ? '' : i.hasAttribute('data-money') ? String(v / 100) : v; });
+      $('sc-saved').textContent = S.savedAt ? 'Last saved ' + when(S.savedAt) + ' by ' + S.savedBy : 'Not saved yet.';
+    }
+  }
+  $('sc-form').addEventListener('input', function(){ scDirty = true; });
+  $('sc-form').addEventListener('submit', function(e){
+    e.preventDefault(); var out = {}, bad = '';
+    Array.prototype.forEach.call(this.elements, function(i){
+      if (!i.name || i.value.trim() === '') return;
+      if (i.hasAttribute('data-money')) { var c = cents(i.value); if (isNaN(c)) bad = bad || i.parentNode.firstChild.textContent; else out[i.name] = c; }
+      else out[i.name] = i.type === 'date' ? i.value : Number(i.value);
+    });
+    if (bad) { alert('Please check: ' + bad); return; }
+    post({ action:'settings', settings: out }, function(){ scDirty = false; });
+  });
 
   /* ---------- Manage one booking: amounts, payments, customer changes, revisions, history ---------- */
   var managing = null;

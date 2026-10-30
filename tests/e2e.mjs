@@ -428,6 +428,22 @@ try {
   assert.ok(!html.includes('test:token') && !/TELEGRAM_BOT_TOKEN|SMTP_PASS|api\.telegram\.org/.test(html));
   ok('no Telegram token or Telegram URL anywhere in the page');
 
+  // Scorecard on the dashboard: visits by source, costs and targets saved by the team, worked out automatically
+  console.log('scorecard');
+  const ev = (body, ip) => p2.evaluate(async ([body, ip]) => (await fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: JSON.stringify(body) })).status, [body, ip]);
+  assert.equal(await ev({ type: 'visit', source: 'outlet' }, '10.0.8.1'), 200); assert.equal(await ev({ type: 'visit', source: '<script>' }, '10.0.8.1'), 200);
+  let sc = (await adm('test-dashboard-pass')).b.scorecard;
+  assert.ok(sc && sc.touch.find((t) => t.key === 'outlet').visits >= 1 && sc.funnel[0].step === 'Visits & scans' && !sc.costsSet);
+  assert.equal((await admPost({ action: 'settings', settings: { targetParties: 12, kitCents: 450, staffCents: 8000, rewardCents: 600, capsulePrintCents: 5000 } })).s, 200);
+  assert.equal((await admPost({ action: 'settings', by: '', settings: {} })).s, 400);
+  sc = (await adm('test-dashboard-pass')).b.scorecard;
+  assert.ok(sc.costsSet && sc.settings.targetParties === 12 && sc.settings.savedBy === 'Tester' && sc.kpis.paidParties >= 1 && sc.kpis.contributionPerPartyCents !== null && sc.weeks.length === 6);
+  x = await api({ ...base, emailToken: issueVerified('ivy@example.com'), referral: { source: 'outlet' }, contact: { ...base.contact, parentName: 'Ivy Teo', email: 'ivy@example.com', phone: '97770001' } }, { 'X-Forwarded-For': '10.0.8.2' });
+  const scd = (await adm('test-dashboard-pass')).b;
+  assert.ok(scd.ok, JSON.stringify(scd).slice(0, 200));
+  assert.equal(scd.bookings.find((q) => q.ref === x.b.ref).source, 'outlet'); assert.ok(scd.scorecard.touch.find((t) => t.key === 'outlet').requests >= 1);
+  ok('the dashboard scorecard counts visits by source, credits each request to its touchpoint, and works out contribution, CAC and ROI once costs are saved');
+
   console.log('not configured');
   const env2 = { ...env, PORT: '3101' }; delete env2.TELEGRAM_BOT_TOKEN;
   await start('dev/server.mjs', env2);
