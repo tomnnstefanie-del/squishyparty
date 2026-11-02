@@ -155,6 +155,34 @@ t('quotation package line costs exactly the same as the itemised breakdown', () 
   assert.ok(det.includes('Squishy DIY') && !det.includes('Workshop Package') && det.includes(total));
   assert.ok(fam.includes('Birthday Party Activity Package') && fam.includes(total));
 });
+t('company PO reference with PDF and HTML special characters prints as text and keeps the PDF valid', () => {
+  const zlib = nodeZlib, text = (s) => [...s.matchAll(/stream\n([\s\S]*?)\nendstream/g)].map((m) => { try { return zlib.inflateSync(Buffer.from(m[1], 'latin1')).toString('latin1'); } catch { return ''; } }).join('');
+  const po = 'PO-(7) \\ <script>alert(1)</script>';
+  const s = quotePdf({ ref: 'SP-1', issued: new Date('2026-10-27'), plan: v.plan, contact: { ...v.contact, companyName: 'Acme (S) Pte Ltd', poRef: po }, price, bookingFor: 'company', discountCents: 0, contactEmail: 'x@example.com', site: 'https://e.sg' }).toString('latin1');
+  assert.ok(s.startsWith('%PDF-1.4') && s.trimEnd().endsWith('%%EOF'));
+  const xref = Number(/startxref\n(\d+)/.exec(s)[1]);
+  [...s.slice(xref).matchAll(/^(\d{10}) 00000 n $/gm)].forEach((m, i) => assert.ok(s.slice(+m[1]).startsWith(`${i + 1} 0 obj`), `object ${i + 1}`));
+  const page = text(s);
+  assert.ok(page.includes('(PO reference PO-\\(7\\) \\\\ <script>alert\\(1\\)</script>) Tj'), 'brackets and backslash escaped, the rest literal');
+  assert.ok(page.includes('(Acme \\(S\\) Pte Ltd) Tj'));
+  assert.ok(!text(quotePdf({ ref: 'SP-1', issued: new Date('2026-10-27'), plan: v.plan, contact: { ...v.contact, poRef: po }, price, bookingFor: 'family', discountCents: 0, contactEmail: 'x@example.com', site: 'https://e.sg' }).toString('latin1')).includes('PO reference'), 'families never get a PO line');
+});
+t('corporate options: only for companies, strict true/false, PO reference cut to 40 characters', () => {
+  const co = (o = {}) => { const g = dateOK(); g.bookingFor = 'company'; Object.assign(g.contact, { companyName: 'Acme Pte Ltd', poRef: 'P'.repeat(60) }); Object.assign(g, o); return validateRequest(g); };
+  assert.equal(co().contact.poRef.length, 40);
+  assert.deepEqual([co().corporate.detailed, co().corporate.procurement], [false, false]);
+  assert.deepEqual([co({ corporate: { detailed: true, procurement: true } }).corporate.detailed, co({ corporate: { detailed: true, procurement: true } }).corporate.procurement], [true, true]);
+  assert.deepEqual([co({ corporate: { detailed: 'yes', procurement: 1 } }).corporate.detailed, co({ corporate: { detailed: 'yes', procurement: 1 } }).corporate.procurement], [false, false]);
+  const fam = dateOK(); fam.contact.poRef = 'PO-1'; fam.corporate = { detailed: true, procurement: true };
+  const f = validateRequest(fam); assert.equal(f.corporate, null); assert.equal(f.contact.poRef, undefined);
+});
+t('procurement support adds a dashboard to-do until the deposit is paid', () => {
+  const b = { companyName: 'Acme', date: '2099-01-01', vendors: [], procurement: true }, today = '2026-11-02', todo = 'Help with their vendor registration / procurement';
+  assert.ok(Stats.todosFor(b, {}, today).includes(todo));
+  assert.ok(Stats.todosFor(b, { contacted: 'x' }, today).includes(todo)); // ready stage
+  assert.ok(!Stats.todosFor(b, { contacted: 'x', confirmed: 'x' }, today).includes(todo)); // deposit paid
+  assert.ok(!Stats.todosFor({ ...b, procurement: false }, {}, today).includes(todo));
+});
 t('a revision keeps the quoted unit prices for items already on the booking', () => {
   const p = { participants: 15, experience: 'both', wax: false, addons: [] }, rates = ratesOf(p);
   rates.exp.both = 2000; // as if the Duo was $20 when quoted
