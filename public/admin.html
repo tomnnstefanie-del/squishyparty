@@ -2338,6 +2338,26 @@ footer{background:#efece7;border-top:0}
 .sc-log h4{font-size:.875rem;margin:6px 0}.sc-log ul{list-style:none;display:grid;gap:8px;margin:0;padding:0}
 .sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
 .sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
+
+/* v72 Dashboard booking filters: search, month, counts on the stage chips, clear filters */
+.ad-find{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.ad-search{flex:1 1 240px;min-width:0}
+.ad-search input,.ad-month select{width:100%;min-height:44px;padding:9px 14px;border:1.5px solid var(--line-2);border-radius:999px;background:#fff;font:inherit;font-size:.875rem;color:var(--ink)}
+.ad-search input{padding-left:38px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235d6480' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 3.5 3.5'/%3E%3C/svg%3E") no-repeat 14px 50%}
+.ad-month{flex:0 1 190px}
+.ad-search input:focus-visible,.ad-month select:focus-visible,.ad-filter .chip:focus-visible,.ad-clear:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.ad-filter .chip-n{display:inline-block;min-width:20px;margin-left:2px;padding:0 6px;border-radius:999px;background:var(--cobalt-100);color:var(--ink-2);font-size:.75rem;line-height:20px;text-align:center}
+.ad-filter .chip.on .chip-n{background:rgba(255,255,255,.22);color:#fff}
+.ad-showing{margin:0 0 10px;font-size:.8125rem;color:var(--muted)}
+.ad-showing:empty{display:none}
+.ad-clear{min-height:32px;padding:4px 10px;border:0;background:none;font:inherit;font-weight:700;color:var(--teal-700);text-decoration:underline;cursor:pointer}
+.ad-book-empty p{margin:0 0 4px}
+@media (max-width:600px){
+  .ad-month{flex:1 1 100%}
+  .ad-filter{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gut) * -1);padding-inline:var(--gut)}
+  .ad-filter::-webkit-scrollbar{display:none}
+  .ad-filter .chip{flex:0 0 auto}
+}
 </style>
 </head>
 <body>
@@ -2444,9 +2464,14 @@ footer{background:#efece7;border-top:0}
             <ul class="ad-todo" id="ad-todo"></ul>
           </div>
         </div>
-        <div class="ad-filter" role="group" aria-label="Show bookings">
-          <button type="button" class="chip on" data-b="upcoming">Upcoming</button><button type="button" class="chip" data-b="pending">🟡 Waiting for vendors</button><button type="button" class="chip" data-b="ready">🟠 Ask for deposit</button><button type="button" class="chip" data-b="booked">🔵 Deposit paid</button><button type="button" class="chip" data-b="paid">🟢 Paid in full</button><button type="button" class="chip" data-b="past">Past</button><button type="button" class="chip" data-b="all">All</button>
+        <div class="ad-find">
+          <label class="ad-search"><input type="search" id="bk-q" aria-label="Search bookings" placeholder="Search SP- reference, name or company" autocomplete="off" spellcheck="false" maxlength="40"></label>
+          <label class="ad-month"><select id="bk-month" aria-label="Month of the party"><option value="">All months</option></select></label>
         </div>
+        <div class="ad-filter" role="group" aria-label="Show bookings">
+          <button type="button" class="chip on" data-b="upcoming" aria-pressed="true">Upcoming</button><button type="button" class="chip" data-b="pending" aria-pressed="false">🟡 Waiting for vendors</button><button type="button" class="chip" data-b="ready" aria-pressed="false">🟠 Ask for deposit</button><button type="button" class="chip" data-b="booked" aria-pressed="false">🔵 Deposit paid</button><button type="button" class="chip" data-b="paid" aria-pressed="false">🟢 Paid in full</button><button type="button" class="chip" data-b="past" aria-pressed="false">Past</button><button type="button" class="chip" data-b="all" aria-pressed="false">All</button>
+        </div>
+        <p class="ad-showing" id="bk-showing" aria-live="polite"></p>
         <div class="ad-books" id="ad-books"></div>
 
         <h2 class="ad-h2">Scorecard</h2>
@@ -2956,7 +2981,24 @@ footer{background:#efece7;border-top:0}
   }
 
   /* ---------- Bookings: calendar, to-dos and one card per party ---------- */
-  var calMonth = null, bookFilter = 'upcoming';
+  var calMonth = null, bookFilter = 'upcoming', bookQ = '', bookMonth = '';
+  // Filters for the booking cards: a stage chip, a month and a search on the reference, first name or company
+  function inChip(b, f, today){
+    if (f === 'all') return true; if (b.state === 'lost') return false;
+    if (f === 'upcoming') return b.date >= today; if (f === 'past') return b.date < today;
+    return b.state === f;
+  }
+  function matches(b){
+    if (bookMonth && b.date.slice(0, 7) !== bookMonth) return false;
+    if (!bookQ) return true;
+    return [b.ref, b.first, b.companyName].some(function(s){ return String(s || '').toLowerCase().indexOf(bookQ) >= 0; });
+  }
+  var filtered = function(){ return !!(bookQ || bookMonth || bookFilter !== 'upcoming'); };
+  function clearFilters(){
+    bookQ = ''; bookMonth = ''; bookFilter = 'upcoming'; $('bk-q').value = ''; $('bk-month').value = '';
+    if (last) bookings(); $('bk-q').focus();
+  }
+  function clearBtn(){ var c = el('button', 'ad-clear', 'Clear filters'); c.type = 'button'; c.addEventListener('click', clearFilters); return c; }
   var openTiles = {}; // which tiles have Details open, kept across refreshes
   var shortDay = function(d){ return new Date(d + 'T00:00').toLocaleDateString('en-SG', {weekday:'short', day:'numeric', month:'short'}); };
   var STAGE = { pending:'🟡 Waiting for vendors', ready:'🟠 Ask for deposit', booked:'🔵 Deposit paid', paid:'🟢 Paid in full', lost:'Didn’t book' };
@@ -2988,15 +3030,30 @@ footer{background:#efece7;border-top:0}
       });
       cal.appendChild(cell);
     }
-    // Cards
-    var list = (last.bookings || []).filter(function(b){
-      if (bookFilter === 'all') return true; if (b.state === 'lost') return false;
-      if (bookFilter === 'upcoming') return b.date >= today; if (bookFilter === 'past') return b.date < today;
-      return b.state === bookFilter;
+    // Filters: months that have parties (newest first), a count on every chip, then the cards
+    var every = last.bookings || [], seen = {}, ms = $('bk-month');
+    every.forEach(function(b){ seen[b.date.slice(0, 7)] = 1; }); if (bookMonth) seen[bookMonth] = 1;
+    ms.length = 1;
+    Object.keys(seen).sort().reverse().forEach(function(k){ var o = el('option', null, new Date(k + '-01T00:00').toLocaleDateString('en-SG', {month:'long', year:'numeric'})); o.value = k; ms.appendChild(o); });
+    ms.value = bookMonth;
+    var found = every.filter(matches);
+    document.querySelectorAll('[data-b]').forEach(function(c){
+      if (!c.dataset.label) c.dataset.label = c.textContent;
+      var on = c.dataset.b === bookFilter; c.classList.toggle('on', on); c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      c.textContent = c.dataset.label + ' ';
+      c.appendChild(el('span', 'chip-n', String(found.filter(function(b){ return inChip(b, c.dataset.b, today); }).length)));
     });
+    var list = found.filter(function(b){ return inChip(b, bookFilter, today); });
     if (bookFilter === 'past') list.reverse();
+    var sh = $('bk-showing'); sh.textContent = '';
+    if (filtered() && list.length) { sh.appendChild(document.createTextNode('Showing ' + list.length + ' of ' + every.length + ' booking' + (every.length === 1 ? '' : 's') + ' ')); sh.appendChild(clearBtn()); }
     var box = $('ad-books'); box.textContent = '';
-    if (!list.length) { box.appendChild(el('p', 'ad-empty ad-book-empty', 'No bookings here yet.')); return; }
+    if (!list.length) {
+      var e = el('div', 'ad-empty ad-book-empty');
+      e.appendChild(el('p', null, filtered() && (bookQ || bookMonth) ? 'No bookings match these filters.' : 'No bookings here yet.'));
+      if (filtered()) e.appendChild(clearBtn());
+      box.appendChild(e); return;
+    }
     list.forEach(function(b){
       // A compact tile: when, who, stage, the one next step, vendor chips. Everything else is under "Details".
       var c = el('article', 'ad-tile-b st-' + b.state); c.id = 'bk-' + b.ref;
@@ -3058,7 +3115,10 @@ footer{background:#efece7;border-top:0}
   var when2 = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
   $('cal-prev').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7) - 2; if (m < 0) { m = 11; y--; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });
   $('cal-next').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7); if (m > 11) { m = 0; y++; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });
-  document.querySelectorAll('[data-b]').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on', x === b); }); bookFilter = b.dataset.b; if (last) bookings(); }); });
+  document.querySelectorAll('[data-b]').forEach(function(b){ b.addEventListener('click', function(){ document.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); bookFilter = b.dataset.b; if (last) bookings(); }); });
+  $('bk-q').addEventListener('input', function(){ bookQ = this.value.trim().toLowerCase(); if (last) bookings(); });
+  // Choosing a month also moves the calendar there
+  $('bk-month').addEventListener('change', function(){ bookMonth = this.value; if (bookMonth) calMonth = bookMonth; if (last) bookings(); });
 
   (function(){ var g = $('ad-guide'), K = 'cc-guide-closed'; try { g.open = !localStorage.getItem(K); } catch (e) { g.open = true; }
     g.addEventListener('toggle', function(){ try { if (g.open) localStorage.removeItem(K); else localStorage.setItem(K, '1'); } catch (e) {} }); })();

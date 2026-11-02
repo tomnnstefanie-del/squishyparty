@@ -1695,3 +1695,23 @@ footer{background:#efece7;border-top:0}
 .sc-log h4{font-size:.875rem;margin:6px 0}.sc-log ul{list-style:none;display:grid;gap:8px;margin:0;padding:0}
 .sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
 .sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
+
+/* v72 Dashboard booking filters: search, month, counts on the stage chips, clear filters */
+.ad-find{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.ad-search{flex:1 1 240px;min-width:0}
+.ad-search input,.ad-month select{width:100%;min-height:44px;padding:9px 14px;border:1.5px solid var(--line-2);border-radius:999px;background:#fff;font:inherit;font-size:.875rem;color:var(--ink)}
+.ad-search input{padding-left:38px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235d6480' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 3.5 3.5'/%3E%3C/svg%3E") no-repeat 14px 50%}
+.ad-month{flex:0 1 190px}
+.ad-search input:focus-visible,.ad-month select:focus-visible,.ad-filter .chip:focus-visible,.ad-clear:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.ad-filter .chip-n{display:inline-block;min-width:20px;margin-left:2px;padding:0 6px;border-radius:999px;background:var(--cobalt-100);color:var(--ink-2);font-size:.75rem;line-height:20px;text-align:center}
+.ad-filter .chip.on .chip-n{background:rgba(255,255,255,.22);color:#fff}
+.ad-showing{margin:0 0 10px;font-size:.8125rem;color:var(--muted)}
+.ad-showing:empty{display:none}
+.ad-clear{min-height:32px;padding:4px 10px;border:0;background:none;font:inherit;font-weight:700;color:var(--teal-700);text-decoration:underline;cursor:pointer}
+.ad-book-empty p{margin:0 0 4px}
+@media (max-width:600px){
+  .ad-month{flex:1 1 100%}
+  .ad-filter{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gut) * -1);padding-inline:var(--gut)}
+  .ad-filter::-webkit-scrollbar{display:none}
+  .ad-filter .chip{flex:0 0 auto}
+}
