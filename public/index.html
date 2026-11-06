@@ -2342,6 +2342,13 @@ footer{background:#efece7;border-top:0}
 .tb-del{display:block;min-height:36px;margin-top:10px;padding:6px 2px;border:0;background:none;font:inherit;font-size:.75rem;font-weight:700;color:#b42318;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .tb-del:hover{color:#8a1a12}
 .tb-del:focus-visible{outline:2px solid #b42318;outline-offset:2px;border-radius:6px}
+
+/* v74 Planner step 1: "Do you already have a venue?" */
+.venue-q .sel-label{margin:0 0 10px}
+.venue-note{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;padding:10px 12px;border-radius:var(--r-sm);background:var(--cobalt-50);color:var(--ink);font-size:.875rem;font-weight:600;line-height:1.4}
+.venue-note .icon{flex:none;width:18px;height:18px;margin-top:1px;color:var(--cobalt)}
+.venue-note[hidden],[data-venue-field][hidden]{display:none}
+@media (max-width:420px){.venue-q .bf-opts{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -2742,7 +2749,15 @@ footer{background:#efece7;border-top:0}
         <!-- STEP 1 -->
         <section class="wstep" id="wstep-1" aria-labelledby="ws1-h">
           <p class="eyebrow">Step 1</p><h2 id="ws1-h" tabindex="-1">Tell us about the party.</h2>
-          <p class="wlead">Start with how many people will be making squishies. It works the same for birthdays and company events.</p>
+          <p class="wlead">Start with where it’s happening and how many people will be making squishies. It works the same for birthdays and company events.</p>
+          <div class="card-block venue-q">
+            <p class="sel-label" id="hv-label">Do you already have a venue?</p>
+            <div class="bf-opts" role="radiogroup" aria-labelledby="hv-label">
+              <label class="bf-opt"><input type="radio" name="hasVenue" value="yes"><span><b>Yes, I have one</b><small>Home, condo clubhouse, office or school</small></span></label>
+              <label class="bf-opt"><input type="radio" name="hasVenue" value="no"><span><b>Not yet</b><small>We can help with that</small></span></label>
+            </div>
+            <p class="venue-note" id="venue-note" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span>No worries! You can check out exclusive rates from our venue partners under Add-ons.</span></p>
+          </div>
           <div class="card-block">
             <div class="grid2">
               <div class="field"><label for="participants">Number of participants</label>
@@ -2760,9 +2775,9 @@ footer{background:#efece7;border-top:0}
                 <div class="field"><span id="time-label">Party time</span>
                   <div class="time-range" role="group" aria-labelledby="time-label"><label><span class="vh">Start time</span><input name="time" id="time" type="time" value="14:00" aria-label="Start time"></label><span class="time-to" aria-hidden="true">to</span><label><span class="vh">End time</span><input name="end" id="end" type="time" value="16:00" aria-label="End time"></label></div>
                   <span class="hint" id="time-hint">2 hours · Singapore time</span><span class="hint early-hint"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Our team arrives 15 minutes before your start time to set up.</span></div>
-                <label class="field full">Venue address<input name="venue" id="venue" autocomplete="street-address" maxlength="300" placeholder="e.g. Blk 123 Tampines St 11"></label>
-                <label class="field full"><span>Exact location <span class="opt-tag">(optional)</span></span><input name="spot" id="spot" maxlength="120" placeholder="e.g. Condo Clubhouse II, function room level 2"><span class="hint">So our team can find you on the day</span></label>
-                <label class="field">Postal code<input name="postal" id="postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 digits"><span class="hint">Helps us plan travel to your venue</span></label>
+                <label class="field full" data-venue-field>Venue address<input name="venue" id="venue" autocomplete="street-address" maxlength="300" placeholder="e.g. Blk 123 Tampines St 11"></label>
+                <label class="field full" data-venue-field><span>Exact location <span class="opt-tag">(optional)</span></span><input name="spot" id="spot" maxlength="120" placeholder="e.g. Condo Clubhouse II, function room level 2"><span class="hint">So our team can find you on the day</span></label>
+                <label class="field" data-venue-field>Postal code<input name="postal" id="postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 digits"><span class="hint">Helps us plan travel to your venue</span></label>
               </div>
             </div>
           </details>
@@ -3241,7 +3256,7 @@ footer{background:#efece7;border-top:0}
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', hasVenue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
 
   function foundation(s){
     var n = billable(s.participants), e = EXP[s.experience], items = [];
@@ -4420,6 +4435,9 @@ footer{background:#efece7;border-top:0}
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
+    // "Do you already have a venue?" Not yet: hide the address fields and point to venue partners in Add-ons.
+    S.hasVenue = d.get('hasVenue') || ''; $('venue-note').hidden = S.hasVenue !== 'no';
+    form.querySelectorAll('[data-venue-field]').forEach(function(f){ f.hidden = S.hasVenue === 'no'; });
     S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax');
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
