@@ -2338,6 +2338,11 @@ footer{background:#efece7;border-top:0}
 .sc-log h4{font-size:.875rem;margin:6px 0}.sc-log ul{list-style:none;display:grid;gap:8px;margin:0;padding:0}
 .sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
 .sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
+
+/* v73 Dashboard: delete a (test) booking from its Details */
+.tb-del{display:block;min-height:36px;margin-top:10px;padding:6px 2px;border:0;background:none;font:inherit;font-size:.75rem;font-weight:700;color:#b42318;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.tb-del:hover{color:#8a1a12}
+.tb-del:focus-visible{outline:2px solid #b42318;outline-offset:2px;border-radius:6px}
 </style>
 </head>
 <body>
@@ -2627,16 +2632,16 @@ footer{background:#efece7;border-top:0}
   var dur = function(h){ if (h == null) return '–'; if (h < 1) return Math.max(1, Math.round(h * 60)) + ' min'; if (h < 48) return (Math.round(h * 10) / 10) + ' h'; return (Math.round(h / 24 * 10) / 10) + ' days'; };
   var since = function(a, b){ return a && b ? dur((new Date(b) - new Date(a)) / 36e5) : ''; };
   var when = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
-  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Deposit paid', 'st-booked'], lost:['Didn’t book', 'k-lost'], paid:['Paid in full', 'st-paid'], vendor:['Vendor confirmed', 'k-ok'], undo:['Undone', 'k-lost'] };
+  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Deposit paid', 'st-booked'], lost:['Didn’t book', 'k-lost'], paid:['Paid in full', 'st-paid'], vendor:['Vendor confirmed', 'k-ok'], undo:['Undone', 'k-lost'], deleted:['Booking deleted', 'k-lost'] };
   var last = null, filter = '';
   function events(){
     var ol = $('ad-events'); ol.textContent = '';
-    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost|paid|vendor|undo/.test(e.type) : e.type === filter); });
+    var list = (last.events || []).filter(function(e){ return !filter || (filter === 'status' ? /contacted|confirmed|lost|paid|vendor|undo|deleted/.test(e.type) : e.type === filter); });
     if (!list.length) { ol.appendChild(el('li', 'ad-empty', 'Nothing yet.')); return; }
     list.slice(0, 120).forEach(function(e){
       var li = el('li'), k = EV[e.type] || [e.type, '']; li.appendChild(el('span', 'k ' + k[1]));
       li.appendChild(el('time', null, when(e.at))); li.appendChild(el('b', null, k[0]));
-      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') + (e.vendor ? ' · ' + e.vendor : '') + (e.what ? ' · ' + e.what : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
+      var d = e.ref ? e.ref + (e.via ? ' · ' + (VIA[e.via] || e.via) : '') + (e.vendor ? ' · ' + e.vendor : '') + (e.what ? ' · ' + e.what : '') + (e.type === 'deleted' && e.by ? ' · by ' + e.by : '') : e.code || ''; if (d) li.appendChild(el('span', 'ad-ev-d', d));
       ol.appendChild(li);
     });
   }
@@ -3050,10 +3055,19 @@ footer{background:#efece7;border-top:0}
       if (b.todos.some(function(t){ return /booking again/.test(t); })) { var rb = el('button', 'mini', 'Asked about next year'); rb.type = 'button'; rb.addEventListener('click', function(){ post({ action:'mark', ref:b.ref, status:'rebook' }); }); acts.appendChild(rb); }
       det.appendChild(acts);
       var mb = el('button', 'btn btn-primary tb-manage', 'Manage: payments & changes'); mb.type = 'button'; mb.addEventListener('click', function(){ openManage(b.ref); }); det.appendChild(mb);
+      var del = el('button', 'tb-del', 'Delete booking'); del.type = 'button'; del.addEventListener('click', function(){ removeBooking(b); }); det.appendChild(del);
       if (openTiles[b.ref]) det.open = true;
       det.addEventListener('toggle', function(){ openTiles[b.ref] = det.open; });
       c.appendChild(det); box.appendChild(c);
     });
+  }
+  // Test bookings can be removed for good: payments, history and contact details go too. Only a line in Activity is kept.
+  function removeBooking(b){
+    var paid = (b.payments || []).length ? '\n\nPayments of ' + money(b.paidCents) + ' are recorded on it and will be removed too.' : '';
+    var typed = prompt('Delete ' + who(b) + '’s booking for good?\n\n' + b.ref + ' · ' + shortDay(b.date) + ' · ' + money(b.totalCents) + paid + '\n\nThis can’t be undone. Type DELETE to confirm.');
+    if (typed == null) return;
+    if (typed.trim().toUpperCase() !== 'DELETE') { alert('Not deleted. Type DELETE to confirm.'); return; }
+    post({ action:'delete', ref:b.ref, confirm:b.ref }, function(){ delete openTiles[b.ref]; });
   }
   var when2 = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
   $('cal-prev').addEventListener('click', function(){ var y = +calMonth.slice(0, 4), m = +calMonth.slice(5, 7) - 2; if (m < 0) { m = 11; y--; } calMonth = y + '-' + (m < 9 ? '0' : '') + (m + 1); bookings(); });

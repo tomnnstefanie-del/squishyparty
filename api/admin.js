@@ -8,13 +8,14 @@
 //   POST { action: 'revision', ref, n, step, vendor, reason, by } -> send (emails R-n) / accept / vendor / apply / withdraw / discard
 //   POST { action: 'change-handled', ref, changeId, by }   -> a customer's change request has been dealt with
 //   POST { action: 'reward', ref (the friend's booking), step: 'sent' | 'redeemed', by } -> referral reward voucher
+//   POST { action: 'delete', ref, confirm (= ref), by }     -> remove a booking for good (test bookings): lib/stats.js deleteBooking
 //   POST { action: 'settings', settings, reason, by }      -> costs and targets for the scorecard (lib/scorecard.js); targets
 //                                                            are fixed while the pilot runs, so a change then needs a reason
 // ADMIN_PASSWORD is a Vercel environment variable (12+ characters); without it the dashboard stays locked.
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
 import { clientIp, limiter, fail, HttpError, readJson, assertSameOrigin } from '../lib/http.js';
-import { readStats, markStatus, tooManyFailures, validStatus, saveSettings } from '../lib/stats.js';
+import { readStats, markStatus, tooManyFailures, validStatus, saveSettings, deleteBooking } from '../lib/stats.js';
 import { addPayment, reversePayment, createRevision, stepRevision, handleChange, getFull, paidCents, cleanBy, BookingError } from '../lib/bookings.js';
 import { validateRequest } from '../lib/validate.js';
 import { ADDON_LIST, EXP_NAME } from '../lib/pricing.js';
@@ -103,6 +104,14 @@ export default async function handler(req, res) {
           const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.');
           const r = await stepReward(ref, b.step, by); if (r.error) throw new HttpError(r.status, r.error);
           return res.status(200).json({ ok: true, reward: r.reward });
+        }
+        case 'delete': {
+          const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.');
+          if (String(b.confirm || '').trim().toUpperCase() !== ref) throw new HttpError(400, 'Type the booking reference to confirm.');
+          const r = await deleteBooking(ref, by);
+          if (!r) throw new HttpError(404, 'That booking isn’t in the dashboard.');
+          console.log('[admin] booking deleted'); // no reference or name logged
+          return res.status(200).json({ ok: true, deleted: ref });
         }
         case 'change-handled': return res.status(200).json({ ok: true, change: await handleChange(ref, { changeId: String(b.changeId || ''), by: b.by }) });
         default: throw new HttpError(400, 'Please refresh and try again.');
