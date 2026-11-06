@@ -260,8 +260,18 @@ try {
   const life = st2.recent.find((q) => q.ref === lastRef).life; assert.ok(life.contacted && life.confirmed);
   assert.ok(st2.lifecycle.toContact.n >= 1 && st2.lifecycle.toConfirm.n >= 1 && st2.events.some((e) => e.type === 'confirmed' && e.ref === lastRef) && st2.events.some((e) => e.type === 'scan'));
   ok('the Telegram buttons record when we contacted and when the deposit was paid; the dashboard shows response times and the activity log');
-  const mk = await p2.evaluate(async (ref) => { const r = await fetch('/api/admin', { method: 'POST', headers: { Authorization: 'Bearer test-dashboard-pass', 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mark', ref, status: 'lost' }) }); return r.status; }, st2.recent.find((q) => q.ref !== lastRef).ref);
-  assert.equal(mk, 200); ok('a request can be marked from the dashboard');
+  // Clicking the stage buttons on the dashboard page itself (a second function named `mark` once silently broke them)
+  const lostRef = st2.recent.find((q) => q.ref !== lastRef).ref;
+  const dp2 = await browser.newPage(); dp2.on('dialog', (d) => d.accept()); await dp2.setExtraHTTPHeaders({ 'X-Forwarded-For': '10.0.5.5' }); // its own rate-limit bucket
+  await dp2.goto(BASE + '/admin.html'); await dp2.fill('#ad-pass', 'test-dashboard-pass'); await dp2.click('#ad-login button');
+  await dp2.waitForSelector('#ad-body:not([hidden])'); await dp2.click('[data-b="all"]');
+  const tileOf = dp2.locator('details.tb-more', { hasText: lostRef });
+  await tileOf.locator('summary').click();
+  const posted = dp2.waitForResponse((r) => r.url().endsWith('/api/admin') && r.request().method() === 'POST', { timeout: 5000 });
+  await tileOf.locator('.tb-acts button', { hasText: 'Didn’t book' }).click(); assert.equal((await posted).status(), 200);
+  const lostLife = (await adm('test-dashboard-pass')).b.recent.find((q) => q.ref === lostRef).life;
+  assert.ok(lostLife.lost); await dp2.close();
+  ok('clicking “Didn’t book” on the dashboard page marks the request');
   const lock = await p2.evaluate(async () => { let s = 0; for (let i = 0; i < 12; i++) { const r = await fetch('/api/admin', { headers: { Authorization: 'Bearer nope-nope-nope', 'X-Forwarded-For': '10.9.9.9' } }); s = r.status; } return s; });
   assert.equal(lock, 429); ok('after 10 wrong passwords the dashboard locks that address for 15 minutes');
 
