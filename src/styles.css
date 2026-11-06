@@ -1696,7 +1696,9 @@ footer{background:#efece7;border-top:0}
 .sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
 .sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
 
-/* v73 Dashboard: delete a (test) booking from its Details */
-.tb-del{display:block;min-height:36px;margin-top:10px;padding:6px 2px;border:0;background:none;font:inherit;font-size:.75rem;font-weight:700;color:#b42318;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.tb-del:hover{color:#8a1a12}
-.tb-del:focus-visible{outline:2px solid #b42318;outline-offset:2px;border-radius:6px}
+/* v73 Dashboard: bin icon at the top right of a booking card deletes a (test) booking */
+.tb-top-r{display:flex;align-items:center;gap:2px;flex:none}
+.tb-del{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;margin:-8px -8px -8px 0;padding:0;border:0;border-radius:999px;background:none;color:#98a2b3;cursor:pointer}
+.tb-del svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-del:hover{color:#b42318;background:#fef3f2}
+.tb-del:focus-visible{outline:2px solid #b42318;outline-offset:-2px;color:#b42318}
