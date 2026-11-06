@@ -2342,6 +2342,13 @@ footer{background:#efece7;border-top:0}
 .tb-del{display:block;min-height:36px;margin-top:10px;padding:6px 2px;border:0;background:none;font:inherit;font-size:.75rem;font-weight:700;color:#b42318;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .tb-del:hover{color:#8a1a12}
 .tb-del:focus-visible{outline:2px solid #b42318;outline-offset:2px;border-radius:6px}
+
+/* v74 Planner step 1: "Do you already have a venue?" */
+.venue-q .sel-label{margin:0 0 10px}
+.venue-note{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;padding:10px 12px;border-radius:var(--r-sm);background:var(--cobalt-50);color:var(--ink);font-size:.875rem;font-weight:600;line-height:1.4}
+.venue-note .icon{flex:none;width:18px;height:18px;margin-top:1px;color:var(--cobalt)}
+.venue-note[hidden],[data-venue-field][hidden]{display:none}
+@media (max-width:420px){.venue-q .bf-opts{grid-template-columns:1fr}}
 </style>
 </head>
 <body>

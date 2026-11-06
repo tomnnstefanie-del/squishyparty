@@ -47,6 +47,12 @@ try {
   assert.equal(await page.inputValue('#end'), '16:00'); ok('changing the start again resets the end to 2 hours later');
   await page.fill('#end', '16:30');
   assert.ok((await txt('.early-hint')).includes('15 minutes before')); ok('basics page says the team arrives 15 minutes early');
+  assert.ok(await page.isHidden('#venue-note')); assert.ok(await page.isVisible('#venue'));
+  await page.check('input[name="hasVenue"][value="no"]');
+  assert.ok((await txt('#venue-note')).includes('venue partners under Add-ons')); assert.ok(await page.isHidden('#venue')); assert.ok(await page.isHidden('#postal'));
+  await page.check('input[name="hasVenue"][value="yes"]');
+  assert.ok(await page.isHidden('#venue-note')); assert.ok(await page.isVisible('#venue'));
+  ok('“Do you already have a venue?” Not yet shows the venue-partner note and hides the address fields; Yes brings them back');
   await page.fill('#spot', 'Clubhouse II, function room L2');
   await page.fill('#venue', '1 Example Road');
   await page.fill('#postal', '123456');

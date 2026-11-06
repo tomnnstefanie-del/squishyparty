@@ -359,7 +359,15 @@
         <!-- STEP 1 -->
         <section class="wstep" id="wstep-1" aria-labelledby="ws1-h">
           <p class="eyebrow">Step 1</p><h2 id="ws1-h" tabindex="-1">Tell us about the party.</h2>
-          <p class="wlead">Start with how many people will be making squishies. It works the same for birthdays and company events.</p>
+          <p class="wlead">Start with where it’s happening and how many people will be making squishies. It works the same for birthdays and company events.</p>
+          <div class="card-block venue-q">
+            <p class="sel-label" id="hv-label">Do you already have a venue?</p>
+            <div class="bf-opts" role="radiogroup" aria-labelledby="hv-label">
+              <label class="bf-opt"><input type="radio" name="hasVenue" value="yes"><span><b>Yes, I have one</b><small>Home, condo clubhouse, office or school</small></span></label>
+              <label class="bf-opt"><input type="radio" name="hasVenue" value="no"><span><b>Not yet</b><small>We can help with that</small></span></label>
+            </div>
+            <p class="venue-note" id="venue-note" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span>No worries! You can check out exclusive rates from our venue partners under Add-ons.</span></p>
+          </div>
           <div class="card-block">
             <div class="grid2">
               <div class="field"><label for="participants">Number of participants</label>
@@ -377,9 +385,9 @@
                 <div class="field"><span id="time-label">Party time</span>
                   <div class="time-range" role="group" aria-labelledby="time-label"><label><span class="vh">Start time</span><input name="time" id="time" type="time" value="14:00" aria-label="Start time"></label><span class="time-to" aria-hidden="true">to</span><label><span class="vh">End time</span><input name="end" id="end" type="time" value="16:00" aria-label="End time"></label></div>
                   <span class="hint" id="time-hint">2 hours · Singapore time</span><span class="hint early-hint"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Our team arrives 15 minutes before your start time to set up.</span></div>
-                <label class="field full">Venue address<input name="venue" id="venue" autocomplete="street-address" maxlength="300" placeholder="e.g. Blk 123 Tampines St 11"></label>
-                <label class="field full"><span>Exact location <span class="opt-tag">(optional)</span></span><input name="spot" id="spot" maxlength="120" placeholder="e.g. Condo Clubhouse II, function room level 2"><span class="hint">So our team can find you on the day</span></label>
-                <label class="field">Postal code<input name="postal" id="postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 digits"><span class="hint">Helps us plan travel to your venue</span></label>
+                <label class="field full" data-venue-field>Venue address<input name="venue" id="venue" autocomplete="street-address" maxlength="300" placeholder="e.g. Blk 123 Tampines St 11"></label>
+                <label class="field full" data-venue-field><span>Exact location <span class="opt-tag">(optional)</span></span><input name="spot" id="spot" maxlength="120" placeholder="e.g. Condo Clubhouse II, function room level 2"><span class="hint">So our team can find you on the day</span></label>
+                <label class="field" data-venue-field>Postal code<input name="postal" id="postal" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 digits"><span class="hint">Helps us plan travel to your venue</span></label>
               </div>
             </div>
           </details>
