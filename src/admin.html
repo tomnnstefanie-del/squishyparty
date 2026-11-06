@@ -573,7 +573,8 @@ __FOOTER__
       var c = el('article', 'ad-tile-b st-' + b.state); c.id = 'bk-' + b.ref;
       var top = el('div', 'tb-top');
       top.appendChild(el('b', 'tb-date', shortDay(b.date) + ' · ' + clock(b.start).replace(':00', '')));
-      top.appendChild(el('span', 'tb-stage', STAGE[b.state])); c.appendChild(top);
+      var topR = el('div', 'tb-top-r'); topR.appendChild(el('span', 'tb-stage', STAGE[b.state]));
+      topR.appendChild(delBtn(b)); top.appendChild(topR); c.appendChild(top);
       var nm = el('p', 'tb-who'); nm.appendChild(el('b', null, who(b))); nm.appendChild(document.createTextNode(' · ' + b.participants + ' pax')); c.appendChild(nm);
       var next = el('p', 'tb-next' + (b.todos.length ? '' : ' done'));
       if (b.todos.length) { next.appendChild(el('span', 'tb-next-k', 'Next')); next.appendChild(document.createTextNode(b.todos[0] + (b.todos.length > 1 ? '  +' + (b.todos.length - 1) + ' more' : ''))); }
@@ -621,13 +622,24 @@ __FOOTER__
       if (b.todos.some(function(t){ return /booking again/.test(t); })) { var rb = el('button', 'mini', 'Asked about next year'); rb.type = 'button'; rb.addEventListener('click', function(){ post({ action:'mark', ref:b.ref, status:'rebook' }); }); acts.appendChild(rb); }
       det.appendChild(acts);
       var mb = el('button', 'btn btn-primary tb-manage', 'Manage: payments & changes'); mb.type = 'button'; mb.addEventListener('click', function(){ openManage(b.ref); }); det.appendChild(mb);
-      var del = el('button', 'tb-del', 'Delete booking'); del.type = 'button'; del.addEventListener('click', function(){ removeBooking(b); }); det.appendChild(del);
       if (openTiles[b.ref]) det.open = true;
       det.addEventListener('toggle', function(){ openTiles[b.ref] = det.open; });
       c.appendChild(det); box.appendChild(c);
     });
   }
   // Test bookings can be removed for good: payments, history and contact details go too. Only a line in Activity is kept.
+  // The small bin icon at the top right of each booking card. Built with DOM calls, no innerHTML.
+  function delBtn(b){
+    var btn = el('button', 'tb-del'); btn.type = 'button';
+    btn.setAttribute('aria-label', 'Delete booking ' + b.ref); btn.title = 'Delete booking';
+    var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
+    ['M4 7h16', 'M10 11v6M14 11v6', 'M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12', 'M9 7V4h6v3'].forEach(function(d){
+      var p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); svg.appendChild(p);
+    });
+    btn.appendChild(svg); btn.addEventListener('click', function(){ removeBooking(b); });
+    return btn;
+  }
   function removeBooking(b){
     var paid = (b.payments || []).length ? '\n\nPayments of ' + money(b.paidCents) + ' are recorded on it and will be removed too.' : '';
     var typed = prompt('Delete ' + who(b) + '’s booking for good?\n\n' + b.ref + ' · ' + shortDay(b.date) + ' · ' + money(b.totalCents) + paid + '\n\nThis can’t be undone. Type DELETE to confirm.');
