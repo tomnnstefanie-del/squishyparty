@@ -459,6 +459,28 @@ try {
   assert.equal(scl.targetLog[0].reason, 'Day 30 checkpoint: strong demand'); assert.deepEqual(scl.targetLog[0].changed.map((c) => [c.key, c.from, c.to]), [['targetParties', 3, 5]]);
   ok('targets are fixed while the pilot runs: changing one needs a checkpoint reason and is logged with who and why; costs can still be updated');
 
+  // Test bookings can be deleted for good from the dashboard: the paid friend's booking (payments, reward) and the sharer's
+  console.log('deleting test bookings');
+  const pre = (await admT()).b;
+  assert.equal((await admT({ action: 'delete', ref: friendRef, confirm: 'SP-000000-0000' })).s, 400); // must confirm with its own reference
+  assert.equal((await admT({ action: 'delete', ref: friendRef, confirm: friendRef, by: '' })).s, 400); // and say who
+  assert.equal((await admT({ action: 'delete', ref: 'SP-000000-0000', confirm: 'SP-000000-0000' })).s, 404);
+  assert.ok(pre.bookings.some((q) => q.ref === friendRef) && pre.rewards.some((r) => r.friendRef === friendRef));
+  assert.equal((await admT({ action: 'delete', ref: friendRef, confirm: friendRef.toLowerCase() })).s, 200);
+  assert.equal((await admT({ action: 'delete', ref: miaRef, confirm: miaRef })).s, 200);
+  const afterDel = (await admT()).b;
+  for (const r of [friendRef, miaRef]) {
+    assert.ok(!afterDel.bookings.some((q) => q.ref === r) && !afterDel.recent.some((q) => q.ref === r));
+    assert.ok(!afterDel.events.some((e) => e.ref === r && e.type !== 'deleted'));
+    assert.ok(afterDel.events.some((e) => e.ref === r && e.type === 'deleted' && e.by === 'Tester'));
+  }
+  assert.ok(!afterDel.rewards.some((r) => r.friendRef === friendRef) && !afterDel.referrers.some((r) => r.code === miaCode));
+  assert.equal(afterDel.totals.requests, pre.totals.requests - 2); assert.equal(afterDel.totals.viaFriend, pre.totals.viaFriend - 1);
+  assert.equal((await admT({ action: 'delete', ref: friendRef, confirm: friendRef })).s, 404); // already afterDel
+  x = await api({ ...base, emailToken: issueVerified('sara@example.com'), contact: { ...base.contact, parentName: 'Sara Lim', email: 'sara@example.com', phone: '98887777' } }, { 'X-Forwarded-For': '10.0.9.3' });
+  assert.equal(x.s, 200); assert.ok(!reqMsg(x.b.ref).text.includes('Returning customer'));
+  ok('a test booking can be deleted from the dashboard (reference typed to confirm, name recorded): booking, payments, reward, referral code and counts go; Activity keeps who deleted it');
+
   console.log('not configured');
   const env2 = { ...env, PORT: '3101' }; delete env2.TELEGRAM_BOT_TOKEN;
   await start('dev/server.mjs', env2);
