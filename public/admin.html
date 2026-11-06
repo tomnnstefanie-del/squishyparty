@@ -2728,13 +2728,13 @@ footer{background:#efece7;border-top:0}
   // Target markers: ✓ on target, ≈ within 20%, ✗ further away (lib/scorecard.js statusOf)
   var UNIT = {}, sc = null;
   function fmtT(key, v){ var u = UNIT[key] != null ? UNIT[key] : ''; return u === '%' ? v + '%' : u === '$' ? '$' + v : u === ': 1' ? v + ' : 1' : String(v); }
-  function mark(c, key, what){
+  function tgMark(c, key, what){
     if (!c || c.target == null) return null;
     var t = (c.dir === 'le' ? '≤ ' : '≥ ') + (what || fmtT(key, c.target));
     var txt = c.status === 'ok' ? '✓ On target · ' + t : c.status === 'close' ? '≈ Close · target ' + t : c.status === 'off' ? '✗ Off target · ' + t : 'Target ' + t;
     var m = el('span', 'sc-tg' + (c.status ? ' st-' + c.status : ''), txt); m.title = c.status ? 'Actual ' + c.actual + ' against a target of ' + t : 'No actual number yet'; return m;
   }
-  var ck = function(key){ return mark(sc.checks[key], key); };
+  var ck = function(key){ return tgMark(sc.checks[key], key); };
   var scDirty = false;
   function scorecard(s){
     sc = s; (s.targetDefs || []).forEach(function(d){ UNIT[d.key] = d.unit; });
@@ -2745,8 +2745,8 @@ footer{background:#efece7;border-top:0}
     kpi(kb, 'Paid parties', String(K.paidParties), K.newCustomers + ' new customers', 'Deposit recorded', '', ck('targetParties'));
     kpi(kb, 'Avg revenue / party', m0(K.avgRevenueCents), K.paidParties ? 'Squishy ' + m0(M.squishyCents / K.paidParties) + ' · add-ons ' + m0(M.addonCents / K.paidParties) : '', 'Value of paid parties ÷ paid parties', '', ck('targetAvgRev'));
     var gm = s.checks.targetMarginPct;
-    kpi(kb, 'Gross profit / party', m0(K.ltvCents), s.costsSet ? (s.checks.marginPct != null ? s.checks.marginPct + '% of revenue · ' : '') + 'after discount & reward: ' + m0(K.contributionPerPartyCents) : 'Add costs below', 'Revenue − kits − staff − partner costs', '', mark(gm, 'targetMarginPct', gm && gm.target + '% of revenue'));
-    kpi(kb, 'Cost to get a customer (CAC)', m0(K.blendedCacCents), K.bestCac ? 'Cheapest: ' + K.bestCac.touch + ' ' + m0(K.bestCac.cents) : 'No marketing costs yet', 'All marketing costs ÷ new customers', '', mark(s.checks.cac, 'cac', m0(CC.cents)));
+    kpi(kb, 'Gross profit / party', m0(K.ltvCents), s.costsSet ? (s.checks.marginPct != null ? s.checks.marginPct + '% of revenue · ' : '') + 'after discount & reward: ' + m0(K.contributionPerPartyCents) : 'Add costs below', 'Revenue − kits − staff − partner costs', '', tgMark(gm, 'targetMarginPct', gm && gm.target + '% of revenue'));
+    kpi(kb, 'Cost to get a customer (CAC)', m0(K.blendedCacCents), K.bestCac ? 'Cheapest: ' + K.bestCac.touch + ' ' + m0(K.bestCac.cents) : 'No marketing costs yet', 'All marketing costs ÷ new customers', '', tgMark(s.checks.cac, 'cac', m0(CC.cents)));
     kpi(kb, 'LTV : CAC', K.ltvCac == null ? '–' : K.ltvCac + ' : 1', K.ltvCac == null ? 'Needs costs and a paid party' : '', 'Gross profit per party ÷ CAC', 'hot', ck('targetLtvCac'));
     kpi(kb, 'Marketing ROI', p0(K.roiPct), M.programmeCents ? 'Programme cost ' + m0(M.programmeCents) : '', '(Gross profit − marketing cost) ÷ marketing cost', '', ck('targetRoiPct'));
     var fb = $('sc-funnel'); fb.textContent = '';
