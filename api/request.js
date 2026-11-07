@@ -47,8 +47,10 @@ export default async function handler(req, res) {
     // Bots that fill the hidden field get a normal-looking reply, but nothing is sent.
     if (data.honeypot) { console.warn('[request] honeypot triggered', ref); return res.status(200).json({ ok: true, ref }); }
 
-    if (!checkVerified(data.contact.email, data.emailToken)) throw new HttpError(400, 'Please verify your email address first.', 'email');
-    const contact = { ...data.contact, emailVerified: true };
+    // The 6-digit email code can be switched off (EMAIL_CODE in src/app.js); Telegram then marks the email as not verified.
+    const verified = checkVerified(data.contact.email, data.emailToken);
+    if (CATALOGUE.EMAIL_CODE && !verified) throw new HttpError(400, 'Please verify your email address first.', 'email');
+    const contact = { ...data.contact, emailVerified: verified };
 
     const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
     const shareCode = makeReferralCode(contact.parentName);

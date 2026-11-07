@@ -13,6 +13,7 @@ const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEG
 process.env.TELEGRAM_BOT_TOKEN = 'test:token'; // so the test can mint a verified-email token like the server does
 const { issueVerified } = await import('../lib/otp.js');
 const { makeReferralCode } = await import('../lib/referral.js');
+const { CATALOGUE } = await import('../lib/catalogue.js'); // EMAIL_CODE: is the 6-digit email code switched on?
 const mails = () => (fs.existsSync(mailbox) ? JSON.parse(fs.readFileSync(mailbox, 'utf8')) : []);
 const procs = [];
 const start = (file, e = env) => new Promise((ok) => { const p = spawn('node', [file], { cwd: root, env: e }); procs.push(p); p.stdout.on('data', (d) => { if (/on http/.test(d)) ok(p); }); p.stderr.on('data', (d) => process.stderr.write(d)); });
@@ -83,19 +84,24 @@ try {
   await page.fill('[name=parentName]', 'Sarah Tan');
   await page.fill('[name=phone]', '8123 4567');
   await page.fill('#req-email', 'sarah@example.com');
-  await page.click('#booking-submit');
-  assert.ok((await txt('#otp-status')).includes('verify'), 'asks to verify'); assert.equal(sent().length, 0);
-  ok('the request can’t be sent until the email is verified');
-  await page.click('#otp-send');
-  await page.waitForFunction(() => !document.getElementById('otp-code-row').hidden);
-  const otpMail = mails().at(-1); const code = /\b(\d{6})\b/.exec(otpMail.subject)[1];
-  assert.equal(otpMail.to, 'sarah@example.com');
-  await page.fill('#otp-code', '000000'.replace(/./g, (d, i) => code[i] === d ? String((+d + 1) % 10) : d)); // a wrong code
-  await page.waitForFunction(() => /isn’t right/.test(document.getElementById('otp-status').textContent));
-  ok('a wrong code is refused');
-  await page.fill('#otp-code', code);
-  await page.waitForFunction(() => document.getElementById('otp-field').classList.contains('verified'));
-  ok('the emailed 6-digit code verifies the address');
+  if (CATALOGUE.EMAIL_CODE) {
+    await page.click('#booking-submit');
+    assert.ok((await txt('#otp-status')).includes('verify'), 'asks to verify'); assert.equal(sent().length, 0);
+    ok('the request can’t be sent until the email is verified');
+    await page.click('#otp-send');
+    await page.waitForFunction(() => !document.getElementById('otp-code-row').hidden);
+    const otpMail = mails().at(-1); const code = /\b(\d{6})\b/.exec(otpMail.subject)[1];
+    assert.equal(otpMail.to, 'sarah@example.com');
+    await page.fill('#otp-code', '000000'.replace(/./g, (d, i) => code[i] === d ? String((+d + 1) % 10) : d)); // a wrong code
+    await page.waitForFunction(() => /isn’t right/.test(document.getElementById('otp-status').textContent));
+    ok('a wrong code is refused');
+    await page.fill('#otp-code', code);
+    await page.waitForFunction(() => document.getElementById('otp-field').classList.contains('verified'));
+    ok('the emailed 6-digit code verifies the address');
+  } else {
+    assert.ok(await page.isHidden('#otp-send')); assert.ok(await page.isHidden('#otp-code-row')); assert.ok((await txt('#otp-status')).includes('quotation'));
+    ok('with the email code switched off, the request step asks for no code');
+  }
   await page.fill('[name=notes]', 'Lift lobby B, level 2');
   await page.click('#booking-submit');
   await page.waitForSelector('#sent-card:not([hidden])', { timeout: 10000 });
@@ -114,7 +120,7 @@ try {
   assert.equal(msgs.length, 1);
   const m = msgs[0];
   assert.equal(m.token, 'test:token'); assert.equal(m.chat_id, '4242'); assert.equal(m.parse_mode, 'HTML');
-  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
+  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', CATALOGUE.EMAIL_CODE ? 'sarah@example.com ✅ verified' : 'sarah@example.com (not verified)', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
     assert.ok(m.text.includes(s), 'message missing: ' + s);
   ok('owner gets one Telegram message with contact, date/time, venue, address, guests, order and notes');
   assert.ok(m.text.includes(`Estimated total: ${pageTotal}`), `server total should match page total ${pageTotal}`);
@@ -185,10 +191,12 @@ try {
   const qm = mails().at(-1); assert.ok(qm.subject.startsWith('Your Confetti Club Quotation | Q-SP-')); assert.deepEqual(qm.attachments, [`Confetti-Club-Quotation-Q-${x.b.ref}.pdf`]);
   const qd = JSON.parse(fs.readFileSync(path.join(root, 'dev/.photos.json'), 'utf8')).at(-1); assert.ok(qd.kind === 'Document' && qd.pdf && qd.caption.includes(x.b.ref));
   ok('ticking “Email me a PDF quotation” attaches the PDF to the email and posts a copy to Telegram');
-  x = await api({ ...base, emailToken: '' }, { 'X-Forwarded-For': '10.0.0.6' });
-  assert.equal(x.s, 400); assert.equal(x.b.field, 'email'); ok('a request without a verified email is refused (400)');
-  x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
-  assert.equal(x.s, 400); ok('a verified token for a different email is refused');
+  if (CATALOGUE.EMAIL_CODE) {
+    x = await api({ ...base, emailToken: '' }, { 'X-Forwarded-For': '10.0.0.6' });
+    assert.equal(x.s, 400); assert.equal(x.b.field, 'email'); ok('a request without a verified email is refused (400)');
+    x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
+    assert.equal(x.s, 400); ok('a verified token for a different email is refused');
+  }
   x = await api({ ...base, bookingFor: 'company', wantQuote: true, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
   assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 46500);
   assert.ok(sent().at(-1).text.includes('CORPORATE BOOKING: yes') && mails().at(-1).text.includes('nothing to pay at this stage') && mails().at(-1).attachments.length === 1 && mails().at(-1).subject.includes('Quotation'));

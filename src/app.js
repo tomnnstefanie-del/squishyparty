@@ -8,7 +8,9 @@
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
+  // EMAIL_CODE: ask for a 6-digit email code before a request is sent. Switched off for now (owner, 7 Nov 2026); set true to require it again.
+  // The server reads the same setting from lib/catalogue.js, so the page and the server always agree.
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, EMAIL_CODE = false;
   // Bakery logos load from each brand's site; if a logo can't load, the brand name shows instead.
   var LOGOS = { 'Butter Studio':'https://thebutterstudio.com/wp-content/uploads/2024/11/Butterstudio-Logo.png' };
   var BAKERIES = ['Butter Studio'];
@@ -1619,6 +1621,7 @@
   function isWebProto(){ try { return /^https?:$/.test(location.protocol); } catch (e) { return false; } }
   function otpStatus(msg, kind){ var st = $('otp-status'); st.textContent = msg; st.className = 'hint otp-status' + (kind ? ' ' + kind : ''); }
   function otpUI(){
+    if (!EMAIL_CODE) { $('otp-send').hidden = true; $('otp-code-row').hidden = true; return; }
     var em = $('req-email'), ok = !!OTP.verified && OTP.email === normEmail(em.value);
     $('otp-field').classList.toggle('verified', ok);
     $('otp-send').hidden = ok; $('otp-code-row').hidden = ok || !OTP.token || OTP.email !== normEmail(em.value);
@@ -1629,7 +1632,7 @@
     return fetch('/api/otp', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
       .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {status:r.status, body:j}; }); });
   }
-  $('req-email').addEventListener('input', function(){ if (OTP.email !== normEmail(this.value)) { OTP.verified = ''; } otpUI(); if (!OTP.verified) otpStatus('We’ll email you a 6-digit code to confirm it’s you.'); });
+  $('req-email').addEventListener('input', function(){ if (OTP.email !== normEmail(this.value)) { OTP.verified = ''; } otpUI(); if (!OTP.verified) otpStatus(EMAIL_CODE ? 'We’ll email you a 6-digit code to confirm it’s you.' : 'We’ll email your quotation to this address.'); });
   $('otp-send').addEventListener('click', function(){
     var em = $('req-email'), v = normEmail(em.value);
     if (!em.checkValidity() || !v) { em.setAttribute('aria-invalid','true'); otpStatus('Please enter a valid email address first.', 'err'); em.focus(); return; }
@@ -1655,6 +1658,7 @@
     }).catch(function(){ btn.disabled = false; btn.textContent = 'Verify'; otpStatus('We couldn’t reach our server. Please try again.', 'err'); });
   }
   $('otp-verify').addEventListener('click', verifyCode);
+  if (!EMAIL_CODE) { otpUI(); otpStatus('We’ll email your quotation to this address.'); }
   $('otp-code').addEventListener('input', function(){ var c = this.value.replace(/\D/g, '').slice(0, 6); if (c !== this.value) this.value = c; if (c.length === 6) verifyCode(); });
   $('otp-code').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); verifyCode(); } });
 
@@ -1719,7 +1723,7 @@
       if (!i.checkValidity()) flag(i, i.validity.valueMissing ? 'Please fill this in.' : i.name === 'postalCode' ? 'Enter a 6-digit Singapore postal code.' : i.name === 'phone' ? checkPhone($('phone-country').value, i.value).error : 'Please check this.');
     });
     if (!S.timeOk && bad.indexOf($('req-end')) < 0) flag($('req-end'), 'The end time needs to be after the start time.');
-    var em = $('req-email'); if (isWebProto() && bad.indexOf(em) < 0 && !(OTP.verified && OTP.email === normEmail(em.value))) { bad.push(em); em.setAttribute('aria-invalid','true'); otpStatus('Please verify your email: tap “Send code”, then enter the code we email you.', 'err'); }
+    var em = $('req-email'); if (EMAIL_CODE && isWebProto() && bad.indexOf(em) < 0 && !(OTP.verified && OTP.email === normEmail(em.value))) { bad.push(em); em.setAttribute('aria-invalid','true'); otpStatus('Please verify your email: tap “Send code”, then enter the code we email you.', 'err'); }
     err.hidden = false;
     track(bad.length ? 'request_invalid' : 'request_submitted', bad.length ? {fields:bad.map(function(i){ return i.name; }).join(',')} : {});
     if (bad.length) { err.textContent = 'Please check the highlighted details.'; (bad[0].classList.contains('tp-native') ? bad[0].previousSibling : bad[0]).focus(); return; }
