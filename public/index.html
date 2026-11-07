@@ -3058,7 +3058,25 @@ footer{background:#efece7;border-top:0}
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = null;
+  // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = special per-person price for both together; null = "in your quote" until it is set.
+  // Clicker Keychains: one base size for the whole party, priced per person, plus the one-time CLICKER_DELIVERY.
+  var CLICKER = [
+    {id:'c3', name:'3-key base', keys:3, price:1000},
+    {id:'c4', name:'4-key base', keys:4, price:1300},
+    {id:'c4sq', name:'4-key square base', keys:4, price:1400},
+    {id:'c5', name:'5-key base', keys:5, price:1600},
+    {id:'c6', name:'6-key base', keys:6, price:1800},
+    {id:'c8', name:'8-key base', keys:8, price:2000},
+    {id:'c9', name:'9-key base', keys:9, price:2200}
+  ];
+  // Packages, on top of the activity. fee null = "price in your quote" until the owner sets it. 'includes' = add-ons added at no extra charge;
+  // 'credit' = cake credit in cents (the most expensive priced cake is reduced by it; anything above is a top-up).
+  var PACKAGES = [
+    {id:'essentials', name:'Essentials', tag:'The activity, run for you', fee:0, credit:0, includes:[], perks:['Our host runs the whole activity', 'Set-up and pack-down', 'Party planner: invitations, RSVPs and run-sheet', 'Birthday sash & tiara for the birthday child', 'Every guest takes home what they made']},
+    {id:'celebration', name:'Celebration', tag:'Decor and cake sorted', popular:true, fee:null, credit:8000, includes:['bl-fabric-std', 'bl-col-12'], perks:['Bloom fabric backdrop in your colours', 'Balloon column, 1.2 m', '$80 cake credit with Butter Studio', 'Party photo album: about 30 photos by our host']},
+    {id:'allin', name:'All-in', tag:'Everything, done for you', fee:null, credit:14000, includes:['bl-fabric-std', 'bl-col-12', 'pp-face-1', 'js-photo-1'], perks:['$140 cake credit instead of $80', 'Face painting, 1 hour', 'Event photographer, 1 hour']}
+  ];
   // Bakery logos load from each brand's site; if a logo can't load, the brand name shows instead.
   var LOGOS = { 'Butter Studio':'https://thebutterstudio.com/wp-content/uploads/2024/11/Butterstudio-Logo.png' };
   var BAKERIES = ['Butter Studio'];
@@ -3219,6 +3237,12 @@ footer{background:#efece7;border-top:0}
     {id:'s-favours', cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']},
   ];
   var BYID = {}; P.forEach(function(p){ BYID[p.id] = p; });
+  var CLK = {}; CLICKER.forEach(function(b){ CLK[b.id] = b; });
+  var PKG = {}; PACKAGES.forEach(function(k){ PKG[k.id] = k; });
+  function hasSquishy(s){ return s.activity !== 'clicker'; }
+  function hasClicker(s){ return s.activity !== 'squishy'; }
+  function activityName(s){ return s.activity === 'clicker' ? 'Clicker Keychain' : s.activity === 'both' ? 'Squishy + Clicker' : 'Squishy ' + EXP[s.experience].short; }
+  function fromPrice(list){ return Math.min.apply(null, list.map(function(x){ return x.price; })); }
   var STATUS = { demo:['st-demo','Sample listing'], prospective:['st-prospective','Prospective'], approved:['st-approved','Approved'], partner:['st-approved','Cake partner'], confirmed:['st-confirmed','Confirmed'] };
 
   /* ================= HELPERS ================= */
@@ -3243,15 +3267,36 @@ footer{background:#efece7;border-top:0}
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, activity:'squishy', clicker:'c5', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
 
+  // The activity lines: Squishy DIY, Clicker Keychains, or both (one travel fee; the combo price replaces both once COMBO is set).
   function foundation(s){
-    var n = billable(s.participants), e = EXP[s.experience], items = [];
-    items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
-    items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
-    if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
-    items.push({label:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', sub:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', cents:LOGISTICS, ic:'i-users'});
+    var n = billable(s.participants), e = EXP[s.experience], b = CLK[s.clicker] || CLK.c5, items = [];
+    if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), sub:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
+    else {
+      if (hasSquishy(s)) {
+        items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
+        items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
+      }
+      if (hasClicker(s)) items.push({label:'Clicker keychain: ' + b.name + ', ' + n + ' × ' + short(b.price), sub:'Clicker keychain, ' + b.name + ', ' + n + ' × ' + short(b.price), cents:b.price * n, ic:'i-sparkles'});
+    }
+    if (hasSquishy(s) && s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
+    var fee = hasSquishy(s) ? 'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)' : 'One-time delivery & set-up (up to ' + TEAM_HOURS + ' hours)';
+    items.push({label:fee, sub:fee, cents:hasSquishy(s) ? LOGISTICS : CLICKER_DELIVERY, ic:'i-users'});
     return items;
+  }
+  // Package maths shared by the summary, the review list and the package cards: included add-ons cost nothing,
+  // and the cake credit comes off the most expensive priced cake (custom cakes are priced in the quote).
+  function cakeCredited(s){
+    var k = PKG[s.pkg]; if (!k || !k.credit) return null;
+    var best = null; s.selected.forEach(function(id){ var p = BYID[id]; if (p.cat === 'cake' && p.price != null && (!best || p.price > best.price)) best = p; });
+    return best ? best.id : null;
+  }
+  function partnerCost(p, s, credited){
+    var k = PKG[s.pkg];
+    if (k && k.includes.indexOf(p.id) >= 0) return 0;
+    var c = costFor(p, s); if (c == null) return null;
+    return p.id === credited ? Math.max(0, c - k.credit) : c;
   }
   // Our suggested add-ons: everything with a rec rank, on-quote items (cakes) first, then by rank.
   // The party running order, shared by the Schedule tab and the invitation's schedule for parents.
@@ -3282,9 +3327,10 @@ footer{background:#efece7;border-top:0}
     return {picks:picks};
   }
   function totals(s){
-    var f = foundation(s), sum = f.reduce(function(a, i){ return a + i.cents; }, 0), pending = [], partners = [];
-    s.selected.forEach(function(id){ var p = BYID[id], c = costFor(p, s); partners.push({p:p, cents:c, qty:qtyFor(p, s)}); if (c == null) pending.push(p); else sum += c; });
-    return {found:f, partners:partners, pending:pending, total:sum};
+    var f = foundation(s), sum = f.reduce(function(a, i){ return a + i.cents; }, 0), pending = [], partners = [], k = PKG[s.pkg] || PKG.essentials, cr = cakeCredited(s);
+    if (k.fee) sum += k.fee;
+    s.selected.forEach(function(id){ var p = BYID[id], c = partnerCost(p, s, cr); partners.push({p:p, cents:c, qty:qtyFor(p, s), included:k.includes.indexOf(id) >= 0, credit:id === cr ? Math.min(k.credit, costFor(p, s)) : 0}); if (c == null) pending.push(p); else sum += c; });
+    return {found:f, partners:partners, pending:pending, total:sum, pkg:k, pkgPending:k.fee == null};
   }
 
   /* ================= PARTNER CARDS (built once) ================= */
