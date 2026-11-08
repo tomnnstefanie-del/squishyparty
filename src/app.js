@@ -9,7 +9,7 @@
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
   var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = null;
-  // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = special per-person price for both together; null = "in your quote" until it is set.
+  // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = optional per-person price for both together; null (owner, 9 Nov 2026) = both at their usual prices with one travel fee.
   // Clicker Keychains: one base size for the whole party, priced per person, plus the one-time CLICKER_DELIVERY.
   // Hosted parties offer only the 8- and 9-key bases (owner, 8 Nov 2026): enough keys to fill the session and less stock for the live station.
   // Smaller bases (3-key $10, 4-key $13, 4-key square $14, 5-key $16, 6-key $18) are kept off the planner for booths and favours.
@@ -1429,7 +1429,7 @@
     T.partners.filter(function(x){ return x.included; }).forEach(function(x){ row(pname(x), pcost(x), 'bd-sub'); });
     var ups = T.partners.filter(function(x){ return !x.included; });
     if (ups.length) { bd.appendChild(el('div','grp','Upgrades')); ups.forEach(function(x){ row(pname(x), pcost(x), null, x.cents == null ? 'pend' : null); }); }
-    var later = [s.activity === 'both' && COMBO == null ? 'your combo discount' : ''].concat(T.pending.map(function(p){ return p.vendor + ' ' + p.name; })).filter(Boolean);
+    var later = [].concat(T.pending.map(function(p){ return p.vendor + ' ' + p.name; })).filter(Boolean);
     $('pending-note').hidden = !later.length || !shown;
     put('pending-note', 'Not yet in your total: ' + later.join(', ') + '. We add ' + (later.length > 1 ? 'them' : 'it') + ' to your quotation.');
     var totalTxt = shown ? money(T.total) + plus : '—', off = shown ? referralOff() : 0;
