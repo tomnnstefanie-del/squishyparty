@@ -7,7 +7,7 @@ const code = [consts, grab('  var CLICKER = ['), grab('  var PACKAGES = ['), gra
   '\nreturn {MIN_PAX, CONTAINER, WAX, WAX_DUO, WAX_DUO_UP, LOGISTICS, TEAM_HOURS, SETUP_MIN, PLAY_MIN, CLICKER_DELIVERY, COMBO, CLICKER, PACKAGES, EXP, CATS, P};';
 const data = new Function(code)();
 data.P = data.P.map(p => ({ id:p.id, cat:p.cat, name:p.name, vendor:p.vendor, status:p.status, basis:p.basis, price:p.price, min:p.min || 0, ...(p.custom ? { custom:p.custom } : {}) }));
-data.PACKAGES = data.PACKAGES.map(k => ({ id:k.id, name:k.name, fee:k.fee, credit:k.credit, includes:k.includes }));
+data.PACKAGES = data.PACKAGES.map(k => ({ id:k.id, name:k.name, off:k.off || 0, cake:!!k.cake, includes:k.includes }));
 data.CLICKER = data.CLICKER.map(b => ({ id:b.id, name:b.name, price:b.price }));
 data.CATS = data.CATS.map(c => ({ id:c.id, title:c.title }));
 fs.writeFileSync(process.argv[3], '// Generated from the page script by dev/extract-catalogue.mjs. The server prices every request from this file.\nexport const CATALOGUE = ' + JSON.stringify(data, null, 2) + ';\n');
