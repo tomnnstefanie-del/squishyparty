@@ -2369,7 +2369,8 @@ footer{background:#efece7;border-top:0}
 .clk-keys{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;max-width:64px;min-height:30px;align-content:center}
 .clk-keys i{width:12px;height:12px;border-radius:3px;background:var(--blush);box-shadow:inset 0 -2px 0 rgba(11,22,64,.15)}
 .clk-keys i:nth-child(3n+2){background:var(--teal-50)}.clk-keys i:nth-child(3n){background:var(--lemon-50)}
-.clk-keys.sq{max-width:30px}
+.clk-bases{grid-template-columns:repeat(2,minmax(0,200px))}
+.clk-pick{position:absolute;top:-10px;right:8px;background:var(--ink);color:var(--lemon);font-size:.625rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:999px}
 .clk-tile:has(input:checked) .clk-keys i{background:var(--cobalt)}
 .clk-name{font-size:.8125rem;font-weight:700;color:var(--ink)}
 .clk-pp{font-size:.8125rem;color:var(--muted)}
@@ -2521,7 +2522,7 @@ footer{background:#efece7;border-top:0}
         </div>
         <div class="hero-float">
           <span class="hero-float-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
-          <div><small>Clicker Keychain from</small><strong>$10 per child</strong></div>
+          <div><small>Clicker Keychain from</small><strong>$20 per child</strong></div>
         </div>
       </div>
     </div>
@@ -2852,7 +2853,7 @@ footer{background:#efece7;border-top:0}
           <p class="wlead">Priced per person, and everyone takes home what they make. A one-time $150 travel &amp; set-up fee is added once.</p>
           <div class="act-picker" role="radiogroup" aria-label="Activity">
             <label class="act-tile"><input type="radio" name="activity" value="squishy" checked><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"/></svg></span><span class="act-name">Squishy DIY</span><span class="act-sub">Make a jelly or crunchy squishy</span><span class="act-pp">from <span id="act-from-squishy">$16</span>/person</span></label>
-            <label class="act-tile"><input type="radio" name="activity" value="clicker"><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-gift"/></svg></span><span class="act-name">Clicker Keychain</span><span class="act-sub">Build a clicky keycap keychain</span><span class="act-pp">from <span id="act-from-clicker">$10</span>/person</span></label>
+            <label class="act-tile"><input type="radio" name="activity" value="clicker"><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-gift"/></svg></span><span class="act-name">Clicker Keychain</span><span class="act-sub">Build a clicky keycap keychain</span><span class="act-pp">from <span id="act-from-clicker">$20</span>/person</span></label>
             <label class="act-tile"><input type="radio" name="activity" value="both"><span class="exp-badge">Combo deal</span><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-star"/></svg></span><span class="act-name">Both</span><span class="act-sub">Squishy + Clicker together</span><span class="act-pp">Combo price in your quote</span></label>
           </div>
           <p class="combo-note" id="combo-note" hidden><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span>Squishy + Clicker together gets a special combo price, added to your quote. Until then your estimate shows both at their usual prices, with one travel fee.</span></p>
@@ -2901,7 +2902,7 @@ footer{background:#efece7;border-top:0}
           </div>
           <div class="exp-panel clk-panel" id="act-clicker" hidden>
             <div><p class="eyebrow">Clicker Keychain</p><h3>Build your own clicker keychain</h3><p class="exp-tag">Pick the keycaps, click them in, clip it to your bag.</p></div>
-            <p class="sel-label" id="clk-label">Choose the base size: <b id="clk-chosen">5-key base</b></p>
+            <p class="sel-label" id="clk-label">Choose the base size: <b id="clk-chosen">Deluxe: 9-key base</b></p>
             <div class="clk-bases" id="clk-bases" role="radiogroup" aria-labelledby="clk-label"></div>
             <p class="fine">One base size for the whole party, so everyone gets the same number of keys.</p>
             <ul class="ticks" id="clk-feats"></ul>
@@ -3163,14 +3164,11 @@ footer{background:#efece7;border-top:0}
   var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = null;
   // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = special per-person price for both together; null = "in your quote" until it is set.
   // Clicker Keychains: one base size for the whole party, priced per person, plus the one-time CLICKER_DELIVERY.
+  // Hosted parties offer only the 8- and 9-key bases (owner, 8 Nov 2026): enough keys to fill the session and less stock for the live station.
+  // Smaller bases (3-key $10, 4-key $13, 4-key square $14, 5-key $16, 6-key $18) are kept off the planner for booths and favours.
   var CLICKER = [
-    {id:'c3', name:'3-key base', keys:3, price:1000},
-    {id:'c4', name:'4-key base', keys:4, price:1300},
-    {id:'c4sq', name:'4-key square base', keys:4, price:1400},
-    {id:'c5', name:'5-key base', keys:5, price:1600},
-    {id:'c6', name:'6-key base', keys:6, price:1800},
-    {id:'c8', name:'8-key base', keys:8, price:2000},
-    {id:'c9', name:'9-key base', keys:9, price:2200}
+    {id:'c8', name:'Standard: 8-key base', keys:8, price:2000},
+    {id:'c9', name:'Deluxe: 9-key base', keys:9, price:2200, pick:true}
   ];
   // Packages, on top of the activity. fee null = "price in your quote" until the owner sets it. 'includes' = add-ons added at no extra charge;
   // 'credit' = cake credit in cents (the most expensive priced cake is reduced by it; anything above is a top-up).
@@ -3375,11 +3373,11 @@ footer{background:#efece7;border-top:0}
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, activity:'squishy', clicker:'c5', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, activity:'squishy', clicker:'c9', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
 
   // The activity lines: Squishy DIY, Clicker Keychains, or both (one travel fee; the combo price replaces both once COMBO is set).
   function foundation(s){
-    var n = billable(s.participants), e = EXP[s.experience], b = CLK[s.clicker] || CLK.c5, items = [];
+    var n = billable(s.participants), e = EXP[s.experience], b = CLK[s.clicker] || CLK.c9, items = [];
     if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), sub:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
     else {
       if (hasSquishy(s)) {
@@ -3826,7 +3824,7 @@ footer{background:#efece7;border-top:0}
     var g = $('pkg-grid'), h = $('pkg-home');
     PACKAGES.forEach(function(k, i){ if (g) g.appendChild(card(k, i, true)); if (h) h.appendChild(card(k, i, false)); });
     ['promises-plan', 'promises-home'].forEach(function(id){ var ul = $(id); if (!ul) return; PROMISES.forEach(function(p){ var li = el('li'), ic = el('span','promise-ic'); ic.appendChild(icon(p.ic)); li.appendChild(ic); var d = el('div'); d.appendChild(el('b', null, p.t)); d.appendChild(el('span', null, p.c)); li.appendChild(d); ul.appendChild(li); }); });
-    var cb = $('clk-bases'); if (cb) CLICKER.forEach(function(b){ var l = el('label','clk-tile'), r = document.createElement('input'); r.type = 'radio'; r.name = 'clicker'; r.value = b.id; r.checked = b.id === S.clicker; l.appendChild(r); var keys = el('span','clk-keys' + (b.id === 'c4sq' ? ' sq' : '')); for (var j = 0; j < b.keys; j++) keys.appendChild(el('i')); l.appendChild(keys); l.appendChild(el('span','clk-name', b.name)); l.appendChild(el('span','clk-pp', short(b.price) + '/person')); cb.appendChild(l); });
+    var cb = $('clk-bases'); if (cb) CLICKER.forEach(function(b){ var l = el('label','clk-tile'), r = document.createElement('input'); r.type = 'radio'; r.name = 'clicker'; r.value = b.id; r.checked = b.id === S.clicker; l.appendChild(r); if (b.pick) l.appendChild(el('span','clk-pick','Our pick')); var keys = el('span','clk-keys'); for (var j = 0; j < b.keys; j++) keys.appendChild(el('i')); l.appendChild(keys); l.appendChild(el('span','clk-name', b.name)); l.appendChild(el('span','clk-pp', short(b.price) + '/person')); cb.appendChild(l); });
     put('act-from-squishy', short(Math.min(EXP.jelly.pax, EXP.crunchy.pax))); put('act-from-clicker', short(fromPrice(CLICKER)));
   }
   function pkgPriceTxt(k){ return k.fee === 0 ? 'No package fee' : k.fee == null ? 'Package price in your quote' : '+' + short(k.fee); }
@@ -4495,7 +4493,7 @@ footer{background:#efece7;border-top:0}
     var shown = s.started;
     var T = totals(s), exp = EXP[s.experience];
 
-    var exp0 = EXP[s.experience], clk = CLK[s.clicker] || CLK.c5, sq = hasSquishy(s), ck = hasClicker(s);
+    var exp0 = EXP[s.experience], clk = CLK[s.clicker] || CLK.c9, sq = hasSquishy(s), ck = hasClicker(s);
     var plus = T.pending.length || T.pkgPending ? '+' : '';
     // step 2: activity
     $('act-squishy').hidden = !sq; $('act-clicker').hidden = !ck; $('combo-note').hidden = s.activity !== 'both' || COMBO != null;
