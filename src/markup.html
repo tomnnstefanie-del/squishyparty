@@ -49,7 +49,7 @@
     <div class="wrap hero-grid">
       <div class="reveal">
         <h1><span class="h1-kicker">Birthday parties &amp; team bonding in Singapore</span>Parties worth <em>sharing</em>.</h1>
-        <p class="lead">A hosted squishy-making party at your home, office or venue. Everyone makes something to take home, every moment is made for photos, and we handle the rest. Plan it in 3 minutes, with one quote and one team.</p>
+        <p class="lead">A hosted Squishy DIY or Clicker Keychain party at your home, office or venue, in a package that fits. Everyone makes something to take home, every moment is made for photos, and we handle the rest. Plan it in 3 minutes, with one quote and one team.</p>
         <div class="hero-actions">
           <a class="btn btn-primary btn-xl" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="btn btn-ghost" href="#explore" data-tab-link="tab-how">How it works</a>
@@ -70,7 +70,7 @@
         </div>
         <div class="hero-float">
           <span class="hero-float-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
-          <div><small>Squishy DIY from</small><strong>$16 per child</strong></div>
+          <div><small>Clicker Keychain from</small><strong>$20 per child</strong></div>
         </div>
       </div>
     </div>
@@ -234,6 +234,16 @@
   </section>
 
   <!-- For companies: outcome-led copy, rate card and quick quote -->
+  <section class="section pkgs" id="packages" aria-labelledby="pkgs-h">
+    <div class="wrap">
+      <div class="section-head"><div><p class="eyebrow">Packages</p><h2 id="pkgs-h">Pick an activity, then a package.</h2><p class="corp-lead">Squishy DIY or Clicker Keychain, priced per child. Then choose how much we take off your hands.</p></div></div>
+      <div class="pkg-grid pkg-home" id="pkg-home"></div>
+      <h3 class="promise-h">Our promises</h3>
+      <ul class="promises" id="promises-home"></ul>
+      <p class="pkg-cta"><a class="btn btn-primary btn-xl" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></p>
+    </div>
+  </section>
+
   <section class="section corp" id="companies" aria-labelledby="corp-h">
     <div class="wrap">
       <div class="section-head"><div><p class="eyebrow">For companies</p><h2 id="corp-h">Team bonding in Singapore that everyone joins in.</h2><p class="corp-lead">Team bonding, family days, year-end parties and roadshow booths. Same prices as our birthday parties, with one quotation and one invoice for your company.</p></div></div>
@@ -256,7 +266,7 @@
           <h3>Four short steps, about 3 minutes</h3>
           <ol class="corp-steps">
             <li><b>Tell us the basics</b><span>How many participants, when and where.</span></li>
-            <li><b>Choose your Squishy DIY</b><span>Jelly, Crunchy or Duo, plus any add-ons.</span></li>
+            <li><b>Choose your activity and package</b><span>Squishy DIY or Clicker Keychain, plus any add-ons.</span></li>
             <li><b>Send your request as a company</b><span>Add your company name for the invoice and verify your email with a 6-digit code.</span></li>
             <li><b>We confirm on WhatsApp</b><span>Then we send a quotation and invoice. Nothing to pay now.</span></li>
           </ol>
@@ -346,8 +356,8 @@
     </div>
     <div class="wrap"><ol class="stepper" id="stepper" aria-label="Planner steps">
       <li><a href="#plan-1"><span class="sn">1</span><span class="sl">Basics</span></a></li>
-      <li><a href="#plan-2"><span class="sn">2</span><span class="sl">Squishy DIY</span></a></li>
-      <li><a href="#plan-3"><span class="sn">3</span><span class="sl">Add-ons</span></a></li>
+      <li><a href="#plan-2"><span class="sn">2</span><span class="sl">Activity</span></a></li>
+      <li><a href="#plan-3"><span class="sn">3</span><span class="sl">Package</span></a></li>
       <li><a href="#plan-4"><span class="sn">4</span><span class="sl">Request</span></a></li>
       <li class="ready-step"><a href="#plan-ready"><span class="sn">+</span><span class="sl">Get ready</span></a></li>
     </ol></div>
@@ -387,8 +397,15 @@
 
         <!-- STEP 2 -->
         <section class="wstep" id="wstep-2" aria-labelledby="ws2-h" hidden>
-          <p class="eyebrow">Step 2 · Required</p><h2 id="ws2-h" tabindex="-1">Choose their Squishy DIY.</h2>
-          <p class="wlead">Priced per person, including a take-home squishy capsule. A one-time $150 travel &amp; set-up fee is added once.</p>
+          <p class="eyebrow">Step 2 · Required</p><h2 id="ws2-h" tabindex="-1">Choose the activity.</h2>
+          <p class="wlead">Priced per person, and everyone takes home what they make. A one-time $150 travel &amp; set-up fee is added once.</p>
+          <div class="act-picker" role="radiogroup" aria-label="Activity">
+            <label class="act-tile"><input type="radio" name="activity" value="squishy" checked><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"/></svg></span><span class="act-name">Squishy DIY</span><span class="act-sub">Make a jelly or crunchy squishy</span><span class="act-pp">from <span id="act-from-squishy">$16</span>/person</span></label>
+            <label class="act-tile"><input type="radio" name="activity" value="clicker"><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-gift"/></svg></span><span class="act-name">Clicker Keychain</span><span class="act-sub">Build a clicky keycap keychain</span><span class="act-pp">from <span id="act-from-clicker">$20</span>/person</span></label>
+            <label class="act-tile"><input type="radio" name="activity" value="both"><span class="exp-badge">Combo deal</span><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-star"/></svg></span><span class="act-name">Both</span><span class="act-sub">Squishy + Clicker together</span><span class="act-pp">Combo price in your quote</span></label>
+          </div>
+          <p class="combo-note" id="combo-note" hidden><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span>Doing both? Each activity is at its usual price, and you pay the travel &amp; set-up fee only once.</span></p>
+          <div id="act-squishy">
           <p class="sel-label" id="exp-label">Select experience: <b id="exp-chosen">Duo: Jelly + Crunchy</b></p>
           <div class="exp-picker" role="radiogroup" aria-labelledby="exp-label">
             <label class="exp-tile"><input type="radio" name="experience" value="jelly"><img class="exp-img" src="__EXP_jelly__" alt="A clear pink jelly squishy filled with flower charms and pearls" width="520" height="520"><span class="exp-name">Jelly</span><span class="exp-sub">Smooth &amp; clear</span><span class="exp-pp"><span id="price-jelly">$16</span>/person</span></label>
@@ -425,18 +442,37 @@
               <span class="addon-body"><span class="addon-title"><span id="wax-title">Wax Cracking</span> <span class="pill" id="wax-pill">+$2 per squishy</span></span><span class="duo-deal" id="duo-deal">$3.50 for both squishies <s>U.P. $4</s></span><span class="addon-copy">A colourful wax shell to crack and reveal their squishy, done within the 45-minute session.</span><span class="addon-qty" id="wax-quantity">30 squishies to crack</span></span>
               <span class="addon-ctl"><span class="wax-prices"><s id="wax-up" hidden></s><span id="wax-price">+$67.50</span></span><input type="checkbox" id="wax" name="wax"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
             </label>
-            <div class="pl-row pl-fixed"><div><b>One-time travel &amp; set-up</b><small>Up to 2 hours on site. Included once in every booking.</small></div><strong>$150.00</strong></div>
+            <div class="pl-row pl-fixed" id="pl-fee"><div><b>One-time travel &amp; set-up</b><small>Up to 2 hours on site. Included once in every booking.</small></div><strong>$150.00</strong></div>
             <div class="pl-total"><span>Squishy DIY total</span><strong id="exp-total">$570.00</strong></div>
             <p class="fine" id="tier-note">Minimum 10 participants.</p>
+            </div>
+          </div>
+          </div>
+          <div class="exp-panel clk-panel" id="act-clicker" hidden>
+            <div><p class="eyebrow">Clicker Keychain</p><h3>Build your own clicker keychain</h3><p class="exp-tag">Pick the keycaps, click them in, clip it to your bag.</p></div>
+            <p class="sel-label" id="clk-label">Choose the base size: <b id="clk-chosen">Deluxe: 9-key base</b></p>
+            <div class="clk-bases" id="clk-bases" role="radiogroup" aria-labelledby="clk-label"></div>
+            <p class="fine">One base size for the whole party, so everyone gets the same number of keys.</p>
+            <ul class="ticks" id="clk-feats"></ul>
+            <div class="price-lines">
+              <div class="pl-row"><div><b>Clicker keychain for <span id="clk-n">15</span> participants</b><small id="clk-sub">$16 per person</small></div><strong id="clk-diy">$240.00</strong></div>
+              <div class="pl-row pl-fixed" id="clk-fee"><div><b>One-time delivery &amp; set-up</b><small>Up to 2 hours on site. Included once in every booking.</small></div><strong>$150.00</strong></div>
+              <div class="pl-total"><span>Clicker Keychain total</span><strong id="clk-total">$390.00</strong></div>
+              <p class="fine" id="clk-note">Minimum 10 participants.</p>
             </div>
           </div>
         </section>
 
         <!-- STEP 3 -->
         <section class="wstep" id="wstep-3" aria-labelledby="ws3-h" hidden>
-          <p class="eyebrow">Step 3 · Optional</p><h2 id="ws3-h" tabindex="-1">Complete your party.</h2>
+          <p class="eyebrow">Step 3 · Required</p><h2 id="ws3-h" tabindex="-1">Choose your package.</h2>
+          <p class="wlead">Every package includes your activity, run by our host. The bigger packages add decor and cake, booked and set up for you.</p>
+          <div class="pkg-grid" id="pkg-grid" role="radiogroup" aria-label="Packages"></div>
+          <p class="pkg-cake" id="pkg-cake" hidden></p>
+          <ul class="promises" id="promises-plan"></ul>
+          <h3 class="upg-h">Upgrade your package</h3>
           <p class="exclusive"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg>Enjoy exclusive rates with our partner vendors, only when you book through Confetti Club.</p>
-          <p class="wlead">Nothing is added until you choose it. Our most popular add-ons are marked Suggested.</p>
+          <p class="wlead">Add anything else you’d like. Our most popular add-ons are marked Suggested.</p>
           <div class="tabs" data-tabs id="addon-tabs"></div>
         </section>
 
@@ -632,12 +668,12 @@
       <div class="summary-photo"><img id="summary-img" alt="" width="1536" height="1024"><span class="summary-chip">One celebration, one quote</span></div>
       <div class="summary-body">
         <p class="eyebrow">Your celebration · SGD</p>
-        <h2 id="summary-h">Squishy <span id="summary-exp">Duo</span> celebration</h2>
+        <h2 id="summary-h"><span id="summary-exp">Squishy Duo</span> celebration</h2>
         <p class="summary-meta"><span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><b id="summary-participants">15</b>&nbsp;participants</span><span><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span id="summary-length">2 hours</span></span></p>
         <div class="total"><div><small>Estimated total</small><strong id="total-price">$0.00</strong><span class="ref-off" id="ref-off" hidden>$10 off with your friend’s referral</span></div><div class="per-child"><strong id="per-child">$0.00</strong><small>per person</small></div></div>
         <p class="summary-hint" id="summary-hint">Your estimate starts when you choose Squishy DIY in step 2. Nothing is added until you choose it.</p>
         <details class="sum-acc" id="sum-acc">
-          <summary>See itemised breakdown <span class="acc-meta"><b id="squishy-count">30</b> squishies · <b id="partner-count">0</b> add-ons</span></summary>
+          <summary>See itemised breakdown <span class="acc-meta"><b id="squishy-count">30</b> <span id="squishy-word">squishies</span> · <b id="partner-count">0</b> add-ons</span></summary>
           <dl class="breakdown" id="breakdown"></dl>
         </details>
         <div class="pending-note" id="pending-note" hidden></div>
