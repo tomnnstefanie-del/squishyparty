@@ -715,7 +715,7 @@ body.planning{background:var(--paper)}
 .wiz-exit{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;text-decoration:none;font-weight:700;font-size:.875rem;color:var(--ink-2);box-shadow:inset 0 0 0 1.5px var(--line-2)}
 .wiz-exit:hover{color:var(--cobalt);box-shadow:inset 0 0 0 1.5px var(--cobalt)}
 .wiz-exit .icon{width:16px;height:16px}
-.stepper{list-style:none;margin:0;padding:0 0 12px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;counter-reset:s}
+.stepper{list-style:none;margin:0;padding:0 0 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;counter-reset:s}
 .stepper li{position:relative}
 .stepper a{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--muted);font-size:.8125rem;font-weight:700;padding-top:4px}
 .stepper a::before{content:"";display:block;height:4px;border-radius:999px;background:var(--step-todo);transition:background .3s}
@@ -1630,7 +1630,7 @@ html:has(body.planning){scroll-padding-top:150px}
   .addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.78) 55%,rgba(24,32,140,.35) 100%),url('img/how/wax.jpg') center 60%/cover no-repeat,var(--cobalt)}
 }
 /* v25 4-step planner: the plan review lives in Request; to-do, schedule and invitation become "Get ready" next steps */
-.stepper{grid-template-columns:repeat(5,minmax(0,1fr))}
+.stepper{grid-template-columns:repeat(4,minmax(0,1fr))}
 .stepper li.ready-step a::before{background:repeating-linear-gradient(90deg,var(--step-todo) 0 6px,transparent 6px 10px)}
 .stepper li.ready-step.open a{color:var(--rose)}
 .stepper li.ready-step.open a::before{background:repeating-linear-gradient(90deg,var(--rose) 0 6px,transparent 6px 10px)}
@@ -2413,6 +2413,12 @@ footer{background:#efece7;border-top:0}
   .pkg-grid,.promises{grid-template-columns:1fr}
   .pkg-grid{gap:20px}
 }
+
+/* v75: one flow, Basics -> Package -> Request; every package includes both activities */
+.kids-make{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;margin:6px 0 4px;border-radius:var(--r-lg);background:var(--cobalt-100);color:var(--ink)}
+.kids-make p{margin:0;font-size:.9375rem;line-height:1.5}
+.kids-make .act-ic{flex:none}
+#wstep-3 label.addon{margin-bottom:18px}
 </style>
 </head>
 <body>
@@ -2503,7 +2509,7 @@ footer{background:#efece7;border-top:0}
     <div class="wrap hero-grid">
       <div class="reveal">
         <h1><span class="h1-kicker">Birthday parties &amp; team bonding in Singapore</span>Parties worth <em>sharing</em>.</h1>
-        <p class="lead">A hosted Squishy DIY or Clicker Keychain party at your home, office or venue, in a package that fits. Everyone makes something to take home, every moment is made for photos, and we handle the rest. Plan it in 3 minutes, with one quote and one team.</p>
+        <p class="lead">A hosted party at your home, office or venue where every child makes a squishy and a clicker keychain, in a package that fits. Everyone makes something to take home, every moment is made for photos, and we handle the rest. Plan it in 3 minutes, with one quote and one team.</p>
         <div class="hero-actions">
           <a class="btn btn-primary btn-xl" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a class="btn btn-ghost" href="#explore" data-tab-link="tab-how">How it works</a>
@@ -2524,7 +2530,7 @@ footer{background:#efece7;border-top:0}
         </div>
         <div class="hero-float">
           <span class="hero-float-icon"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
-          <div><small>Clicker Keychain from</small><strong>$20 per child</strong></div>
+          <div><small>Squishy + Clicker Keychain</small><strong>$38 per child</strong></div>
         </div>
       </div>
     </div>
@@ -2690,7 +2696,7 @@ footer{background:#efece7;border-top:0}
   <!-- For companies: outcome-led copy, rate card and quick quote -->
   <section class="section pkgs" id="packages" aria-labelledby="pkgs-h">
     <div class="wrap">
-      <div class="section-head"><div><p class="eyebrow">Packages</p><h2 id="pkgs-h">Pick an activity, then a package.</h2><p class="corp-lead">Squishy DIY or Clicker Keychain, priced per child. Then choose how much we take off your hands.</p></div></div>
+      <div class="section-head"><div><p class="eyebrow">Packages</p><h2 id="pkgs-h">Pick a package. That’s it.</h2><p class="corp-lead">Every package includes both activities: each child makes a squishy and a clicker keychain. Then choose how much we take off your hands.</p></div></div>
       <div class="pkg-grid pkg-home" id="pkg-home"></div>
       <h3 class="promise-h">Our promises</h3>
       <ul class="promises" id="promises-home"></ul>
@@ -2720,7 +2726,7 @@ footer{background:#efece7;border-top:0}
           <h3>Four short steps, about 3 minutes</h3>
           <ol class="corp-steps">
             <li><b>Tell us the basics</b><span>How many participants, when and where.</span></li>
-            <li><b>Choose your activity and package</b><span>Squishy DIY or Clicker Keychain, plus any add-ons.</span></li>
+            <li><b>Choose your package</b><span>Squishy DIY and Clicker Keychain, plus any add-ons.</span></li>
             <li><b>Send your request as a company</b><span>Add your company name for the invoice and verify your email with a 6-digit code.</span></li>
             <li><b>We confirm on WhatsApp</b><span>Then we send a quotation and invoice. Nothing to pay now.</span></li>
           </ol>
@@ -2810,9 +2816,8 @@ footer{background:#efece7;border-top:0}
     </div>
     <div class="wrap"><ol class="stepper" id="stepper" aria-label="Planner steps">
       <li><a href="#plan-1"><span class="sn">1</span><span class="sl">Basics</span></a></li>
-      <li><a href="#plan-2"><span class="sn">2</span><span class="sl">Activity</span></a></li>
-      <li><a href="#plan-3"><span class="sn">3</span><span class="sl">Package</span></a></li>
-      <li><a href="#plan-4"><span class="sn">4</span><span class="sl">Request</span></a></li>
+      <li><a href="#plan-2"><span class="sn">2</span><span class="sl">Package</span></a></li>
+      <li><a href="#plan-3"><span class="sn">3</span><span class="sl">Request</span></a></li>
       <li class="ready-step"><a href="#plan-ready"><span class="sn">+</span><span class="sl">Get ready</span></a></li>
     </ol></div>
   </header>
@@ -2850,6 +2855,7 @@ footer{background:#efece7;border-top:0}
         </section>
 
         <!-- STEP 2 -->
+        <!-- Old activity step: no longer in the planner (every package includes both activities). Kept hidden for its how-it-works carousel. -->
         <section class="wstep" id="wstep-2" aria-labelledby="ws2-h" hidden>
           <p class="eyebrow">Step 2 · Required</p><h2 id="ws2-h" tabindex="-1">Choose the activity.</h2>
           <p class="wlead">Priced per person, and everyone takes home what they make. A one-time $150 travel &amp; set-up fee is added once.</p>
@@ -2891,11 +2897,7 @@ footer{background:#efece7;border-top:0}
             <div class="price-lines">
             <div class="pl-row"><div><b>Squishy DIY for <span id="pl-n">15</span> participants</b><small id="pl-sub">$26 Duo + $2 squishy capsule, per person</small></div><strong id="pl-diy">$420.00</strong></div>
             <p class="sel-label addon-label">Add-on</p>
-            <label class="addon" for="wax">
-              <span class="addon-icon" aria-hidden="true"><svg class="icon"><use href="#i-crack"/></svg></span>
-              <span class="addon-body"><span class="addon-title"><span id="wax-title">Wax Cracking</span> <span class="pill" id="wax-pill">+$2 per squishy</span></span><span class="duo-deal" id="duo-deal">$3.50 for both squishies <s>U.P. $4</s></span><span class="addon-copy">A colourful wax shell to crack and reveal their squishy, done within the 45-minute session.</span><span class="addon-qty" id="wax-quantity">30 squishies to crack</span></span>
-              <span class="addon-ctl"><span class="wax-prices"><s id="wax-up" hidden></s><span id="wax-price">+$67.50</span></span><input type="checkbox" id="wax" name="wax"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
-            </label>
+
             <div class="pl-row pl-fixed" id="pl-fee"><div><b>One-time travel &amp; set-up</b><small>Up to 2 hours on site. Included once in every booking.</small></div><strong>$150.00</strong></div>
             <div class="pl-total"><span>Squishy DIY total</span><strong id="exp-total">$570.00</strong></div>
             <p class="fine" id="tier-note">Minimum 10 participants.</p>
@@ -2919,9 +2921,15 @@ footer{background:#efece7;border-top:0}
 
         <!-- STEP 3 -->
         <section class="wstep" id="wstep-3" aria-labelledby="ws3-h" hidden>
-          <p class="eyebrow">Step 3 · Required</p><h2 id="ws3-h" tabindex="-1">Choose your package.</h2>
-          <p class="wlead">Every package includes your activity, run by our host. The bigger packages add decor and cake, booked and set up for you.</p>
+          <p class="eyebrow">Step 2 · Required</p><h2 id="ws3-h" tabindex="-1">Choose your package.</h2>
+          <div class="kids-make"><span class="act-ic" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"/></svg></span><p><b>In every package, each child makes two things to take home:</b> a squishy (Jelly or Crunchy, they pick on the day) and a Deluxe 9-key clicker keychain. <span id="bundle-pp">$38</span> per child (minimum 10), plus a one-time $150 travel &amp; set-up fee.</p></div>
           <div class="pkg-grid" id="pkg-grid" role="radiogroup" aria-label="Packages"></div>
+          <p class="sel-label addon-label">Optional</p>
+          <label class="addon" for="wax">
+            <span class="addon-icon" aria-hidden="true"><svg class="icon"><use href="#i-crack"/></svg></span>
+            <span class="addon-body"><span class="addon-title"><span id="wax-title">Wax Cracking</span> <span class="pill" id="wax-pill">+$2 per squishy</span></span><span class="duo-deal" id="duo-deal">$3.50 for both squishies <s>U.P. $4</s></span><span class="addon-copy">A colourful wax shell to crack and reveal their squishy, done within the 45-minute session.</span><span class="addon-qty" id="wax-quantity">30 squishies to crack</span></span>
+            <span class="addon-ctl"><span class="wax-prices"><s id="wax-up" hidden></s><span id="wax-price">+$67.50</span></span><input type="checkbox" id="wax" name="wax"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
+          </label>
           <p class="pkg-cake" id="pkg-cake" hidden></p>
           <ul class="promises" id="promises-plan"></ul>
           <h3 class="upg-h">Upgrade your package</h3>
@@ -3015,7 +3023,7 @@ footer{background:#efece7;border-top:0}
 
       <!-- STEP 4: REQUEST (section id kept as wstep-5) -->
       <section class="wstep" id="wstep-5" aria-labelledby="ws5-h" hidden>
-        <p class="eyebrow">Step 4</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
+        <p class="eyebrow">Step 3</p><h2 id="ws5-h" tabindex="-1">Request availability.</h2>
         <p class="wlead">Tell us how to reach you and verify your email. There’s nothing to pay now: we email your quotation straight away, then confirm availability on WhatsApp.</p>
         <details class="acc acc-card plan-review" open hidden>
           <summary>Your plan <span class="acc-meta" id="recap-total">$0.00</span></summary>
@@ -3163,8 +3171,9 @@ footer{background:#efece7;border-top:0}
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = null;
-  // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = optional per-person price for both together; null (owner, 9 Nov 2026) = both at their usual prices with one travel fee.
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = 3800;
+  // Activities: Squishy DIY (EXP below) and Clicker Keychains. Every package includes both (owner, 9 Nov 2026): each child makes one squishy
+  // (Jelly or Crunchy, picked on the day) and a Deluxe 9-key clicker, at COMBO per child (capsule included) + one LOGISTICS fee.
   // Clicker Keychains: one base size for the whole party, priced per person, plus the one-time CLICKER_DELIVERY.
   // Hosted parties offer only the 8- and 9-key bases (owner, 8 Nov 2026): enough keys to fill the session and less stock for the live station.
   // Smaller bases (3-key $10, 4-key $13, 4-key square $14, 5-key $16, 6-key $18) are kept off the planner for booths and favours.
@@ -3176,7 +3185,7 @@ footer{background:#efece7;border-top:0}
   // 'includes' = add-ons put in the plan with the package; 'cake' = the package comes with a cake of their choice (the dearest priced one counts);
   // 'off' = % off the regular price of the included add-ons and that cake, so it's cheaper than sourcing them separately.
   var PACKAGES = [
-    {id:'essentials', name:'Essentials', tag:'The activity, run for you', off:0, cake:false, includes:[], perks:['Our host runs the whole activity', 'Set-up and pack-down', 'Party planner: invitations, RSVPs and run-sheet', 'Birthday sash & tiara for the birthday child', 'Every guest takes home what they made']},
+    {id:'essentials', name:'Essentials', tag:'Both activities, run for you', off:0, cake:false, includes:[], perks:['Squishy DIY: Jelly or Crunchy, picked on the day', 'Deluxe 9-key clicker keychain', 'Our host runs both activities', 'Set-up and pack-down', 'Party planner: invitations, RSVPs and run-sheet', 'Birthday sash & tiara for the birthday child', 'Every child takes home a squishy and a clicker keychain']},
     {id:'celebration', name:'Celebration', tag:'Decor and cake sorted', popular:true, off:10, cake:true, includes:['bl-fabric-std', 'bl-col-12'], perks:['Bloom fabric backdrop in your colours', 'Balloon column, 1.2 m', 'A Butter Studio cake of your choice', 'Party photo album: about 30 photos by our host', '10% off the cake and decor']},
     {id:'allin', name:'All-in', tag:'Everything, done for you', off:10, cake:true, includes:['bl-fabric-std', 'bl-col-12', 'pp-face-1', 'js-photo-1'], perks:['Face painting, 1 hour', 'Event photographer, 1 hour', '10% off the cake, decor and entertainment']}
   ];
@@ -3376,12 +3385,12 @@ footer{background:#efece7;border-top:0}
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, activity:'squishy', clicker:'c9', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'jelly', wax:false, activity:'both', clicker:'c9', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
 
   // The activity lines: Squishy DIY, Clicker Keychains, or both (one travel fee; the combo price replaces both once COMBO is set).
   function foundation(s){
     var n = billable(s.participants), e = EXP[s.experience], b = CLK[s.clicker] || CLK.c9, items = [];
-    if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), sub:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
+    if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Deluxe clicker keychain, ' + n + ' × ' + short(COMBO), sub:'Squishy (Jelly or Crunchy) + Deluxe clicker keychain, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
     else {
       if (hasSquishy(s)) {
         items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
@@ -3840,13 +3849,11 @@ footer{background:#efece7;border-top:0}
     PACKAGES.forEach(function(k, i){ if (g) g.appendChild(card(k, i, true)); if (h) h.appendChild(card(k, i, false)); });
     ['promises-plan', 'promises-home'].forEach(function(id){ var ul = $(id); if (!ul) return; PROMISES.forEach(function(p){ var li = el('li'), ic = el('span','promise-ic'); ic.appendChild(icon(p.ic)); li.appendChild(ic); var d = el('div'); d.appendChild(el('b', null, p.t)); d.appendChild(el('span', null, p.c)); li.appendChild(d); ul.appendChild(li); }); });
     var cb = $('clk-bases'); if (cb) CLICKER.forEach(function(b){ var l = el('label','clk-tile'), r = document.createElement('input'); r.type = 'radio'; r.name = 'clicker'; r.value = b.id; r.checked = b.id === S.clicker; l.appendChild(r); if (b.pick) l.appendChild(el('span','clk-pick','Our pick')); var keys = el('span','clk-keys'); for (var j = 0; j < b.keys; j++) keys.appendChild(el('i')); l.appendChild(keys); l.appendChild(el('span','clk-name', b.name)); l.appendChild(el('span','clk-pp', short(b.price) + '/person')); cb.appendChild(l); });
-    put('act-from-squishy', short(Math.min(EXP.jelly.pax, EXP.crunchy.pax))); put('act-from-clicker', short(fromPrice(CLICKER)));
+    put('act-from-squishy', short(Math.min(EXP.jelly.pax, EXP.crunchy.pax))); put('act-from-clicker', short(fromPrice(CLICKER))); put('bundle-pp', short(COMBO));
   }
-  // Home page cards: the lowest price for the minimum of 10 participants (cheapest activity, cheapest cake).
+  // Home page cards: the price for the minimum of 10 participants (with our lowest-priced party cake).
   function pkgFrom(k){
-    var base = {participants:MIN_PAX, wax:false, selected:[], clicker:CLICKER[0].id, experience:'jelly', activity:'squishy'};
-    var opts = [Object.assign({}, base), Object.assign({}, base, {experience:'crunchy'}), Object.assign({}, base, {activity:'clicker'})];
-    return opts.map(function(o){ return pkgQuote(k, o); }).sort(function(a, b){ return a.total - b.total; })[0];
+    return pkgQuote(k, {participants:MIN_PAX, wax:false, selected:[], clicker:'c9', experience:'jelly', activity:'both'});
   }
   function toggle(id){
     var i = S.selected.indexOf(id);
@@ -4651,7 +4658,7 @@ footer{background:#efece7;border-top:0}
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax'); S.activity = d.get('activity') || 'squishy'; S.clicker = d.get('clicker') || S.clicker;
+    S.theme = d.get('theme'); S.wax = d.has('wax'); S.activity = 'both'; S.clicker = 'c9'; S.experience = 'jelly'; // every package: one squishy (picked on the day) + a Deluxe clicker
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
   form.addEventListener('change', function(e){
@@ -4757,9 +4764,9 @@ footer{background:#efece7;border-top:0}
   document.querySelectorAll('[data-bakery-logos]').forEach(function(h){ BAKERIES.forEach(function(v){ h.appendChild(logoEl(v)); }); });
 
   /* ================= VIEWS + WIZARD (hash routing keeps Back working) ================= */
-  // Four planner steps, then a "Get ready" view (to-do list, schedule, invitation) that sits outside the stepper.
-  // View 5 is that page; its route is #plan-ready. Section ids: step 4 (Request) is #wstep-5, Get ready is #wstep-4.
-  var STEPS = ['The basics','Activity','Package','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-2', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 4, READY = 5, cur = 1, reached = 1;
+  // Three planner steps (Basics, Package, Request), then a "Get ready" view (to-do list, schedule, invitation) outside the stepper.
+  // Its route is #plan-ready. Section ids: Package is #wstep-3, Request is #wstep-5, Get ready is #wstep-4 (#wstep-2, the old activity step, stays hidden).
+  var STEPS = ['The basics','Package','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 3, READY = 4, cur = 1, reached = 1;
   function route(k){ return k === READY ? '#plan-ready' : '#plan-' + k; }
   var homeV = $('view-home'), planV = $('view-plan');
   /* Navigation is driven by JS state, not the URL, so it also works inside sandboxed
@@ -4791,10 +4798,10 @@ footer{background:#efece7;border-top:0}
     nm.textContent = k < LAST ? 'Next' : 'Send request'; nm.hidden = k === READY || (k === LAST && !!S.requested);
     $('wiz-again').hidden = !(k === LAST && S.requested);
     window.scrollTo(0, 0);
-    var h = $(k === READY ? 'ws4-h' : k === LAST ? 'ws5-h' : 'ws' + k + '-h'); if (h && focus) h.focus({preventScroll:true});
+    var h = $(SECTION[k]).querySelector('h2'); if (h && focus) h.focus({preventScroll:true});
   }
   function go(target, push){
-    var m = /^#?plan-([1-4]|ready)$/.exec(target || '');
+    var m = /^#?plan-([1-3]|ready)$/.exec(target || '');
     if (m) showStep(m[1] === 'ready' ? READY : +m[1], true); else showHome((target || '').replace('#',''));
     if (push !== false && canHistory()) { try { history.pushState({t:target}, '', m ? route(cur) : '#' + ((target || '').replace('#','') || 'top')); } catch (e) {} }
   }
@@ -4811,7 +4818,7 @@ footer{background:#efece7;border-top:0}
   $('wiz-next').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); });
   $('wiz-next-m').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); else if (cur === LAST) $('booking-submit').click(); });
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
-  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-3]|ready)$/.test(h)) go(h, false); })();
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
   // #care and #privacy open that FAQ answer
   document.querySelectorAll('a[href="#care"],a[href="#privacy"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); $('tab-faq').click(); var d = $(a.getAttribute('href').slice(1)); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });

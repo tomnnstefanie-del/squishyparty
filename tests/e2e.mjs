@@ -51,9 +51,10 @@ try {
   await page.fill('#venue', '1 Example Road');
   await page.fill('#postal', '123456');
   await page.click('#wiz-next');
-  await page.click('label.addon'); // wax duo deal
-  await page.click('#wiz-next');
-  assert.equal(await page.locator('.rec-acc, #use-rec').count(), 0); ok('step 3 has no "Your plan so far" box: the add-on tabs come straight after the intro');
+  assert.ok(await page.isVisible('#wstep-3')); assert.equal(await txt('#wiz-count'), 'Step 2 of 3');
+  ok('Basics goes straight to the package step (no activity step)');
+  await page.click('#wstep-3 label.addon'); // Wax Cracking
+  assert.equal(await page.locator('.rec-acc, #use-rec').count(), 0); ok('the package step has no "Your plan so far" box');
   // Bloom: personalise the Standard fabric backdrop
   await page.click('#tab-a-styling'); await page.click('#panel-a-styling .store'); await page.waitForTimeout(300);
   await page.click('.ss-item >> nth=0 >> .ss-name'); await page.waitForTimeout(300);
@@ -66,8 +67,8 @@ try {
   await page.click('#ss-opt-add'); await page.click('.ss-foot .btn'); await page.waitForTimeout(300);
   ok('Bloom backdrop: choose colours (names appear), type vinyl text and inspiration, add a moodboard image');
   await page.click('#wiz-next');
-  assert.ok(await page.isVisible('#wstep-5')); assert.equal(await txt('#wiz-count'), 'Step 4 of 4');
-  ok('Add-ons goes straight to Request (step 4 of 4), with the itemised plan to check');
+  assert.ok(await page.isVisible('#wstep-5')); assert.equal(await txt('#wiz-count'), 'Step 3 of 3');
+  ok('Package goes straight to Request (step 3 of 3), with the itemised plan to check');
   assert.equal(await page.inputValue('#req-date'), date);
   assert.equal(await page.inputValue('#req-time'), '14:00');
   assert.equal(await page.inputValue('#req-end'), '16:30');
@@ -114,7 +115,7 @@ try {
   assert.equal(msgs.length, 1);
   const m = msgs[0];
   assert.equal(m.token, 'test:token'); assert.equal(m.chat_id, '4242'); assert.equal(m.parse_mode, 'HTML');
-  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
+  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Squishy + Clicker', 'Jelly or Crunchy', '12 × $38', 'Wax Cracking', 'travel', 'Lift lobby B, level 2'])
     assert.ok(m.text.includes(s), 'message missing: ' + s);
   ok('owner gets one Telegram message with contact, date/time, venue, address, guests, order and notes');
   assert.ok(m.text.includes(`Estimated total: ${pageTotal}`), `server total should match page total ${pageTotal}`);

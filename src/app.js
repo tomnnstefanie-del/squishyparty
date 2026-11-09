@@ -8,8 +8,9 @@
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = null;
-  // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = optional per-person price for both together; null (owner, 9 Nov 2026) = both at their usual prices with one travel fee.
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = 3800;
+  // Activities: Squishy DIY (EXP below) and Clicker Keychains. Every package includes both (owner, 9 Nov 2026): each child makes one squishy
+  // (Jelly or Crunchy, picked on the day) and a Deluxe 9-key clicker, at COMBO per child (capsule included) + one LOGISTICS fee.
   // Clicker Keychains: one base size for the whole party, priced per person, plus the one-time CLICKER_DELIVERY.
   // Hosted parties offer only the 8- and 9-key bases (owner, 8 Nov 2026): enough keys to fill the session and less stock for the live station.
   // Smaller bases (3-key $10, 4-key $13, 4-key square $14, 5-key $16, 6-key $18) are kept off the planner for booths and favours.
@@ -21,7 +22,7 @@
   // 'includes' = add-ons put in the plan with the package; 'cake' = the package comes with a cake of their choice (the dearest priced one counts);
   // 'off' = % off the regular price of the included add-ons and that cake, so it's cheaper than sourcing them separately.
   var PACKAGES = [
-    {id:'essentials', name:'Essentials', tag:'The activity, run for you', off:0, cake:false, includes:[], perks:['Our host runs the whole activity', 'Set-up and pack-down', 'Party planner: invitations, RSVPs and run-sheet', 'Birthday sash & tiara for the birthday child', 'Every guest takes home what they made']},
+    {id:'essentials', name:'Essentials', tag:'Both activities, run for you', off:0, cake:false, includes:[], perks:['Squishy DIY: Jelly or Crunchy, picked on the day', 'Deluxe 9-key clicker keychain', 'Our host runs both activities', 'Set-up and pack-down', 'Party planner: invitations, RSVPs and run-sheet', 'Birthday sash & tiara for the birthday child', 'Every child takes home a squishy and a clicker keychain']},
     {id:'celebration', name:'Celebration', tag:'Decor and cake sorted', popular:true, off:10, cake:true, includes:['bl-fabric-std', 'bl-col-12'], perks:['Bloom fabric backdrop in your colours', 'Balloon column, 1.2 m', 'A Butter Studio cake of your choice', 'Party photo album: about 30 photos by our host', '10% off the cake and decor']},
     {id:'allin', name:'All-in', tag:'Everything, done for you', off:10, cake:true, includes:['bl-fabric-std', 'bl-col-12', 'pp-face-1', 'js-photo-1'], perks:['Face painting, 1 hour', 'Event photographer, 1 hour', '10% off the cake, decor and entertainment']}
   ];
@@ -221,12 +222,12 @@
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, activity:'squishy', clicker:'c9', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'jelly', wax:false, activity:'both', clicker:'c9', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
 
   // The activity lines: Squishy DIY, Clicker Keychains, or both (one travel fee; the combo price replaces both once COMBO is set).
   function foundation(s){
     var n = billable(s.participants), e = EXP[s.experience], b = CLK[s.clicker] || CLK.c9, items = [];
-    if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), sub:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
+    if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Deluxe clicker keychain, ' + n + ' × ' + short(COMBO), sub:'Squishy (Jelly or Crunchy) + Deluxe clicker keychain, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
     else {
       if (hasSquishy(s)) {
         items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
@@ -685,13 +686,11 @@
     PACKAGES.forEach(function(k, i){ if (g) g.appendChild(card(k, i, true)); if (h) h.appendChild(card(k, i, false)); });
     ['promises-plan', 'promises-home'].forEach(function(id){ var ul = $(id); if (!ul) return; PROMISES.forEach(function(p){ var li = el('li'), ic = el('span','promise-ic'); ic.appendChild(icon(p.ic)); li.appendChild(ic); var d = el('div'); d.appendChild(el('b', null, p.t)); d.appendChild(el('span', null, p.c)); li.appendChild(d); ul.appendChild(li); }); });
     var cb = $('clk-bases'); if (cb) CLICKER.forEach(function(b){ var l = el('label','clk-tile'), r = document.createElement('input'); r.type = 'radio'; r.name = 'clicker'; r.value = b.id; r.checked = b.id === S.clicker; l.appendChild(r); if (b.pick) l.appendChild(el('span','clk-pick','Our pick')); var keys = el('span','clk-keys'); for (var j = 0; j < b.keys; j++) keys.appendChild(el('i')); l.appendChild(keys); l.appendChild(el('span','clk-name', b.name)); l.appendChild(el('span','clk-pp', short(b.price) + '/person')); cb.appendChild(l); });
-    put('act-from-squishy', short(Math.min(EXP.jelly.pax, EXP.crunchy.pax))); put('act-from-clicker', short(fromPrice(CLICKER)));
+    put('act-from-squishy', short(Math.min(EXP.jelly.pax, EXP.crunchy.pax))); put('act-from-clicker', short(fromPrice(CLICKER))); put('bundle-pp', short(COMBO));
   }
-  // Home page cards: the lowest price for the minimum of 10 participants (cheapest activity, cheapest cake).
+  // Home page cards: the price for the minimum of 10 participants (with our lowest-priced party cake).
   function pkgFrom(k){
-    var base = {participants:MIN_PAX, wax:false, selected:[], clicker:CLICKER[0].id, experience:'jelly', activity:'squishy'};
-    var opts = [Object.assign({}, base), Object.assign({}, base, {experience:'crunchy'}), Object.assign({}, base, {activity:'clicker'})];
-    return opts.map(function(o){ return pkgQuote(k, o); }).sort(function(a, b){ return a.total - b.total; })[0];
+    return pkgQuote(k, {participants:MIN_PAX, wax:false, selected:[], clicker:'c9', experience:'jelly', activity:'both'});
   }
   function toggle(id){
     var i = S.selected.indexOf(id);
@@ -1496,7 +1495,7 @@
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax'); S.activity = d.get('activity') || 'squishy'; S.clicker = d.get('clicker') || S.clicker;
+    S.theme = d.get('theme'); S.wax = d.has('wax'); S.activity = 'both'; S.clicker = 'c9'; S.experience = 'jelly'; // every package: one squishy (picked on the day) + a Deluxe clicker
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
   form.addEventListener('change', function(e){
@@ -1602,9 +1601,9 @@
   document.querySelectorAll('[data-bakery-logos]').forEach(function(h){ BAKERIES.forEach(function(v){ h.appendChild(logoEl(v)); }); });
 
   /* ================= VIEWS + WIZARD (hash routing keeps Back working) ================= */
-  // Four planner steps, then a "Get ready" view (to-do list, schedule, invitation) that sits outside the stepper.
-  // View 5 is that page; its route is #plan-ready. Section ids: step 4 (Request) is #wstep-5, Get ready is #wstep-4.
-  var STEPS = ['The basics','Activity','Package','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-2', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 4, READY = 5, cur = 1, reached = 1;
+  // Three planner steps (Basics, Package, Request), then a "Get ready" view (to-do list, schedule, invitation) outside the stepper.
+  // Its route is #plan-ready. Section ids: Package is #wstep-3, Request is #wstep-5, Get ready is #wstep-4 (#wstep-2, the old activity step, stays hidden).
+  var STEPS = ['The basics','Package','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 3, READY = 4, cur = 1, reached = 1;
   function route(k){ return k === READY ? '#plan-ready' : '#plan-' + k; }
   var homeV = $('view-home'), planV = $('view-plan');
   /* Navigation is driven by JS state, not the URL, so it also works inside sandboxed
@@ -1636,10 +1635,10 @@
     nm.textContent = k < LAST ? 'Next' : 'Send request'; nm.hidden = k === READY || (k === LAST && !!S.requested);
     $('wiz-again').hidden = !(k === LAST && S.requested);
     window.scrollTo(0, 0);
-    var h = $(k === READY ? 'ws4-h' : k === LAST ? 'ws5-h' : 'ws' + k + '-h'); if (h && focus) h.focus({preventScroll:true});
+    var h = $(SECTION[k]).querySelector('h2'); if (h && focus) h.focus({preventScroll:true});
   }
   function go(target, push){
-    var m = /^#?plan-([1-4]|ready)$/.exec(target || '');
+    var m = /^#?plan-([1-3]|ready)$/.exec(target || '');
     if (m) showStep(m[1] === 'ready' ? READY : +m[1], true); else showHome((target || '').replace('#',''));
     if (push !== false && canHistory()) { try { history.pushState({t:target}, '', m ? route(cur) : '#' + ((target || '').replace('#','') || 'top')); } catch (e) {} }
   }
@@ -1656,7 +1655,7 @@
   $('wiz-next').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); });
   $('wiz-next-m').addEventListener('click', function(){ if (cur < LAST) go(route(cur + 1)); else if (cur === LAST) $('booking-submit').click(); });
   $('wiz-back').addEventListener('click', function(){ go(cur === READY ? route(LAST) : cur > 1 ? route(cur - 1) : '#top'); });
-  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-4]|ready)$/.test(h)) go(h, false); })();
+  (function(){ var h = ''; try { h = location.hash; } catch (e) {} if (/^#plan-([1-3]|ready)$/.test(h)) go(h, false); })();
   // #care (sent on WhatsApp after the party) opens the squishy care answer in the FAQ
   // #care and #privacy open that FAQ answer
   document.querySelectorAll('a[href="#care"],a[href="#privacy"]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); $('tab-faq').click(); var d = $(a.getAttribute('href').slice(1)); d.open = true; d.scrollIntoView({block:'center', behavior:'smooth'}); }); });
