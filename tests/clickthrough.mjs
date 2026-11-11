@@ -30,8 +30,8 @@ async function run(label, width, setup){
   await f.click(next); ok('Next -> step 2', await vis('#wstep-2'));
   await f.click('.exp-tile:has(input[value=jelly])'); ok('pick Jelly', (await txt('#exp-title'))==='Jelly');
   await f.click('.exp-tile:has(input[value=both])'); ok('pick Duo', (await txt('#exp-title')).startsWith('Duo'));
-  await f.click('label.addon'); ok('wax add-on toggles', await f.isChecked('#wax'));
-  ok('Duo deal label shows', await vis('#duo-deal'));
+  const tb=await txt('#total-price'); await f.click('label.addon'); await p.waitForTimeout(200); ok('goodie bag add-on toggles and adds to the total', await f.isChecked('#goodie') && (await txt('#total-price'))!==tb);
+  ok('goodie bags are $5 per friend', (await txt('#goodie-pill'))==='+$5 per friend'); ok('Other activities tab and our favour bags are gone', !(await f.evaluate(()=>!!document.getElementById('tab-a-entertainment'))) && !/Party favours from our own stores/.test(await f.evaluate(()=>document.getElementById('panel-a-styling').textContent)));
   await f.click(next); ok('Next -> step 3', await vis('#wstep-3'));
   ok('step 3 opens on the add-on tabs (no plan-so-far box)', !(await f.evaluate(()=>!!document.querySelector('.rec-acc'))) && await vis('#addon-tabs'));
   await f.click('#tab-a-styling'); ok('add-on tab Styling', await vis('#panel-a-styling'));

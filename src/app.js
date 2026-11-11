@@ -30,8 +30,9 @@
   var EXP = { jelly:{name:'Jelly',short:'Jelly',pax:1600,per:1}, crunchy:{name:'Crunchy',short:'Crunchy',pax:1800,per:1}, both:{name:'Duo: Jelly + Crunchy',short:'Duo',pax:2600,per:2} };
   var CATS = [
     {id:'styling', title:'Styling', tab:'Styling', icon:'i-balloon', blurb:'Balloon backdrops, dessert tables and party favours in your colour theme.'},
-    {id:'entertainment', title:'Other activities', tab:'Other activities', icon:'i-smile', blurb:'Face painting, glitter tattoos, balloon sculpting, magic and caricatures by PartyPainters.sg, plus photos and video by J Square Photography.'},
-    {id:'cake', title:'Cakes', tab:'Cakes', icon:'i-cake', blurb:'From our partner bakery, Butter Studio. Delivered to your venue before the finale.'}
+    {id:'entertainment', hidden:true, title:'Other activities', tab:'Other activities', icon:'i-smile', blurb:'Face painting, glitter tattoos, balloon sculpting, magic and caricatures by PartyPainters.sg, plus photos and video by J Square Photography.'},
+    {id:'cake', title:'Cakes', tab:'Cakes', icon:'i-cake', blurb:'From our partner bakery, Butter Studio. Delivered to your venue before the finale.'},
+    {id:'favours', hidden:true, title:'Goodie bags', tab:'Goodie bags', icon:'i-gift', blurb:'Take-home goodie bags from our own stores.'}
   ];
   var P = [
     // Butter Studio menu (names and prices from their foodpanda listing; prices tagged Demo until the partner rate is agreed).
@@ -166,7 +167,9 @@
     {id:'bl-3d-08', g:'bl-3d', gname:'3D standee with stand', size:'0.8 m tall', sec:'Add-ons', cat:'styling', name:'3D standee, 0.8 m', vendor:'Bloom', status:'approved', basis:'booking', price:5500, rec:0, img:'img/bloom/3d-standee.jpg', cap:'A cut-out character or theme figure on a stand', inc:['1 custom 3D standee with stand'], cond:['A 0.9 m size is also available: ask in your notes']},
     {id:'bl-3d-10', g:'bl-3d', gname:'3D standee with stand', size:'1 m tall', sec:'Add-ons', cat:'styling', name:'3D standee, 1 m', vendor:'Bloom', status:'approved', basis:'booking', price:7500, rec:0, img:'img/bloom/3d-standee.jpg', cap:'A cut-out character or theme figure on a stand', inc:['1 custom 3D standee with stand'], cond:['A 0.9 m size is also available: ask in your notes']},
     {id:'bl-poster', sec:'Add-ons', cat:'styling', name:'Foamboard poster with easel', vendor:'Bloom', status:'approved', basis:'booking', price:5000, rec:0, img:'img/bloom/foam-poster.jpg', cap:'An A3 or A4 welcome sign on an easel', inc:['1 foamboard poster (A3 or A4)','1 easel stand'], cond:[]},
-    {id:'s-favours', cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']},
+    {id:'s-favours', hidden:true, cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']},
+    // Squishy goodie bag for each friend (owner, 12 Nov 2026): ticked on the Squishy DIY step, one per participant.
+    {id:'t-goodie', cat:'favours', name:'Squishy goodie bag (glossy squishy, mixed colours)', vendor:'Tom & Stefanie', status:'approved', basis:'child', price:500, rec:0, cap:'One per friend', inc:['A glossy squishy in mixed assorted colours'], cond:['Confirmed with your quotation']},
   ];
   var BYID = {}; P.forEach(function(p){ BYID[p.id] = p; });
   var STATUS = { demo:['st-demo','Sample listing'], prospective:['st-prospective','Prospective'], approved:['st-approved','Approved'], partner:['st-approved','Cake partner'], confirmed:['st-confirmed','Confirmed'] };
@@ -241,7 +244,7 @@
   var cardEls = {};
   function buildCards(){
     var host = $('addon-tabs'), list = el('div','tablist'); list.setAttribute('role','tablist'); list.setAttribute('aria-label','Add-on categories'); host.appendChild(list);
-    CATS.forEach(function(cat, ci){
+    SHOWN_CATS.forEach(function(cat, ci){
       var tab = el('button'); tab.type = 'button'; tab.setAttribute('role','tab'); tab.id = 'tab-a-' + cat.id; tab.setAttribute('aria-controls','panel-a-' + cat.id); tab.setAttribute('aria-selected', String(ci === 0)); if (ci) tab.tabIndex = -1;
       tab.appendChild(icon(cat.icon)); tab.appendChild(document.createTextNode(cat.tab)); 
       var cnt = el('span','tcount','0'); cnt.id = 'count-' + cat.id; cnt.dataset.n = '0'; tab.appendChild(cnt); list.appendChild(tab);
@@ -290,7 +293,7 @@
     });
     // Step 2: one swipeable card per partner
     var vs = $('tl-vendors');
-    var order = []; ['cake','styling','entertainment'].forEach(function(c){ vendorsFor(c).forEach(function(v){ order.push([v, c]); }); });
+    var order = []; SHOWN_CATS.map(function(c){ return c.id; }).forEach(function(c){ vendorsFor(c).forEach(function(v){ order.push([v, c]); }); });
     order.forEach(function(x){
       var v = x[0], cat = x[1], st = storeOf(v), card = el('div','tl-vcard'); card.setAttribute('role','listitem');
       var pic = st.hero || (P.filter(function(p){ return p.vendor === v && p.img; })[0] || {}).img;
@@ -336,7 +339,8 @@
     var im = document.createElement('img'); im.alt = alt || ''; im.decoding = 'async'; im.draggable = false;
     im.addEventListener('error', none); im.src = src; w.appendChild(im); return w;
   }
-  function vendorsFor(cat){ var vs = []; P.forEach(function(p){ if (p.cat === cat && vs.indexOf(p.vendor) < 0) vs.push(p.vendor); }); return vs; }
+  function vendorsFor(cat){ var vs = []; P.forEach(function(p){ if (p.cat === cat && !p.hidden && vs.indexOf(p.vendor) < 0) vs.push(p.vendor); }); return vs; }
+  var SHOWN_CATS = CATS.filter(function(c){ return !c.hidden; });
   function storeGroups(vendor){
     var gs = [], by = {};
     P.forEach(function(p){ if (p.vendor !== vendor) return; var k = p.g || p.id; if (!by[k]) { by[k] = {key:k, name:p.gname || p.name, items:[]}; gs.push(by[k]); } by[k].items.push(p); });
@@ -617,7 +621,6 @@
       {img:'img/how/jelly-3.jpg', title:'Fill the beauty capsule', caption:'Take a 4-piece beauty capsule and fill 3 pieces with charms.'},
       {img:'img/how/jelly-4.jpg', title:'Mix and play', caption:'Mix and play on yellow trays, with fun tools provided.'},
       {img:'img/how/jelly-5.jpg', title:'The finished Jelly squishy', caption:'Their very own Jelly squishy, filled, tied and ready to squish.'},
-      WAX_STEP,
       {img:'img/how/jelly-6.jpg', title:'Decorate your take-home capsule', caption:'Rhinestone stickers, DIY, then their squishy goes home in it.'}
     ],
     crunchy: [
@@ -626,7 +629,6 @@
       {img:'img/how/crunchy-3.jpg', title:'Pick the crunch', caption:'Take 2 boxes and fill them with crunchy toppings.'},
       {img:'img/how/crunchy-4.jpg', title:'Mix and play', caption:'Mix and play on yellow trays, with fun tools provided.'},
       {img:'img/how/crunchy-5.jpg', title:'The finished Crunchy squishy', caption:'Their very own Crunchy squishy, filled, tied and ready to crunch.'},
-      WAX_STEP,
       {img:'img/how/crunchy-6.jpg', title:'Decorate your take-home capsule', caption:'Rhinestone stickers, DIY, then their squishy goes home in it.'}
     ],
     both: [
@@ -635,7 +637,6 @@
       {img:'img/how/duo-3.jpg', title:'Boxes and capsule', caption:'2 boxes of crunchy toppings in one hand, a 4-piece beauty capsule of charms in the other.'},
       {img:'img/how/duo-4.jpg', title:'Mix and play', caption:'Mix and play on yellow trays, with fun tools provided.'},
       {img:'img/how/duo-5.jpg', title:'The finished Duo', caption:'A Jelly and a Crunchy squishy each, filled, tied and ready to squish.'},
-      WAX_STEP,
       {img:'img/how/duo-6.jpg', title:'Decorate your take-home capsule', caption:'Rhinestone stickers, DIY, then both squishies go home in it.'}
     ]
   };
@@ -665,7 +666,6 @@
     {img:'img/making/2.jpg', title:'Choose toppings', caption:'Favourites from our 20-topping menu of charms, sprinkles and crunchy mix-ins.'},
     {img:'img/making/3.jpg', title:'Make & customise', caption:'Our team guides the mixing and making, then helps tie each squishy.'},
     {img:'img/making/4.jpg', title:'Squish it!', caption:'The best part: squeeze, squash and squish their brand-new creation.'},
-    WAX_STEP,
     {img:'img/making/5.jpg', title:'Decorate your capsule box', caption:'Rhinestone stickers, DIY, then it’s theirs to take home.'}
   ];
   /* Reviews: real Google reviews, copied word for word (never edited or invented). Our parties run from the
@@ -1271,16 +1271,15 @@
     put('exp-copy', COPY[s.experience]); put('exp-n', s.participants);
     var fl = $('exp-feats'); fl.textContent = '';
     [dup ? 'Two squishies each' : 'One ' + exp0.name + ' squishy each', 'Take-home squishy capsule', 'DIY rhinestone stickers', '45 minutes of guided play', 'Birthday Girl sash & tiara to wear on the day'].forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); fl.appendChild(li); });
-    var expSum = exp0.pax * n + CONTAINER * n + (s.wax ? waxCents(s.experience, n) : 0) + LOGISTICS;
+    var expSum = exp0.pax * n + CONTAINER * n + LOGISTICS;
     put('pl-n', n); put('pl-diy', money((exp0.pax + CONTAINER) * n));
     put('pl-sub', short(exp0.pax) + ' ' + (dup ? 'Duo' : exp0.name) + ' + $2 squishy capsule, per person' + (s.participants < MIN_PAX ? ' (minimum 10)' : ''));
-    put('wax-title', dup ? 'Wax Cracking duo deal!' : 'Wax Cracking');
     $('exp-panel').classList.toggle('is-duo', dup);
     renderHow(s.experience);
     if (put('exp-total', money(expSum))) { var et = $('exp-total'); et.classList.remove('bump'); void et.offsetWidth; et.classList.add('bump'); }
-    put('wax-quantity', dup ? (n * 2) + ' squishies, two per person, at ' + short(WAX_DUO) + ' per person' : (n * exp0.per) + ' squishies to crack, one per person');
-    put('wax-price', '+' + money(waxCents(s.experience, n)).replace('.00',''));
-    var up = $('wax-up'); up.hidden = !dup; if (dup) put('wax-up', 'U.P. ' + money(WAX_DUO_UP * n).replace('.00',''));
+    var gb = BYID['t-goodie'], gOn = s.selected.indexOf('t-goodie') >= 0;
+    put('goodie-pill', '+' + short(gb.price) + ' per friend'); put('goodie-qty', s.participants + ' goodie bag' + (s.participants === 1 ? '' : 's') + ', one per friend');
+    put('goodie-price', '+' + short(gb.price * s.participants)); $('goodie').checked = gOn;
     put('tier-note', s.participants < MIN_PAX ? 'Minimum 10 participants: for ' + s.participants + ' we charge for 10, and spare materials are yours to keep.' : 'Minimum 10 participants.');
 
     // step 3: suggested add-ons are marked on the vendor cards (see syncStores)
@@ -1372,15 +1371,15 @@
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax');
+    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = false; // Wax Cracking is no longer offered (replaced by goodie bags)
   }
-  form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
+  form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo || e.target.id === 'goodie') return; readForm(); render(false); });
   form.addEventListener('change', function(e){
     if (e.target.dataset && e.target.dataset.todo) return; // to-do ticks are handled separately
+    if (e.target.id === 'goodie') { var gi = S.selected.indexOf('t-goodie'); if (e.target.checked && gi < 0) S.selected.push('t-goodie'); if (!e.target.checked && gi >= 0) S.selected.splice(gi, 1); track(e.target.checked ? 'addon_added' : 'addon_removed', {id:'t-goodie', category:'favours', vendor:'Tom & Stefanie'}); render(true, (e.target.checked ? 'Added' : 'Removed') + ' squishy goodie bags.'); return; }
     if (e.target.name === 'participants') e.target.value = S.participants;
     readForm(); render(true);
     if (e.target.name === 'experience') track('experience_selected', {experience:S.experience});
-    if (e.target.name === 'wax') track('wax_toggled', {on:S.wax, experience:S.experience});
   });
   form.querySelectorAll('[data-step]').forEach(function(b){ b.addEventListener('click', function(){ var i = $(b.dataset.step); i.value = clamp(Number(i.value) + Number(b.dataset.d), Number(i.min), Number(i.max)); readForm(); render(true); }); });
 
@@ -1780,7 +1779,6 @@
     rateRow(rl, 'Crunchy', 'One squishy packed with crunchy toppings', short(EXP.crunchy.pax));
     rateRow(rl, 'Duo', 'One Jelly and one Crunchy each', short(EXP.both.pax), 'Best value');
     rateRow(rl, 'Take-home squishy capsule', 'Decorated with rhinestone stickers', '+' + short(CONTAINER));
-    rateRow(rx, 'Wax Cracking', 'Crack a wax shell to reveal each squishy', '+' + short(WAX) + ' / squishy');
     rateRow(rx, 'Your logo on the capsule stickers', null, 'In your quote');
     rateRow(rx, 'Extra hosts for bigger groups', null, 'In your quote');
     rateRow(rx, 'Travel & set-up', 'Once per event, up to 2 hours on site', short(LOGISTICS));
