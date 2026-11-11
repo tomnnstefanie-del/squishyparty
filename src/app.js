@@ -8,29 +8,7 @@
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45, CLICKER_DELIVERY = 15000, COMBO = null;
-  // Activities: Squishy DIY (EXP below) and Clicker Keychains. COMBO = optional per-person price for both together; null (owner, 9 Nov 2026) = both at their usual prices with one travel fee.
-  // Clicker Keychains: one base size for the whole party, priced per person, plus the one-time CLICKER_DELIVERY.
-  // Hosted parties offer only the 8- and 9-key bases (owner, 8 Nov 2026): enough keys to fill the session and less stock for the live station.
-  // Smaller bases (3-key $10, 4-key $13, 4-key square $14, 5-key $16, 6-key $18) are kept off the planner for booths and favours.
-  var CLICKER = [
-    {id:'c8', name:'Standard: 8-key base', keys:8, price:2000},
-    {id:'c9', name:'Deluxe: 9-key base', keys:9, price:2200, pick:true}
-  ];
-  // Packages (owner, 9 Nov 2026): no fixed fee, so the price follows the number of participants (activity per person, minimum 10).
-  // 'includes' = add-ons put in the plan with the package; 'cake' = the package comes with a cake of their choice (the dearest priced one counts);
-  // 'off' = % off the regular price of the included add-ons and that cake, so it's cheaper than sourcing them separately.
-  var PACKAGES = [
-    {id:'essentials', name:'Essentials', tag:'The activity, run for you', off:0, cake:false, includes:[], perks:['Our host runs the whole activity', 'Set-up and pack-down', 'Party planner: invitations, RSVPs and run-sheet', 'Birthday sash & tiara for the birthday child', 'Every guest takes home what they made']},
-    {id:'celebration', name:'Celebration', tag:'Decor and cake sorted', popular:true, off:10, cake:true, includes:['bl-fabric-std', 'bl-col-12'], perks:['Bloom fabric backdrop in your colours', 'Balloon column, 1.2 m', 'A Butter Studio cake of your choice', 'Party photo album: about 30 photos by our host', '10% off the cake and decor']},
-    {id:'allin', name:'All-in', tag:'Everything, done for you', off:10, cake:true, includes:['bl-fabric-std', 'bl-col-12', 'pp-face-1', 'js-photo-1'], perks:['Face painting, 1 hour', 'Event photographer, 1 hour', '10% off the cake, decor and entertainment']}
-  ];
-  // Our promises, shown under the packages (planner and home page) and on the PDF quotation.
-  var PROMISES = [
-    {t:'Leak-free squishy', c:'If a squishy leaks within 7 days, we replace it.', ic:'i-check'},
-    {t:'Rain-or-sick reschedule', c:'Move your party once, free, up to 48 hours before.', ic:'i-clock'},
-    {t:'Kids-love-it promise', c:'If the kids don’t love it, your next party’s session is on us.', ic:'i-star'}
-  ];
+  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
   // Bakery logos load from each brand's site; if a logo can't load, the brand name shows instead.
   var LOGOS = { 'Butter Studio':'https://thebutterstudio.com/wp-content/uploads/2024/11/Butterstudio-Logo.png' };
   var BAKERIES = ['Butter Studio'];
@@ -191,12 +169,6 @@
     {id:'s-favours', cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']},
   ];
   var BYID = {}; P.forEach(function(p){ BYID[p.id] = p; });
-  var CLK = {}; CLICKER.forEach(function(b){ CLK[b.id] = b; });
-  var PKG = {}; PACKAGES.forEach(function(k){ PKG[k.id] = k; });
-  function hasSquishy(s){ return s.activity !== 'clicker'; }
-  function hasClicker(s){ return s.activity !== 'squishy'; }
-  function activityName(s){ return s.activity === 'clicker' ? 'Clicker Keychain' : s.activity === 'both' ? 'Squishy + Clicker' : 'Squishy ' + EXP[s.experience].short; }
-  function fromPrice(list){ return Math.min.apply(null, list.map(function(x){ return x.price; })); }
   var STATUS = { demo:['st-demo','Sample listing'], prospective:['st-prospective','Prospective'], approved:['st-approved','Approved'], partner:['st-approved','Cake partner'], confirmed:['st-confirmed','Confirmed'] };
 
   /* ================= HELPERS ================= */
@@ -221,48 +193,15 @@
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, activity:'squishy', clicker:'c9', pkg:'essentials', selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
 
-  // The activity lines: Squishy DIY, Clicker Keychains, or both (one travel fee; the combo price replaces both once COMBO is set).
   function foundation(s){
-    var n = billable(s.participants), e = EXP[s.experience], b = CLK[s.clicker] || CLK.c9, items = [];
-    if (s.activity === 'both' && COMBO != null) items.push({label:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), sub:'Squishy + Clicker combo, ' + n + ' × ' + short(COMBO), cents:COMBO * n, ic:'i-sparkles'});
-    else {
-      if (hasSquishy(s)) {
-        items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
-        items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
-      }
-      if (hasClicker(s)) items.push({label:'Clicker keychain: ' + b.name + ', ' + n + ' × ' + short(b.price), sub:'Clicker keychain, ' + b.name + ', ' + n + ' × ' + short(b.price), cents:b.price * n, ic:'i-sparkles'});
-    }
-    if (hasSquishy(s) && s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
-    var fee = hasSquishy(s) ? 'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)' : 'One-time delivery & set-up (up to ' + TEAM_HOURS + ' hours)';
-    items.push({label:fee, sub:fee, cents:hasSquishy(s) ? LOGISTICS : CLICKER_DELIVERY, ic:'i-users'});
+    var n = billable(s.participants), e = EXP[s.experience], items = [];
+    items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
+    items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
+    if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
+    items.push({label:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', sub:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', cents:LOGISTICS, ic:'i-users'});
     return items;
-  }
-  // Package maths shared by the summary, the review list and the package cards: the package's add-ons and its cake
-  // (the most expensive priced cake chosen; custom cakes are priced in the quote) are k.off % off their regular price.
-  function offCents(c, pct){ return Math.round(c * (100 - pct) / 100); }
-  function pkgCake(s){
-    var k = PKG[s.pkg]; if (!k || !k.cake) return null;
-    var best = null; s.selected.forEach(function(id){ var p = BYID[id]; if (p.cat === 'cake' && p.price != null && (!best || p.price > best.price)) best = p; });
-    return best ? best.id : null;
-  }
-  function inPackage(p, s, cakeId){ var k = PKG[s.pkg]; return !!(k && k.off && (k.includes.indexOf(p.id) >= 0 || p.id === cakeId)); }
-  function partnerCost(p, s, cakeId){
-    var c = costFor(p, s); if (c == null) return null;
-    return inPackage(p, s, cakeId) ? offCents(c, PKG[s.pkg].off) : c;
-  }
-  // For "from" prices before a cake is chosen: our lowest-priced whole party cake (not a petit cakelet or cupcakes).
-  var CHEAPEST_CAKE = P.filter(function(p){ return p.cat === 'cake' && p.sec === 'Celebration cakes' && p.price != null; }).sort(function(a, b){ return a.price - b.price; })[0];
-  // What a package comes to for this plan's activity and participants: the chosen cake, or our cheapest cake if none is chosen yet.
-  function pkgQuote(k, s){
-    var act = foundation(s).reduce(function(a, f){ return a + f.cents; }, 0), full = 0, paid = 0;
-    if (k.off) {
-      var ids = k.includes.slice(), best = null;
-      if (k.cake) { s.selected.forEach(function(id){ var p = BYID[id]; if (p.cat === 'cake' && p.price != null && (!best || p.price > best.price)) best = p; }); best = best || CHEAPEST_CAKE; if (best) ids.push(best.id); }
-      ids.forEach(function(id){ var c = costFor(BYID[id], s); full += c; paid += offCents(c, k.off); });
-    }
-    return {total:act + paid, saved:full - paid};
   }
   // Our suggested add-ons: everything with a rec rank, on-quote items (cakes) first, then by rank.
   // The party running order, shared by the Schedule tab and the invitation's schedule for parents.
@@ -293,9 +232,9 @@
     return {picks:picks};
   }
   function totals(s){
-    var f = foundation(s), sum = f.reduce(function(a, i){ return a + i.cents; }, 0), pending = [], partners = [], k = PKG[s.pkg] || PKG.essentials, cake = pkgCake(s), saved = 0;
-    s.selected.forEach(function(id){ var p = BYID[id], c = partnerCost(p, s, cake), inc = inPackage(p, s, cake), full = costFor(p, s); partners.push({p:p, cents:c, qty:qtyFor(p, s), included:inc}); if (inc && c != null) saved += full - c; if (c == null) pending.push(p); else sum += c; });
-    return {found:f, partners:partners, pending:pending, total:sum, pkg:k, saved:saved, cake:cake};
+    var f = foundation(s), sum = f.reduce(function(a, i){ return a + i.cents; }, 0), pending = [], partners = [];
+    s.selected.forEach(function(id){ var p = BYID[id], c = costFor(p, s); partners.push({p:p, cents:c, qty:qtyFor(p, s)}); if (c == null) pending.push(p); else sum += c; });
+    return {found:f, partners:partners, pending:pending, total:sum};
   }
 
   /* ================= PARTNER CARDS (built once) ================= */
@@ -657,41 +596,6 @@
       x.sub.classList.toggle('demo', !on && !!demo);
     });
     put('ss-foot-txt', n ? n + ' item' + (n === 1 ? '' : 's') + ' from ' + (storeOf(sheetVendor).title || sheetVendor) + ' in your plan' : 'Tap + to add to your plan');
-  }
-  function setPackage(id, quiet){
-    var old = PKG[S.pkg], k = PKG[id]; if (!k) return;
-    old.includes.forEach(function(x){ var i = S.selected.indexOf(x); if (i >= 0 && k.includes.indexOf(x) < 0) S.selected.splice(i, 1); });
-    k.includes.forEach(function(x){ var g = BYID[x].g; if (g) S.selected = S.selected.filter(function(y){ return y === x || BYID[y].g !== g; }); if (S.selected.indexOf(x) < 0) S.selected.push(x); });
-    S.pkg = id;
-    var r = document.querySelector('input[name="package"][value="' + id + '"]'); if (r) r.checked = true;
-    track('package_selected', {package:id});
-    if (!quiet) render(true, k.name + ' package chosen.');
-  }
-  function buildPackages(){
-    function card(k, i, interactive){
-      var c = el(interactive ? 'label' : 'article', 'pkg-card' + (k.popular ? ' popular' : ''));
-      if (interactive) { var r = document.createElement('input'); r.type = 'radio'; r.name = 'package'; r.value = k.id; r.checked = k.id === S.pkg; c.appendChild(r); }
-      if (k.popular) c.appendChild(el('span','pkg-badge','Most popular'));
-      c.appendChild(el('span','pkg-name', k.name)); c.appendChild(el('span','pkg-tag', k.tag));
-      var pr = el('span','pkg-price'); pr.dataset.pkg = k.id; pr.dataset.home = interactive ? '' : '1'; c.appendChild(pr);
-      if (k.off) { var sv = el('span','pkg-save'); sv.dataset.pkg = k.id; sv.dataset.home = interactive ? '' : '1'; c.appendChild(sv); }
-      if (i) c.appendChild(el('span','pkg-plus', 'Everything in ' + PACKAGES[i - 1].name + ', plus:'));
-      var ul = el('ul','pkg-perks'); k.perks.forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); ul.appendChild(li); }); c.appendChild(ul);
-      if (interactive) c.appendChild(el('span','pkg-pick', 'Choose ' + k.name));
-      else { var a = el('a','btn btn-ghost pkg-go', 'Choose ' + k.name); a.href = '#plan-1'; a.addEventListener('click', function(){ setPackage(k.id); }); c.appendChild(a); }
-      return c;
-    }
-    var g = $('pkg-grid'), h = $('pkg-home');
-    PACKAGES.forEach(function(k, i){ if (g) g.appendChild(card(k, i, true)); if (h) h.appendChild(card(k, i, false)); });
-    ['promises-plan', 'promises-home'].forEach(function(id){ var ul = $(id); if (!ul) return; PROMISES.forEach(function(p){ var li = el('li'), ic = el('span','promise-ic'); ic.appendChild(icon(p.ic)); li.appendChild(ic); var d = el('div'); d.appendChild(el('b', null, p.t)); d.appendChild(el('span', null, p.c)); li.appendChild(d); ul.appendChild(li); }); });
-    var cb = $('clk-bases'); if (cb) CLICKER.forEach(function(b){ var l = el('label','clk-tile'), r = document.createElement('input'); r.type = 'radio'; r.name = 'clicker'; r.value = b.id; r.checked = b.id === S.clicker; l.appendChild(r); if (b.pick) l.appendChild(el('span','clk-pick','Our pick')); var keys = el('span','clk-keys'); for (var j = 0; j < b.keys; j++) keys.appendChild(el('i')); l.appendChild(keys); l.appendChild(el('span','clk-name', b.name)); l.appendChild(el('span','clk-pp', short(b.price) + '/person')); cb.appendChild(l); });
-    put('act-from-squishy', short(Math.min(EXP.jelly.pax, EXP.crunchy.pax))); put('act-from-clicker', short(fromPrice(CLICKER)));
-  }
-  // Home page cards: the lowest price for the minimum of 10 participants (cheapest activity, cheapest cake).
-  function pkgFrom(k){
-    var base = {participants:MIN_PAX, wax:false, selected:[], clicker:CLICKER[0].id, experience:'jelly', activity:'squishy'};
-    var opts = [Object.assign({}, base), Object.assign({}, base, {experience:'crunchy'}), Object.assign({}, base, {activity:'clicker'})];
-    return opts.map(function(o){ return pkgQuote(k, o); }).sort(function(a, b){ return a.total - b.total; })[0];
   }
   function toggle(id){
     var i = S.selected.indexOf(id);
@@ -1358,27 +1262,8 @@
     var shown = s.started;
     var T = totals(s), exp = EXP[s.experience];
 
-    var exp0 = EXP[s.experience], clk = CLK[s.clicker] || CLK.c9, sq = hasSquishy(s), ck = hasClicker(s);
-    var plus = T.pending.length ? '+' : '';
-    // step 2: activity
-    $('act-squishy').hidden = !sq; $('act-clicker').hidden = !ck; $('combo-note').hidden = s.activity !== 'both' || COMBO != null;
-    $('pl-fee').hidden = !sq; $('clk-fee').hidden = sq;
-    put('clk-chosen', clk.name); put('clk-n', n); put('clk-diy', money(clk.price * n));
-    put('clk-sub', short(clk.price) + ' per person, ' + clk.keys + ' keycaps each' + (s.participants < MIN_PAX ? ' (minimum 10)' : ''));
-    put('clk-total', money(clk.price * n + (sq ? 0 : CLICKER_DELIVERY)));
-    put('clk-note', s.participants < MIN_PAX ? 'Minimum 10 participants: for ' + s.participants + ' we charge for 10.' : 'Minimum 10 participants.');
-    var cf = $('clk-feats'); cf.textContent = '';
-    [clk.keys + ' keycaps each, picked by the kids', 'Keychain clip to take home', 'Guided by our host', 'Birthday sash & tiara for the birthday child'].forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); cf.appendChild(li); });
-    // step 3: packages
-    PACKAGES.forEach(function(k){
-      var q = pkgQuote(k, s), h = pkgFrom(k);
-      document.querySelectorAll('.pkg-price[data-pkg="' + k.id + '"]').forEach(function(e){ e.textContent = e.dataset.home ? 'From ' + short(h.total) + ' for ' + MIN_PAX + ' participants' : money(q.total) + ' for ' + s.participants + ' participant' + (s.participants === 1 ? '' : 's'); });
-      document.querySelectorAll('.pkg-save[data-pkg="' + k.id + '"]').forEach(function(e){ var v = e.dataset.home ? h.saved : q.saved; e.textContent = 'You save ' + money(v) + ' (' + k.off + '% off)'; });
-    });
-    document.querySelectorAll('#pkg-grid .pkg-card').forEach(function(c){ c.classList.toggle('on', c.querySelector('input').value === s.pkg); });
-    var pk = PKG[s.pkg], pc = $('pkg-cake'); pc.hidden = !pk.cake;
-    if (pk.cake) { var cp = T.cake ? BYID[T.cake] : null, custom = s.selected.some(function(id){ return BYID[id].cat === 'cake' && BYID[id].price == null; }); pc.textContent = cp ? 'Your cake: ' + cp.vendor + ' ' + cp.name + ', ' + money(offCents(cp.price, pk.off)) + ' with ' + pk.off + '% off (usually ' + money(cp.price) + ').' : custom ? 'Your custom cake is priced in your quotation, with ' + pk.off + '% off.' : 'Your package comes with a cake at ' + pk.off + '% off. Choose a Butter Studio cake under Cakes below. Prices above use our lowest-priced cake until you do.'; }
-    // step 2: squishy
+    var exp0 = EXP[s.experience];
+    // step 2
     ['both','jelly','crunchy'].forEach(function(e){ put('price-' + e, short(EXP[e].pax)); });
     var dup = s.experience === 'both', COPY = { both:'Make both textures: a smooth Jelly and a satisfying Crunchy. Both go home in a squishy capsule they decorate with our rhinestone stickers.', jelly:'Smooth, clear and endlessly squishable. It goes home in a squishy capsule they decorate with our rhinestone stickers.', crunchy:'Extra texture and that satisfying crunch. It goes home in a squishy capsule they decorate with our rhinestone stickers.' };
     put('exp-chosen', exp0.name); put('exp-title', exp0.name); put('exp-pp', short(exp0.pax));
@@ -1414,27 +1299,19 @@
     syncStores(R);
 
     // summary
-    put('summary-exp', activityName(s)); put('summary-participants', s.participants); put('summary-length', lengthLabel(s.length));
-    put('squishy-count', sq ? s.participants * exp.per : s.participants); put('squishy-word', sq ? 'squishies' : 'keychains'); put('partner-count', s.selected.length);
+    put('summary-exp', exp.short); put('summary-participants', s.participants); put('summary-length', lengthLabel(s.length));
+    put('squishy-count', s.participants * exp.per); put('partner-count', s.selected.length);
     var bd = $('breakdown'); bd.textContent = '';
     function row(dt, dd, cls, ddcls){ var d = el('div', cls); d.appendChild(el('dt', null, dt)); d.appendChild(el('dd', ddcls, dd)); bd.appendChild(d); }
     bd.appendChild(el('div','grp','Main activity'));
-    row('Activity total', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)));
+    row('Squishy DIY total', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)));
     T.found.forEach(function(f){ row(f.sub, money(f.cents), 'bd-sub'); });
-    bd.appendChild(el('div','grp', T.pkg.name + ' package'));
-    if (!T.pkg.off) row('Package fee', 'None');
-    else row('You save', T.saved ? money(T.saved) + ' (' + T.pkg.off + '% off)' : 'Choose a cake');
-    function pname(x){ return (x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.included ? ' (' + T.pkg.off + '% off)' : '') + (x.p.status === 'demo' ? ' (demo price)' : ''); }
-    function pcost(x){ return x.cents == null ? 'On quote' : money(x.cents); }
-    T.partners.filter(function(x){ return x.included; }).forEach(function(x){ row(pname(x), pcost(x), 'bd-sub'); });
-    var ups = T.partners.filter(function(x){ return !x.included; });
-    if (ups.length) { bd.appendChild(el('div','grp','Upgrades')); ups.forEach(function(x){ row(pname(x), pcost(x), null, x.cents == null ? 'pend' : null); }); }
-    var later = [].concat(T.pending.map(function(p){ return p.vendor + ' ' + p.name; })).filter(Boolean);
-    $('pending-note').hidden = !later.length || !shown;
-    put('pending-note', 'Not yet in your total: ' + later.join(', ') + '. We add ' + (later.length > 1 ? 'them' : 'it') + ' to your quotation.');
-    var totalTxt = shown ? money(T.total) + plus : '—', off = shown ? referralOff() : 0;
+    if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
+    $('pending-note').hidden = !T.pending.length || !shown;
+    if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
+    var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—', off = shown ? referralOff() : 0;
     // A friend's code or the capsule QR: show $10 off (the server still prices the full amount; we take it off the quotation)
-    function struck(id){ var e = $(id), w = el('s', 'was', money(T.total)); e.textContent = money(T.total - off) + plus; w.setAttribute('aria-label', 'was ' + money(T.total)); e.appendChild(w); }
+    function struck(id){ var e = $(id), w = el('s', 'was', money(T.total)); e.textContent = money(T.total - off) + (T.pending.length ? '+' : ''); w.setAttribute('aria-label', 'was ' + money(T.total)); e.appendChild(w); }
     if (off) struck('total-price'); else put('total-price', totalTxt);
     $('ref-off').hidden = !off;
     put('per-child', shown ? money(Math.round((T.total - off) / s.participants)) : '—');
@@ -1465,22 +1342,21 @@
     [['req-date', s.date], ['req-time', s.time], ['req-end', s.end], ['req-address', s.venue], ['req-spot', s.spot], ['req-postal', s.postal]].forEach(function(p){ var e = $(p[0]); if (e && document.activeElement !== e && e.value !== (p[1] || '')) e.value = p[1] || ''; if (e) e.classList.toggle('prefilled', !!e.value); });
 
     // plan review (request step) + mobile
-    put('recap-total', money(T.total) + plus);
+    put('recap-total', money(T.total) + (T.pending.length ? '+' : ''));
     CATS.forEach(function(c){ var k = s.selected.filter(function(id){ return BYID[id].cat === c.id; }).length, e = $('count-' + c.id); if (e) { e.textContent = k; e.dataset.n = k; } });
     put('theme-meta', {cobalt:'Cobalt', pink:'Pink', lemon:'Lemon'}[s.theme]);
     var rv = $('review-list'); rv.textContent = '';
     function rrow(a, b2, cls){ var d = el('div', cls); d.appendChild(el('dt', null, a)); if (b2 != null) d.appendChild(el('dd', null, b2)); rv.appendChild(d); }
     rrow('Main activity', null, 'grp');
-    rrow('Activity total: ' + activityName(s) + ', ' + s.participants + ' participants', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)), 'rv-main');
+    rrow('Squishy DIY total: ' + EXP[s.experience].name + ', ' + s.participants + ' participants', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)), 'rv-main');
     T.found.forEach(function(f){ rrow(f.sub, money(f.cents), 'rv-sub'); });
-    rrow(T.pkg.name + ' package', T.pkg.off ? (T.saved ? 'You save ' + money(T.saved) : T.pkg.off + '% off cake and decor') : 'No package fee', 'rv-main');
-    if (T.partners.length) { rrow('Included and upgrades', null, 'grp'); T.partners.forEach(function(x){ var cs = x.p.custom ? customSummary(x.p.g || x.p.id) : ''; rrow(pname(x) + (cs ? ' · ' + cs : ''), pcost(x)); }); }
-    put('review-total', money(T.total) + plus);
-    put('review-note', plus ? 'Anything marked “In your quote” or “On quote” is added to your quotation.' : '');
-    put('mobile-caption', shown ? s.participants + ' participants · ' + activityName(s) + ' · ' + T.pkg.name + ' · ' + s.selected.length + ' add-on' + (s.selected.length === 1 ? '' : 's') : 'Your estimate starts at step 2');
-    if (off) struck('mobile-price'); else put('mobile-price', shown ? money(T.total) + plus : s.participants + ' participants');
+    if (T.partners.length) { rrow('Add-ons', null, 'grp'); T.partners.forEach(function(x){ var cs = x.p.custom ? customSummary(x.p.g || x.p.id) : ''; rrow((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.status === 'demo' ? ' (demo price)' : '') + (cs ? ' · ' + cs : ''), x.cents == null ? 'On quote' : money(x.cents)); }); }
+    put('review-total', money(T.total) + (T.pending.length ? '+' : ''));
+    put('review-note', T.pending.length ? 'Cake prices are added to your quotation.' : '');
+    put('mobile-caption', shown ? s.participants + ' participants · ' + exp.short + ' · ' + s.selected.length + ' add-on' + (s.selected.length === 1 ? '' : 's') : 'Your estimate starts at step 2');
+    if (off) struck('mobile-price'); else put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.participants + ' participants');
     $('mobile-price').classList.toggle('muted-price', !shown);
-    if (announce) put('live', (msg ? msg + ' ' : '') + 'Estimated total ' + money(T.total) + (plus ? ' plus items priced in your quote' : '') + '.');
+    if (announce) put('live', (msg ? msg + ' ' : '') + 'Estimated total ' + money(T.total) + (T.pending.length ? ' plus items pending price' : '') + '.');
   }
 
   /* ================= EVENTS ================= */
@@ -1496,16 +1372,13 @@
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax'); S.activity = d.get('activity') || 'squishy'; S.clicker = d.get('clicker') || S.clicker;
+    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax');
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
   form.addEventListener('change', function(e){
     if (e.target.dataset && e.target.dataset.todo) return; // to-do ticks are handled separately
     if (e.target.name === 'participants') e.target.value = S.participants;
-    if (e.target.name === 'package') { setPackage(e.target.value); return; }
     readForm(); render(true);
-    if (e.target.name === 'activity') track('activity_selected', {activity:S.activity});
-    if (e.target.name === 'clicker') track('clicker_selected', {clicker:S.clicker});
     if (e.target.name === 'experience') track('experience_selected', {experience:S.experience});
     if (e.target.name === 'wax') track('wax_toggled', {on:S.wax, experience:S.experience});
   });
@@ -1577,7 +1450,6 @@
   })();
   initHow();
   buildCards();
-  buildPackages();
   buildInvite();
   buildTimeline();
   document.addEventListener('change', function(e){ var id = e.target.dataset && e.target.dataset.todo; if (id) { S.done[id] = e.target.checked; render(false); } });
@@ -1604,7 +1476,7 @@
   /* ================= VIEWS + WIZARD (hash routing keeps Back working) ================= */
   // Four planner steps, then a "Get ready" view (to-do list, schedule, invitation) that sits outside the stepper.
   // View 5 is that page; its route is #plan-ready. Section ids: step 4 (Request) is #wstep-5, Get ready is #wstep-4.
-  var STEPS = ['The basics','Activity','Package','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-2', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 4, READY = 5, cur = 1, reached = 1;
+  var STEPS = ['The basics','Squishy DIY','Add-ons','Request','Get ready'], SECTION = [null, 'wstep-1', 'wstep-2', 'wstep-3', 'wstep-5', 'wstep-4'], LAST = 4, READY = 5, cur = 1, reached = 1;
   function route(k){ return k === READY ? '#plan-ready' : '#plan-' + k; }
   var homeV = $('view-home'), planV = $('view-plan');
   /* Navigation is driven by JS state, not the URL, so it also works inside sandboxed
@@ -1856,7 +1728,7 @@
     var d = new FormData(bf), T = totals(S);
     var payload = {
       v: 1,
-      plan: { participants:S.participants, activity:S.activity, experience:S.experience, wax:hasSquishy(S) && S.wax, clicker:S.clicker, package:S.pkg, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
+      plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', billingContact:isCompany() ? (d.get('billingContact') || '').trim() : '', poRef:isCompany() ? (d.get('poRef') || '').trim() : '', billingNotes:isCompany() ? (d.get('billingNotes') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
@@ -1873,7 +1745,7 @@
         clearTimeout(timer);
         if (res.status === 200 && res.body.ok) {
           S.requested = true;
-          track('request_sent', {activity:S.activity, package:S.pkg, experience:S.experience, participants:S.participants, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
+          track('request_sent', {experience:S.experience, participants:S.participants, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
           put('sent-ref', res.body.ref); put('sent-phone', checkPhone(payload.contact.phoneCountry, payload.contact.phone).pretty || payload.contact.phone);
           put('sent-date', new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {weekday:'long', day:'numeric', month:'long'}));
           put('sent-email', payload.contact.email); $('sent-mail').hidden = res.body.emailed === false;
@@ -1908,7 +1780,6 @@
     rateRow(rl, 'Crunchy', 'One squishy packed with crunchy toppings', short(EXP.crunchy.pax));
     rateRow(rl, 'Duo', 'One Jelly and one Crunchy each', short(EXP.both.pax), 'Best value');
     rateRow(rl, 'Take-home squishy capsule', 'Decorated with rhinestone stickers', '+' + short(CONTAINER));
-    rateRow(rl, 'Clicker Keychain', 'Build a keycap keychain, ' + CLICKER[0].keys + ' to ' + CLICKER[CLICKER.length - 1].keys + ' keys', 'from ' + short(fromPrice(CLICKER)));
     rateRow(rx, 'Wax Cracking', 'Crack a wax shell to reveal each squishy', '+' + short(WAX) + ' / squishy');
     rateRow(rx, 'Your logo on the capsule stickers', null, 'In your quote');
     rateRow(rx, 'Extra hosts for bigger groups', null, 'In your quote');

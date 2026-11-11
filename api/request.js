@@ -4,7 +4,7 @@
 // Secrets stay here and only come from environment variables.
 import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
-import { priceRequest, ratesOf, activityLabel } from '../lib/pricing.js';
+import { priceRequest, ratesOf } from '../lib/pricing.js';
 import { CATALOGUE } from '../lib/catalogue.js';
 import { makeReferralCode, readReferralCode, samePerson } from '../lib/referral.js';
 import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
     const discountCents = referralDiscount(data.referral, readReferralCode, (u, n) => !!(match && match.selfReferral) || samePerson(u, n), contact.parentName);
-    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: activityLabel(data.plan), corporate: data.corporate,
+    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
       rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor, match, source: data.referral.source });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
