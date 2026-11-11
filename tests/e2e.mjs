@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outbox = path.join(root, 'dev/.outbox.json'), mailbox = path.join(root, 'dev/.mailbox.json');
-const PORT = Number(process.env.E2E_PORT) || 3100, MOCK = 8789, BASE = `http://localhost:${PORT}`;
+const PORT = 3100, MOCK = 8789, BASE = `http://localhost:${PORT}`;
 const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEGRAM_BOT_TOKEN: 'test:token', TELEGRAM_CHAT_ID: '4242', TELEGRAM_API_BASE: `http://localhost:${MOCK}`, MAIL_TRANSPORT: 'file', STATS_MEMORY: '1', ADMIN_PASSWORD: 'test-dashboard-pass', CRON_SECRET: 'test-cron-secret-123456' };
 process.env.TELEGRAM_BOT_TOKEN = 'test:token'; // so the test can mint a verified-email token like the server does
 const { issueVerified } = await import('../lib/otp.js');
