@@ -91,5 +91,18 @@ await run('Opened as a file, desktop', 1280, async p=>{ await p.goto('file://'+f
 // browser back button when opened as a file
 const p=await b.newPage(); await p.goto('file://'+file); await p.click('.hero-actions a.btn-primary'); await p.click('#wiz-next'); await p.goBack(); await p.waitForTimeout(300);
 console.log('\nBrowser Back from step 2 ->', await p.evaluate(()=>!document.getElementById('wstep-1').hidden ? 'step 1 ✓' : 'wrong'));
+// Store QR gift test: a phone that scanned the poster keeps its gift; A takes $10 off, B adds a free squishy line
+for (const g of ['A', 'B']) {
+  const q = await b.newPage({viewport:{width:1280,height:900}}); const errs=[]; q.on('pageerror',e=>errs.push(e.message));
+  await q.addInitScript(v=>{ try { localStorage.setItem('cc-gift', v); } catch (e) {} }, g);
+  await q.goto('file://'+file+'?src=store&o=wcc'); await q.waitForTimeout(300);
+  const h = await q.evaluate(()=>!document.getElementById('store-gift').hidden && document.getElementById('gift-h').textContent);
+  await q.click('#store-gift a.btn-primary'); await q.click('#wiz-next'); await q.waitForTimeout(200);
+  const total = await q.evaluate(()=>document.getElementById('total-price').textContent), bd = await q.evaluate(()=>document.getElementById('breakdown').textContent);
+  const okG = g === 'A' ? h === 'You got $10 off your first party!' && /was/.test(await q.evaluate(()=>document.getElementById('total-price').innerHTML)) && !/birthday child/.test(bd)
+    : h === 'You got a free jelly squishy for the birthday child!' && /Jelly squishy for the birthday child \(worth \$18\)Free/.test(bd) && !/was/.test(await q.evaluate(()=>document.getElementById('total-price').innerHTML));
+  console.log('\nStore gift ' + g + ':', okG && !errs.length ? '✓' : '✗ ' + h + ' | ' + total + ' | ' + errs.join('; ')); if (!okG || errs.length) failed++;
+  await q.close();
+}
 await b.close();
 if (failed) { console.error(failed + ' click-through problem(s)'); process.exit(1); }

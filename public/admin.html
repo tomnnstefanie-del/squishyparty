@@ -2468,6 +2468,17 @@ footer{background:#efece7;border-top:0}
           <thead><tr><th>Touchpoint</th><th>Visits / scans</th><th>Requests</th><th>Paid parties</th><th>New customers</th><th>Cost</th><th>CAC</th></tr></thead>
           <tbody id="sc-touch"></tbody>
         </table></div>
+        <h3 class="sc-h3">Store QR gift test <small>($10 off vs a free jelly squishy for the birthday child)</small></h3>
+        <p class="ad-fine" id="sc-ab-lead"></p>
+        <div class="ad-table-wrap"><table class="ad-table sc-table">
+          <thead><tr><th>Gift</th><th>Costs us, each</th><th>Phones given it</th><th>Requests</th><th>Paid parties</th><th>Scan → request</th><th>Paid per 100 scans</th><th>Revenue</th><th>Gift cost</th><th id="sc-ab-profit-h">Profit after gift</th><th>Profit per 100 scans</th></tr></thead>
+          <tbody id="sc-ab"></tbody>
+        </table></div>
+        <p class="ad-fine">Each phone that scans a store poster gets one gift at random and keeps it. Requests count under the gift they were shown, even if a friend’s code was used instead. <span id="sc-ab-note"></span></p>
+        <div class="ad-table-wrap"><table class="ad-table sc-table">
+          <thead><tr><th>Outlet</th><th>Phones scanned</th><th>Requests</th><th>Paid parties</th></tr></thead>
+          <tbody id="sc-outlets"></tbody>
+        </table></div>
         <h3 class="sc-h3">Referrals <small>(families sharing their link with friends)</small></h3>
         <div class="sc-group" id="sc-ref-group">
           <p class="ad-fine sc-gl">Where friends drop off, step by step</p>
@@ -2498,6 +2509,7 @@ footer{background:#efece7;border-top:0}
               <label>Facilitator staff, per party ($)<input name="staffCents" data-money inputmode="decimal" placeholder="e.g. 120"></label>
               <label>Partner cost (% of partner price we pay)<input type="number" name="partnerCostPct" min="0" max="100" step="1" placeholder="100"></label>
               <label>Free-squishy reward, each ($)<input name="rewardCents" data-money inputmode="decimal" placeholder="e.g. 6"></label>
+              <label>Store gift jelly squishy, our cost ($)<input name="bonusCostCents" data-money inputmode="decimal" placeholder="4"></label>
             </fieldset>
             <fieldset><legend>Marketing programme (whole pilot)</legend>
               <label>Capsule QR sticker printing ($)<input name="capsulePrintCents" data-money inputmode="decimal"></label>
@@ -2634,7 +2646,7 @@ footer{background:#efece7;border-top:0}
   var dur = function(h){ if (h == null) return '–'; if (h < 1) return Math.max(1, Math.round(h * 60)) + ' min'; if (h < 48) return (Math.round(h * 10) / 10) + ' h'; return (Math.round(h / 24 * 10) / 10) + ' days'; };
   var since = function(a, b){ return a && b ? dur((new Date(b) - new Date(a)) / 36e5) : ''; };
   var when = function(s){ return new Date(s).toLocaleString('en-SG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'}); };
-  var EV = { scan:['QR scan', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Deposit paid', 'st-booked'], lost:['Didn’t book', 'k-lost'], paid:['Paid in full', 'st-paid'], vendor:['Vendor confirmed', 'k-ok'], undo:['Undone', 'k-lost'], deleted:['Booking deleted', 'k-lost'] };
+  var EV = { scan:['QR scan', 'k-scan'], gift:['Store QR gift given', 'k-scan'], open:['Friend’s link opened', 'k-open'], request:['Request sent', 'k-req'], contacted:['Contacted', 'k-ok'], confirmed:['Deposit paid', 'st-booked'], lost:['Didn’t book', 'k-lost'], paid:['Paid in full', 'st-paid'], vendor:['Vendor confirmed', 'k-ok'], undo:['Undone', 'k-lost'], deleted:['Booking deleted', 'k-lost'] };
   var last = null, filter = '';
   function events(){
     var ol = $('ad-events'); ol.textContent = '';
@@ -2766,6 +2778,22 @@ footer{background:#efece7;border-top:0}
       cell(tr, t.costCents ? m0(t.costCents) : '—', 'num'); var cc = cell(tr, (t.cacStatus === 'ok' ? '✓ ' : t.cacStatus === 'close' ? '≈ ' : t.cacStatus === 'off' ? '✗ ' : '') + m0(t.cacCents), 'num' + (t.cacStatus ? ' cac-' + t.cacStatus : '')); tb.appendChild(tr);
     });
     if (!tb.children.length) { var tr0 = el('tr'); var td0 = cell(tr0, 'Nothing in this window yet.', 'ad-empty'); td0.colSpan = 7; tb.appendChild(tr0); }
+    // Store QR gift A/B test (lib/scorecard.js ab)
+    var AB = s.ab, abb = $('sc-ab'); abb.textContent = '';
+    if (AB) {
+      var rev = AB.profitIs === 'revenue', perScan = function(v){ return v == null ? '–' : v + ''; };
+      $('sc-ab-profit-h').textContent = rev ? 'Revenue after gift' : 'Profit after gift';
+      AB.arms.forEach(function(a){
+        var tr = el('tr'); cell(tr, a.key + ': ' + a.label + (AB.lead === a.key ? ' ★' : '')); cell(tr, m0(a.eachCents), 'num'); cell(tr, a.scans, 'num'); cell(tr, a.requests, 'num'); cell(tr, a.paid, 'num' + (a.paid ? ' ad-win' : ''));
+        cell(tr, p0(a.requestPct), 'num'); cell(tr, perScan(a.paidPer100), 'num'); cell(tr, m0(a.revenueCents), 'num'); cell(tr, m0(a.giftCostCents), 'num'); cell(tr, m0(a.profitCents), 'num'); cell(tr, m0(a.profitPer100Cents), 'num'); abb.appendChild(tr);
+      });
+      var L = AB.lead ? AB.arms.filter(function(a){ return a.key === AB.lead; })[0] : null;
+      $('sc-ab-lead').textContent = L ? '★ Ahead so far: ' + L.key + ' (' + L.name + '), ' + m0(L.profitPer100Cents) + (rev ? ' revenue' : ' profit') + ' per 100 scans after the gift.' + (AB.enough ? '' : ' Too few paid parties to call it yet: keep the test running.')
+        : 'No winner yet: each gift needs at least one paid party to compare.';
+      $('sc-ab-note').textContent = 'Pilot volume is small, so read this as a direction, not proof. ' + (rev ? 'Add kit and staff costs below to see profit instead of revenue. ' : '') + 'Gift cost: $10 per discount given, ' + m0(AB.bonusCostCents) + ' per free squishy (change it below).';
+      var ob = $('sc-outlets'); ob.textContent = '';
+      AB.outlets.forEach(function(o){ var tr = el('tr'); cell(tr, o.name); cell(tr, o.scans, 'num'); cell(tr, o.requests, 'num'); cell(tr, o.paid, 'num'); ob.appendChild(tr); });
+    }
     var R = s.referral, W = s.rewards, C = s.company, rb = $('sc-repeat'); rb.textContent = '';
     var rd = $('sc-refdrop'); rd.textContent = '';
     var DK = [null, 'targetOpensPerFamily', 'targetOpenQuotePct', 'targetQuotePaidPct'];

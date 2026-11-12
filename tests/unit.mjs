@@ -274,6 +274,67 @@ console.log('referrals (friend gets $10 off, no database)');
   const fs = await import('node:fs');
   t('the sticker short link /c is counted, then opens the capsule offer', () => { const r = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).rewrites; assert.ok(r.some((x) => x.source === '/c' && x.destination === '/api/scan')); assert.ok(fs.readFileSync(new URL('../api/scan.js', import.meta.url), 'utf8').includes("'/?src=capsule#offer'")); });
   t('a bad source value is dropped', () => { const b = dateOK(); b.referral = { source: '<script>' }; assert.equal(validateRequest(b).referral.source, ''); });
+
+  // Store QR gift A/B test (lib/gift.js)
+  const { storeGiftFor } = await import('../lib/quote-pdf.js');
+  t('store QR gift: only A or B from a store source, known outlets only', () => {
+    const b = dateOK(); b.referral = { source: 'outlet', gift: 'B', outlet: 'plq' }; const r = validateRequest(b).referral;
+    assert.deepEqual([r.gift, r.outlet], ['B', 'plq']);
+    const x = dateOK(); x.referral = { source: 'outlet', gift: 'C', outlet: 'xyz' }; const rx = validateRequest(x).referral;
+    assert.deepEqual([rx.gift, rx.outlet], ['', '']);
+  });
+  t('store gift A is $10 off and B is a free squishy, first party only, and a friend’s code wins (one offer per booking)', () => {
+    const { makeReferralCode, readReferralCode, samePerson } = Ref; const code = makeReferralCode('Mia Tan');
+    const A = { source: 'outlet', gift: 'A' }, B = { source: 'outlet', gift: 'B' };
+    assert.equal(referralDiscount(A, readReferralCode, samePerson, 'Sarah Lim'), 1000);
+    assert.equal(storeGiftFor(A, readReferralCode, samePerson, 'Sarah Lim'), 'A');
+    assert.equal(referralDiscount(B, readReferralCode, samePerson, 'Sarah Lim'), 0);
+    assert.equal(storeGiftFor(B, readReferralCode, samePerson, 'Sarah Lim'), 'B');
+    assert.equal(storeGiftFor({ ...B, returning: true }, readReferralCode, samePerson, 'Sarah Lim'), '');
+    assert.equal(storeGiftFor({ ...B, code }, readReferralCode, samePerson, 'Sarah Lim'), ''); // the friend's $10 instead
+    assert.equal(referralDiscount({ ...B, code }, readReferralCode, samePerson, 'Sarah Lim'), 1000);
+    assert.equal(storeGiftFor({ source: 'instagram', gift: 'A' }, readReferralCode, samePerson, 'Sarah Lim'), ''); // only from the store QR
+  });
+  t('Telegram shows the store gift and the outlet', () => {
+    const b = dateOK(); b.referral = { source: 'outlet', gift: 'B', outlet: 'wcc' }; const vb = validateRequest(b);
+    const mb = buildMessage({ ref: 'SP-3', plan: vb.plan, contact: vb.contact, price: priceRequest(vb.plan), clientTotalCents: null, referral: vb.referral, shareCode: 'X-AB23', site: 'https://example.sg' });
+    assert.match(mb, /Store QR gift B<\/b> \(Woodlands Civic Centre\): Free jelly squishy for the birthday child \(worth \$18\.00\)/);
+  });
+  t('the quotation shows the free squishy for gift B', () => {
+    const b = dateOK(); const vb = validateRequest(b); const price = priceRequest(vb.plan);
+    const pdf = quotePdf({ ref: 'SP-4', plan: vb.plan, contact: vb.contact, price, bookingFor: 'family', discountCents: 0, gift: 'B', site: 'https://example.sg' });
+    const txt = (pdf.toString('latin1').match(/stream\r?\n([\s\S]*?)endstream/g) || []).map((m) => { try { return nodeZlib.inflateSync(Buffer.from(m.replace(/^stream\r?\n/, '').replace(/\r?\nendstream$/, ''), 'latin1')).toString('latin1'); } catch (e) { return ''; } }).join('');
+    assert.ok(txt.includes('jelly squishy for the birthday child'), 'gift line'); assert.ok(txt.includes('Free'));
+  });
+}
+
+console.log('scorecard: store gift test');
+t('A/B table: phones, requests, paid per 100 scans, gift cost ($10 vs $4 squishy) and profit per 100 scans', () => {
+  const at = (d) => d + 'T02:00:00.000Z', L = (c) => ({ squishyCents: c, addons: [] });
+  const books = [
+    { ref: 'A1', at: at('2026-10-05'), date: '2026-10-20', participants: 10, totalCents: 33000, discountCents: 1000, source: 'outlet', giftArm: 'A', gift: 'A', outlet: 'wcc', lines: L(33000) },
+    { ref: 'A2', at: at('2026-10-06'), date: '2026-10-21', participants: 10, totalCents: 33000, source: 'outlet', giftArm: 'A', gift: '', outlet: 'plq', lines: L(33000) },
+    { ref: 'B1', at: at('2026-10-05'), date: '2026-10-22', participants: 10, totalCents: 33000, source: 'outlet', giftArm: 'B', gift: 'B', outlet: 'wcc', lines: L(33000) },
+    { ref: 'B2', at: at('2026-10-07'), date: '2026-10-23', participants: 12, totalCents: 37000, source: 'outlet', giftArm: 'B', gift: 'B', outlet: 'epm', lines: L(37000) },
+  ];
+  const life = { A1: { confirmed: 'x' }, A2: { lost: 'x' }, B1: { confirmed: 'x' }, B2: { confirmed: 'x', paid: 'x' } };
+  const days = { '2026-10-05': { gift_A: 20, gift_B: 20, outlet_wcc: 25, outlet_plq: 10, outlet_epm: 5 } };
+  const s = Score.buildScorecard({ books, life, codes: {}, rewards: [], days, settings: { pilotStart: '2026-10-01', pilotEnd: '2026-10-21' }, today: '2026-10-28' });
+  const [a, b] = s.ab.arms;
+  assert.deepEqual([a.scans, a.requests, a.paid, a.requestPct, a.paidPer100, a.giftCostCents, a.eachCents], [20, 2, 1, 10, 5, 1000, 1000]);
+  assert.deepEqual([b.scans, b.requests, b.paid, b.full, b.paidPer100, b.giftCostCents, b.eachCents], [20, 2, 2, 1, 10, 800, 400]);
+  // without kit and staff costs: revenue after the gift. A 33000 − 1000 = 32000; B 70000 − 800 = 69200
+  assert.equal(s.ab.profitIs, 'revenue'); assert.equal(a.profitCents, 32000); assert.equal(b.profitCents, 69200);
+  assert.equal(a.profitPer100Cents, 160000); assert.equal(b.profitPer100Cents, 346000); assert.equal(s.ab.lead, 'B'); assert.equal(s.ab.enough, false);
+  assert.deepEqual(s.ab.outlets.map((o) => [o.key, o.scans, o.requests, o.paid]), [['wcc', 25, 2, 2], ['plq', 10, 1, 0], ['epm', 5, 1, 1]]);
+  // the owner's own squishy cost, and with party costs the squishy is taken off contribution
+  const s2 = Score.buildScorecard({ books, life, codes: {}, rewards: [], days, settings: Score.cleanSettings({ pilotStart: '2026-10-01', pilotEnd: '2026-10-21', kitCents: 500, staffCents: 5000, bonusCostCents: 600 }), today: '2026-10-28' });
+  const b2 = s2.ab.arms[1];
+  assert.equal(b2.giftCostCents, 1200); assert.equal(s2.ab.profitIs, 'contribution');
+  assert.equal(b2.profitCents, (33000 - 5000 - 5000 - 600) + (37000 - 6000 - 5000 - 600)); // revenue − kits − staff − free squishy
+  assert.equal(s2.money.bonusCents, 1200);
+});
+{
 }
 
 console.log(`\n${passed} unit tests passed`);
