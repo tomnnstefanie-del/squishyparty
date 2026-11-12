@@ -25,13 +25,16 @@ async function run(label, width, setup){
   await f.click(width>640 ? '.hero-actions a.btn-primary' : '.mobile-cta a'); ok('Build my party', await vis('#wstep-1'));
   const c0=+(await f.inputValue('#participants')); await f.click('[data-step=participants][data-d="1"]'); ok('participants +', +(await f.inputValue('#participants'))===c0+1);
   await f.click('[data-step=participants][data-d="-1"]');
+  await f.fill('#participants','4'); await f.dispatchEvent('#participants','change'); ok('participants cannot go below 10', +(await f.inputValue('#participants'))===10);
+  for (let i=0;i<3;i++) await f.click('[data-step=participants][data-d="-1"]'); ok('the minus button stops at 10', +(await f.inputValue('#participants'))===10);
+  await f.fill('#participants','15'); await f.dispatchEvent('#participants','change');
   await f.click('#wstep-1 details summary'); ok('when & where dropdown closes', !(await f.evaluate(()=>document.querySelector('#wstep-1 details').open))); await f.click('#wstep-1 details summary');
   const next = width>900 ? '#wiz-next' : '#wiz-next-m';
   await f.click(next); ok('Next -> step 2', await vis('#wstep-2'));
   await f.click('.exp-tile:has(input[value=jelly])'); ok('pick Jelly', (await txt('#exp-title'))==='Jelly');
   await f.click('.exp-tile:has(input[value=both])'); ok('pick Duo', (await txt('#exp-title')).startsWith('Duo'));
-  await f.click('label.addon'); ok('wax add-on toggles', await f.isChecked('#wax'));
-  ok('Duo deal label shows', await vis('#duo-deal'));
+  const tb=await txt('#total-price'); await f.click('label.addon'); await p.waitForTimeout(200); ok('squishy basket add-on toggles and adds to the total', await f.isChecked('#goodie') && (await txt('#total-price'))!==tb);
+  ok('squishy basket is $5 per child (U.P. $7)', (await txt('#goodie-pill'))==='$5 per child U.P. $7' && (await txt('#goodie-price'))==='+$75'); ok('Other activities tab and our favour bags are gone', !(await f.evaluate(()=>!!document.getElementById('tab-a-entertainment'))) && !/Party favours from our own stores/.test(await f.evaluate(()=>document.getElementById('panel-a-styling').textContent)));
   await f.click(next); ok('Next -> step 3', await vis('#wstep-3'));
   ok('step 3 opens on the add-on tabs (no plan-so-far box)', !(await f.evaluate(()=>!!document.querySelector('.rec-acc'))) && await vis('#addon-tabs'));
   await f.click('#tab-a-styling'); ok('add-on tab Styling', await vis('#panel-a-styling'));

@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outbox = path.join(root, 'dev/.outbox.json'), mailbox = path.join(root, 'dev/.mailbox.json');
-const PORT = 3100, MOCK = 8789, BASE = `http://localhost:${PORT}`;
+const PORT = Number(process.env.E2E_PORT) || 3100, MOCK = 8789, BASE = `http://localhost:${PORT}`;
 const env = { ...process.env, PORT: String(PORT), MOCK_PORT: String(MOCK), TELEGRAM_BOT_TOKEN: 'test:token', TELEGRAM_CHAT_ID: '4242', TELEGRAM_API_BASE: `http://localhost:${MOCK}`, MAIL_TRANSPORT: 'file', STATS_MEMORY: '1', ADMIN_PASSWORD: 'test-dashboard-pass', CRON_SECRET: 'test-cron-secret-123456' };
 process.env.TELEGRAM_BOT_TOKEN = 'test:token'; // so the test can mint a verified-email token like the server does
 const { issueVerified } = await import('../lib/otp.js');
@@ -51,7 +51,7 @@ try {
   await page.fill('#venue', '1 Example Road');
   await page.fill('#postal', '123456');
   await page.click('#wiz-next');
-  await page.click('label.addon'); // wax duo deal
+  await page.click('label.addon'); // squishy basket
   await page.click('#wiz-next');
   assert.equal(await page.locator('.rec-acc, #use-rec').count(), 0); ok('step 3 has no "Your plan so far" box: the add-on tabs come straight after the intro');
   // Bloom: personalise the Standard fabric backdrop
@@ -114,7 +114,7 @@ try {
   assert.equal(msgs.length, 1);
   const m = msgs[0];
   assert.equal(m.token, 'test:token'); assert.equal(m.chat_id, '4242'); assert.equal(m.parse_mode, 'HTML');
-  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
+  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Squishy basket', '×12, Tom &amp; Stefanie: $60.00', 'travel', 'Lift lobby B, level 2'])
     assert.ok(m.text.includes(s), 'message missing: ' + s);
   ok('owner gets one Telegram message with contact, date/time, venue, address, guests, order and notes');
   assert.ok(m.text.includes(`Estimated total: ${pageTotal}`), `server total should match page total ${pageTotal}`);

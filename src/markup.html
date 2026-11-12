@@ -363,8 +363,8 @@
           <div class="card-block">
             <div class="grid2">
               <div class="field"><label for="participants">Number of participants</label>
-                <div class="counter"><button type="button" data-step="participants" data-d="-1" aria-label="One fewer participant"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button><input id="participants" name="participants" type="number" inputmode="numeric" min="1" max="60" value="15" aria-describedby="participants-help"><button type="button" data-step="participants" data-d="1" aria-label="One more participant"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-                <span class="hint" id="participants-help">Everyone making a squishy. Minimum charge is 10.</span></div>
+                <div class="counter"><button type="button" data-step="participants" data-d="-1" aria-label="One fewer participant"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button><input id="participants" name="participants" type="number" inputmode="numeric" min="10" max="60" value="15" aria-describedby="participants-help"><button type="button" data-step="participants" data-d="1" aria-label="One more participant"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                <span class="hint" id="participants-help">Everyone making a squishy. Minimum 10.</span></div>
             </div>
             <div class="warn" id="time-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>The end time needs to be after the start time.</span></div>
             <div class="warn" id="participants-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-hourglass"/></svg><span>For more than 60 participants, plan for 60 here and tell us the full number in your request.</span></div>
@@ -420,10 +420,10 @@
             <div class="price-lines">
             <div class="pl-row"><div><b>Squishy DIY for <span id="pl-n">15</span> participants</b><small id="pl-sub">$26 Duo + $2 squishy capsule, per person</small></div><strong id="pl-diy">$420.00</strong></div>
             <p class="sel-label addon-label">Add-on</p>
-            <label class="addon" for="wax">
-              <span class="addon-icon" aria-hidden="true"><svg class="icon"><use href="#i-crack"/></svg></span>
-              <span class="addon-body"><span class="addon-title"><span id="wax-title">Wax Cracking</span> <span class="pill" id="wax-pill">+$2 per squishy</span></span><span class="duo-deal" id="duo-deal">$3.50 for both squishies <s>U.P. $4</s></span><span class="addon-copy">A colourful wax shell to crack and reveal their squishy, done within the 45-minute session.</span><span class="addon-qty" id="wax-quantity">30 squishies to crack</span></span>
-              <span class="addon-ctl"><span class="wax-prices"><s id="wax-up" hidden></s><span id="wax-price">+$67.50</span></span><input type="checkbox" id="wax" name="wax"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
+            <label class="addon" for="goodie">
+              <span class="addon-icon" aria-hidden="true"><svg class="icon"><use href="#i-gift"/></svg></span>
+              <span class="addon-body"><span class="addon-title">Squishy basket <span class="pill" id="goodie-pill">$5 per child <s>U.P. $7</s></span></span><span class="addon-copy">A glossy squishy for each child to take home.</span><span class="addon-qty" id="goodie-qty">15 glossy squishies, one per child</span></span>
+              <span class="addon-ctl"><span class="wax-prices"><s id="goodie-up">U.P. $105</s><span id="goodie-price">+$75</span></span><input type="checkbox" id="goodie"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
             </label>
             <div class="pl-row pl-fixed"><div><b>One-time travel &amp; set-up</b><small>Up to 2 hours on site. Included once in every booking.</small></div><strong>$150.00</strong></div>
             <div class="pl-total"><span>Squishy DIY total</span><strong id="exp-total">$570.00</strong></div>
