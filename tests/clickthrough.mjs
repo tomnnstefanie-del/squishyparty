@@ -104,5 +104,14 @@ for (const g of ['A', 'B']) {
   console.log('\nStore gift ' + g + ':', okG && !errs.length ? '✓' : '✗ ' + h + ' | ' + total + ' | ' + errs.join('; ')); if (!okG || errs.length) failed++;
   await q.close();
 }
+// A store gift scanned more than 14 days ago without a request has ended
+{
+  const q = await b.newPage({viewport:{width:1280,height:900}});
+  await q.addInitScript(()=>{ try { localStorage.setItem('cc-gift', 'A'); localStorage.setItem('cc-gift-at', String(Date.now() - 20 * 864e5)); } catch (e) {} });
+  await q.goto('file://'+file+'?src=store&o=wcc'); await q.waitForTimeout(300);
+  const ended = await q.evaluate(()=>document.getElementById('store-gift').hidden && /store gift has ended/.test(document.getElementById('ref-banner').textContent));
+  console.log('\nStore gift ended after 14 days:', ended ? '✓' : '✗'); if (!ended) failed++;
+  await q.close();
+}
 await b.close();
 if (failed) { console.error(failed + ' click-through problem(s)'); process.exit(1); }

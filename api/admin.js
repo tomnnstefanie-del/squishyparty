@@ -41,7 +41,7 @@ async function sendRevision(ref, n, by) {
   if (!mailConfigured()) throw new BookingError('Email isn’t set up, so the revised quotation can’t be sent.', 503);
   const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
   const paid = paidCents(f.payments), c = f.contact, discount = f.booking.discountCents || 0;
-  const pdf = quotePdf({ ref, issued: new Date(), plan: rev.plan, contact: c, price: rev.price, bookingFor: c.bookingFor, discountCents: discount, gift: f.booking.gift || '',
+  const pdf = quotePdf({ ref, issued: new Date(), plan: rev.plan, contact: c, price: rev.price, bookingFor: c.bookingFor, discountCents: discount, gift: f.booking.gift || '', giftBy: f.booking.giftBy || '',
     detailed: !!(c.corporate && c.corporate.detailed), experienceName: EXP_NAME[rev.plan.experience], revision: n, paidCents: paid, prevTotalCents: rev.prevTotalCents,
     contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
   const filename = `Confetti-Club-Quotation-Q-${ref}-R${n}.pdf`;

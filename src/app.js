@@ -1415,11 +1415,15 @@
       var g = ''; try { g = localStorage.getItem('cc-gift') || ''; } catch (e) {}
       if (g !== 'A' && g !== 'B') {
         g = Math.random() < 0.5 ? 'A' : 'B';
-        try { localStorage.setItem('cc-gift', g); } catch (e) {}
+        try { localStorage.setItem('cc-gift', g); localStorage.setItem('cc-gift-at', String(Date.now())); } catch (e) {}
         if (isWeb()) { try { fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'gift', gift:g, outlet:saved.outlet || ''})}).catch(function(){}); } catch (e) {} }
         track('store_gift_assigned', {gift:g, outlet:saved.outlet || ''});
       }
-      saved.gift = g;
+      // 14 days to lock it in with a request (or a WhatsApp message to us); after a request it stays locked
+      var gAt = 0, gLocked = false; try { gAt = Number(localStorage.getItem('cc-gift-at')) || 0; gLocked = !!localStorage.getItem('cc-gift-locked'); if (!gAt) { gAt = Date.now(); localStorage.setItem('cc-gift-at', String(gAt)); } } catch (e) { gAt = Date.now(); }
+      saved.giftArm = g; saved.giftAt = gAt; // still counted in its arm after it ends
+      if (!gLocked && Date.now() - gAt > 14 * 864e5) saved.giftEnded = true;
+      else { saved.gift = g; saved.giftLocked = gLocked; }
     }
     return saved;
   })();
@@ -1432,8 +1436,11 @@
     put('gift-h', GB ? 'You got a free jelly squishy for the birthday child!' : 'You got $10 off your first party!');
     put('gift-copy', (GB ? 'The birthday child gets their own jelly squishy, on us (worth $18). ' : '') + 'We bring a hosted squishy-making party to your home, condo function room or venue, with our hosts and every material.');
     put('gift-step3', GB ? 'The free squishy is on your quotation. Nothing to pay now.' : 'Then $10 comes off your quotation. Nothing to pay now.');
+    var lockBy = new Date(REF.giftAt + 14 * 864e5).toLocaleDateString('en-SG', {day:'numeric', month:'long'});
+    put('gift-lock', REF.giftLocked ? 'Your gift is locked in.' : 'Lock it in: send your request or WhatsApp us by ' + lockBy + '.');
     if (!REF.code) { var rb = $('ref-banner'); rb.hidden = false; var sp = rb.querySelector('span'); sp.textContent = 'Your store gift: '; sp.appendChild(el('b', null, GB ? 'a free jelly squishy for the birthday child' : '$10 off your first party')); sp.appendChild(document.createTextNode(' is added to your request.')); }
   }
+  if (REF.giftEnded && !REF.code) { var rbe = $('ref-banner'); rbe.hidden = false; rbe.querySelector('span').textContent = 'Your store gift has ended (it needed a message within 14 days of scanning). Ask us about current offers in your request.'; }
   /** The store gift that applies right now: none once a friend's code is typed (one offer per booking). */
   function storeGift(){ var c = $('ref-code'); return typeof REF !== 'undefined' && REF.gift && !(c && c.value.trim()) ? REF.gift : ''; }
   // Capsule QR sticker: one printed QR for every lid, so the offer comes from the source, not a personal code
@@ -1759,7 +1766,7 @@
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
       corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:REF.gift || '', outlet:REF.outlet || '' },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:REF.giftArm || '', giftAt:REF.giftAt || 0, outlet:REF.outlet || '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';
@@ -1770,6 +1777,7 @@
       .then(function(res){
         clearTimeout(timer);
         if (res.status === 200 && res.body.ok) {
+          if (REF.gift) { try { if (!localStorage.getItem('cc-gift-locked')) localStorage.setItem('cc-gift-locked', String(Date.now())); } catch (e) {} } // the request locks the store gift in
           S.requested = true;
           track('request_sent', {experience:S.experience, participants:S.participants, wax:S.wax, addons:S.selected.length, total_sgd:Math.round((res.body.totalCents || 0) / 100)});
           put('sent-ref', res.body.ref); put('sent-phone', checkPhone(payload.contact.phoneCountry, payload.contact.phone).pretty || payload.contact.phone);
