@@ -51,7 +51,7 @@ try {
   await page.fill('#venue', '1 Example Road');
   await page.fill('#postal', '123456');
   await page.click('#wiz-next');
-  await page.click('label.addon'); // squishy goodie bags
+  await page.click('label.addon'); // squishy basket
   await page.click('#wiz-next');
   assert.equal(await page.locator('.rec-acc, #use-rec').count(), 0); ok('step 3 has no "Your plan so far" box: the add-on tabs come straight after the intro');
   // Bloom: personalise the Standard fabric backdrop
@@ -114,7 +114,7 @@ try {
   assert.equal(msgs.length, 1);
   const m = msgs[0];
   assert.equal(m.token, 'test:token'); assert.equal(m.chat_id, '4242'); assert.equal(m.parse_mode, 'HTML');
-  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Squishy goodie bag', '×12, Tom &amp; Stefanie: $60.00', 'travel', 'Lift lobby B, level 2'])
+  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Squishy basket', '×12, Tom &amp; Stefanie: $60.00', 'travel', 'Lift lobby B, level 2'])
     assert.ok(m.text.includes(s), 'message missing: ' + s);
   ok('owner gets one Telegram message with contact, date/time, venue, address, guests, order and notes');
   assert.ok(m.text.includes(`Estimated total: ${pageTotal}`), `server total should match page total ${pageTotal}`);

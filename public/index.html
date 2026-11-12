@@ -2748,8 +2748,8 @@ footer{background:#efece7;border-top:0}
           <div class="card-block">
             <div class="grid2">
               <div class="field"><label for="participants">Number of participants</label>
-                <div class="counter"><button type="button" data-step="participants" data-d="-1" aria-label="One fewer participant"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button><input id="participants" name="participants" type="number" inputmode="numeric" min="1" max="60" value="15" aria-describedby="participants-help"><button type="button" data-step="participants" data-d="1" aria-label="One more participant"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-                <span class="hint" id="participants-help">Everyone making a squishy. Minimum charge is 10.</span></div>
+                <div class="counter"><button type="button" data-step="participants" data-d="-1" aria-label="One fewer participant"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button><input id="participants" name="participants" type="number" inputmode="numeric" min="10" max="60" value="15" aria-describedby="participants-help"><button type="button" data-step="participants" data-d="1" aria-label="One more participant"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                <span class="hint" id="participants-help">Everyone making a squishy. Minimum 10.</span></div>
             </div>
             <div class="warn" id="time-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>The end time needs to be after the start time.</span></div>
             <div class="warn" id="participants-warn" hidden><svg class="icon" aria-hidden="true"><use href="#i-hourglass"/></svg><span>For more than 60 participants, plan for 60 here and tell us the full number in your request.</span></div>
@@ -2807,8 +2807,8 @@ footer{background:#efece7;border-top:0}
             <p class="sel-label addon-label">Add-on</p>
             <label class="addon" for="goodie">
               <span class="addon-icon" aria-hidden="true"><svg class="icon"><use href="#i-gift"/></svg></span>
-              <span class="addon-body"><span class="addon-title">Squishy goodie bags <span class="pill" id="goodie-pill">+$5 per friend</span></span><span class="addon-copy">Add on a take-home goodie bag for each friend, with a glossy squishy in mixed assorted colours.</span><span class="addon-qty" id="goodie-qty">15 goodie bags, one per friend</span></span>
-              <span class="addon-ctl"><span class="wax-prices"><span id="goodie-price">+$75</span></span><input type="checkbox" id="goodie"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
+              <span class="addon-body"><span class="addon-title">Squishy basket <span class="pill" id="goodie-pill">$5 per child <s>U.P. $7</s></span></span><span class="addon-copy">A glossy squishy for each child to take home.</span><span class="addon-qty" id="goodie-qty">15 glossy squishies, one per child</span></span>
+              <span class="addon-ctl"><span class="wax-prices"><s id="goodie-up">U.P. $105</s><span id="goodie-price">+$75</span></span><input type="checkbox" id="goodie"><span class="tickbox" aria-hidden="true"><svg class="icon"><use href="#i-check"/></svg></span></span>
             </label>
             <div class="pl-row pl-fixed"><div><b>One-time travel &amp; set-up</b><small>Up to 2 hours on site. Included once in every booking.</small></div><strong>$150.00</strong></div>
             <div class="pl-total"><span>Squishy DIY total</span><strong id="exp-total">$570.00</strong></div>
@@ -3082,7 +3082,7 @@ footer{background:#efece7;border-top:0}
     {id:'styling', title:'Styling', tab:'Styling', icon:'i-balloon', blurb:'Balloon backdrops, dessert tables and party favours in your colour theme.'},
     {id:'entertainment', hidden:true, title:'Other activities', tab:'Other activities', icon:'i-smile', blurb:'Face painting, glitter tattoos, balloon sculpting, magic and caricatures by PartyPainters.sg, plus photos and video by J Square Photography.'},
     {id:'cake', title:'Cakes', tab:'Cakes', icon:'i-cake', blurb:'From our partner bakery, Butter Studio. Delivered to your venue before the finale.'},
-    {id:'favours', hidden:true, title:'Goodie bags', tab:'Goodie bags', icon:'i-gift', blurb:'Take-home goodie bags from our own stores.'}
+    {id:'favours', hidden:true, title:'Squishy basket', tab:'Squishy basket', icon:'i-gift', blurb:'Take-home squishies from our own stores.'}
   ];
   var P = [
     // Butter Studio menu (names and prices from their foodpanda listing; prices tagged Demo until the partner rate is agreed).
@@ -3218,8 +3218,8 @@ footer{background:#efece7;border-top:0}
     {id:'bl-3d-10', g:'bl-3d', gname:'3D standee with stand', size:'1 m tall', sec:'Add-ons', cat:'styling', name:'3D standee, 1 m', vendor:'Bloom', status:'approved', basis:'booking', price:7500, rec:0, img:'img/bloom/3d-standee.jpg', cap:'A cut-out character or theme figure on a stand', inc:['1 custom 3D standee with stand'], cond:['A 0.9 m size is also available: ask in your notes']},
     {id:'bl-poster', sec:'Add-ons', cat:'styling', name:'Foamboard poster with easel', vendor:'Bloom', status:'approved', basis:'booking', price:5000, rec:0, img:'img/bloom/foam-poster.jpg', cap:'An A3 or A4 welcome sign on an easel', inc:['1 foamboard poster (A3 or A4)','1 easel stand'], cond:[]},
     {id:'s-favours', hidden:true, cat:'styling', name:'Party favour bags', vendor:'Tom & Stefanie', status:'demo', basis:'child', price:600, rec:0, cap:'One per child', inc:['Themed bag','Sticker sheet','Thank-you tag'], cond:['Confirmed with your quotation']},
-    // Squishy goodie bag for each friend (owner, 12 Nov 2026): ticked on the Squishy DIY step, one per participant.
-    {id:'t-goodie', cat:'favours', name:'Squishy goodie bag (glossy squishy, mixed colours)', vendor:'Tom & Stefanie', status:'approved', basis:'child', price:500, rec:0, cap:'One per friend', inc:['A glossy squishy in mixed assorted colours'], cond:['Confirmed with your quotation']},
+    // Squishy basket (owner, 12 Nov 2026): one glossy squishy for each child to take home, $5 (U.P. $7), ticked on the Squishy DIY step, one per participant.
+    {id:'t-goodie', cat:'favours', name:'Squishy basket: a glossy squishy for each child', vendor:'Tom & Stefanie', status:'approved', basis:'child', price:500, was:700, rec:0, cap:'One per child', inc:['A glossy squishy for each child to take home'], cond:['Confirmed with your quotation']},
   ];
   var BYID = {}; P.forEach(function(p){ BYID[p.id] = p; });
   var STATUS = { demo:['st-demo','Sample listing'], prospective:['st-prospective','Prospective'], approved:['st-approved','Approved'], partner:['st-approved','Cake partner'], confirmed:['st-confirmed','Confirmed'] };
@@ -4328,7 +4328,7 @@ footer{background:#efece7;border-top:0}
     renderHow(s.experience);
     if (put('exp-total', money(expSum))) { var et = $('exp-total'); et.classList.remove('bump'); void et.offsetWidth; et.classList.add('bump'); }
     var gb = BYID['t-goodie'], gOn = s.selected.indexOf('t-goodie') >= 0;
-    put('goodie-pill', '+' + short(gb.price) + ' per friend'); put('goodie-qty', s.participants + ' goodie bag' + (s.participants === 1 ? '' : 's') + ', one per friend');
+    put('goodie-qty', s.participants + ' glossy squishies, one per child'); put('goodie-up', 'U.P. ' + short(gb.was * s.participants));
     put('goodie-price', '+' + short(gb.price * s.participants)); $('goodie').checked = gOn;
     put('tier-note', s.participants < MIN_PAX ? 'Minimum 10 participants: for ' + s.participants + ' we charge for 10, and spare materials are yours to keep.' : 'Minimum 10 participants.');
 
@@ -4413,7 +4413,7 @@ footer{background:#efece7;border-top:0}
   form.addEventListener('submit', function(e){ e.preventDefault(); }); // the planner form never submits; pressing Enter in a field must not reload the page
   function readForm(){
     var d = new FormData(form);
-    S.participants = clamp(d.get('participants'), 1, 60);
+    S.participants = clamp(d.get('participants'), MIN_PAX, 60); // the planner starts at the 10-participant minimum
     $('participants-warn').hidden = !(Number(d.get('participants')) > 60);
     S.date = d.get('date') || ''; S.time = d.get('time') || ''; S.end = d.get('end') || '';
     var a = mins(S.time), b = mins(S.end), ok = a != null && b != null && b > a;
@@ -4421,12 +4421,12 @@ footer{background:#efece7;border-top:0}
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = false; // Wax Cracking is no longer offered (replaced by goodie bags)
+    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = false; // Wax Cracking is no longer offered (replaced by the squishy basket)
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo || e.target.id === 'goodie') return; readForm(); render(false); });
   form.addEventListener('change', function(e){
     if (e.target.dataset && e.target.dataset.todo) return; // to-do ticks are handled separately
-    if (e.target.id === 'goodie') { var gi = S.selected.indexOf('t-goodie'); if (e.target.checked && gi < 0) S.selected.push('t-goodie'); if (!e.target.checked && gi >= 0) S.selected.splice(gi, 1); track(e.target.checked ? 'addon_added' : 'addon_removed', {id:'t-goodie', category:'favours', vendor:'Tom & Stefanie'}); render(true, (e.target.checked ? 'Added' : 'Removed') + ' squishy goodie bags.'); return; }
+    if (e.target.id === 'goodie') { var gi = S.selected.indexOf('t-goodie'); if (e.target.checked && gi < 0) S.selected.push('t-goodie'); if (!e.target.checked && gi >= 0) S.selected.splice(gi, 1); track(e.target.checked ? 'addon_added' : 'addon_removed', {id:'t-goodie', category:'favours', vendor:'Tom & Stefanie'}); render(true, (e.target.checked ? 'Added' : 'Removed') + ' the squishy basket.'); return; }
     if (e.target.name === 'participants') e.target.value = S.participants;
     readForm(); render(true);
     if (e.target.name === 'experience') track('experience_selected', {experience:S.experience});
