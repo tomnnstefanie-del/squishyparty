@@ -1308,9 +1308,9 @@
     if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
     $('pending-note').hidden = !T.pending.length || !shown;
     if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
-    if (shown && storeGift() === 'B') { bd.appendChild(el('div','grp','Your store gift')); row('Jelly squishy for the birthday child (worth $18)', 'Free'); }
+    if (shown && (storeGift() === 'B' || friendCode())) { bd.appendChild(el('div','grp', friendCode() ? 'Your friend’s referral' : 'Your store gift')); row('Jelly squishy for the birthday child (worth $18)', 'Free'); }
     var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—', off = shown ? referralOff() : 0;
-    // A friend's code or the capsule QR: show $10 off (the server still prices the full amount; we take it off the quotation)
+    // The capsule QR or store gift A: show $10 off (the server still prices the full amount; we take it off the quotation)
     function struck(id){ var e = $(id), w = el('s', 'was', money(T.total)); e.textContent = money(T.total - off) + (T.pending.length ? '+' : ''); w.setAttribute('aria-label', 'was ' + money(T.total)); e.appendChild(w); }
     if (off) struck('total-price'); else put('total-price', totalTxt);
     $('ref-off').hidden = !off;
@@ -1388,7 +1388,7 @@
   if (isWeb()) { var pn = $('preview-notice'); if (pn) pn.hidden = true; }
 
   /* ---------- Referrals and where people came from ----------
-     ?ref=MIA-K7Q2 is a friend's referral link (the friend's family gets nothing; the new customer gets $10 off).
+     ?ref=MIA-K7Q2 is a friend's referral link (the new customer gets a free jelly squishy for the birthday child).
      ?src=capsule says where the link was (capsule QR sticker, Instagram...). Both are remembered for 60 days on this
      device and sent with the request. Analytics only learns that a code or source was present, never the code. */
   var REF = (function(){
@@ -1453,14 +1453,16 @@
     $('offer').hidden = false; $('sticker-field').hidden = false;
     if (!REF.code) { $('ref-banner').hidden = false; $('ref-banner').querySelector('span').innerHTML = 'Scanned a squishy capsule? <b>$10 off your first hosted party</b> is added to your request.'; }
   }
+  /** A friend's code typed or filled in: a free jelly squishy for the birthday child (no $10 off). */
+  function friendCode(){ var c = $('ref-code'); return !!c && /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(c.value.trim()); }
   function referralOff(){
     var c = $('ref-code'); if (!c || typeof REF === 'undefined') return 0;
-    var v = c.value.trim(), code = /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v);
-    return code || (!v && REF.source === 'capsule') || storeGift() === 'A' ? 1000 : 0;
+    var v = c.value.trim();
+    return (!v && REF.source === 'capsule') || storeGift() === 'A' ? 1000 : 0;
   }
   function refHint(){
     var v = $('ref-code').value.trim(), ok = !v || /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v), h = $('ref-hint');
-    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? 'Thanks! $10 off is shown in your total.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
+    h.textContent = !v ? 'From a friend? New customers get a free jelly squishy for the birthday child (worth $18).' : ok ? 'Thanks! The free jelly squishy is in your price breakdown.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
     h.classList.toggle('err', !ok); $('ref-code').toggleAttribute('aria-invalid', !ok);
   }
   $('ref-code').addEventListener('input', function(){ refHint(); render(false); }); refHint();

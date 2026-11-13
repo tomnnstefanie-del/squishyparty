@@ -150,6 +150,7 @@ __HEADER__
           </article>
         </div>
         <p class="ad-fine ad-total">All requests: <b id="n-req">0</b><span id="n-unknown"></span></p>
+        <p class="ad-fine">Test clicks before launch? <button type="button" class="mini" id="ad-reset-counts">Clear test counts</button> resets QR scans, links opened, visits and store-gift counts. Requests come off when you delete a test booking with its bin icon.</p>
 
         <h2 class="ad-h2">How fast we get back to customers</h2>
         <div class="ad-life">
@@ -419,6 +420,10 @@ __FOOTER__
       .then(function(r){ return r.json(); }).then(function(j){ if (!j.ok) { alert(j.error || 'Something went wrong.'); return; } if (done) done(j); load(); })
       .catch(function(){ alert('We couldn’t reach the server.'); });
   }
+  $('ad-reset-counts').addEventListener('click', function(){
+    if ((prompt('This clears all QR scans, links opened, visits and store-gift counts. Bookings stay. Type RESET to confirm:') || '').trim() !== 'RESET') return;
+    post({ action:'reset-counts', confirm:'RESET' }, function(){ alert('Test counts cleared.'); });
+  });
   var cents = function(v){ var m = /^\s*(\d{1,6})(?:\.(\d{1,2}))?\s*$/.exec(v || ''); return m ? +m[1] * 100 + +(m[2] || '0').padEnd(2, '0') : NaN; };
   var OCCN = { 'family-day':'Family day', 'team-bonding':'Team bonding', 'year-end':'D&D / year-end', anniversary:'Anniversary', festive:'Festive', other:'Other event' };
   function btnR(txt, fn){ var b = el('button', 'mini', txt); b.type = 'button'; b.addEventListener('click', fn); return b; }

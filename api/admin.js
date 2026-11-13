@@ -1,6 +1,7 @@
 // /api/admin  (Authorization: Bearer <ADMIN_PASSWORD>): the private dashboard at /admin.html.
 //   GET                                                   -> the numbers, bookings and the add-on list for amendments
 //   POST { action: 'mark' | 'undo', ref, status }         -> contacted / lost / vendor n (payments use the ledger below)
+//   POST { action: 'reset-counts', confirm: 'RESET', by } -> clear test scans, link opens, visits and store-gift counts
 //   POST { action: 'digest' }                              -> send the to-do list to Telegram now
 //   POST { action: 'payment', ref, kind, cents, by, note } -> record a deposit or payment received
 //   POST { action: 'reverse', ref, paymentId, reason, by } -> reverse a payment recorded by mistake (never deleted)
@@ -15,7 +16,7 @@
 // Wrong passwords are counted per address in the database (10 per 15 minutes), so guessing is slow on every instance.
 import crypto from 'node:crypto';
 import { clientIp, limiter, fail, HttpError, readJson, assertSameOrigin } from '../lib/http.js';
-import { readStats, markStatus, tooManyFailures, validStatus, saveSettings, deleteBooking } from '../lib/stats.js';
+import { readStats, markStatus, tooManyFailures, validStatus, saveSettings, deleteBooking, resetCounts } from '../lib/stats.js';
 import { addPayment, reversePayment, createRevision, stepRevision, handleChange, getFull, paidCents, cleanBy, BookingError } from '../lib/bookings.js';
 import { validateRequest } from '../lib/validate.js';
 import { ADDON_LIST, EXP_NAME } from '../lib/pricing.js';
@@ -41,7 +42,7 @@ async function sendRevision(ref, n, by) {
   if (!mailConfigured()) throw new BookingError('Email isn’t set up, so the revised quotation can’t be sent.', 503);
   const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
   const paid = paidCents(f.payments), c = f.contact, discount = f.booking.discountCents || 0;
-  const pdf = quotePdf({ ref, issued: new Date(), plan: rev.plan, contact: c, price: rev.price, bookingFor: c.bookingFor, discountCents: discount, gift: f.booking.gift || '', giftBy: f.booking.giftBy || '',
+  const pdf = quotePdf({ ref, issued: new Date(), plan: rev.plan, contact: c, price: rev.price, bookingFor: c.bookingFor, discountCents: discount, friendSquishy: !!f.booking.friendSquishy, gift: f.booking.gift || '', giftBy: f.booking.giftBy || '',
     detailed: !!(c.corporate && c.corporate.detailed), experienceName: EXP_NAME[rev.plan.experience], revision: n, paidCents: paid, prevTotalCents: rev.prevTotalCents,
     contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
   const filename = `Confetti-Club-Quotation-Q-${ref}-R${n}.pdf`;
@@ -80,6 +81,12 @@ export default async function handler(req, res) {
       const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.');
       const r = await saveSettings(b.settings || {}, by, b.reason); if (r.error) throw new HttpError(r.status, r.error);
       return res.status(200).json({ ok: true, settings: r.settings });
+    }
+    if (b.action === 'reset-counts') {
+      const by = cleanBy(b.by); if (!by) throw new HttpError(400, 'Please add your name, for the record.');
+      if (b.confirm !== 'RESET') throw new HttpError(400, 'Type RESET to confirm.');
+      const r = await resetCounts(by); if (r.error) throw new HttpError(r.status, r.error);
+      return res.status(200).json({ ok: true, removedEvents: r.removedEvents });
     }
     const ref = String(b.ref || '');
     if (!REF.test(ref)) throw new HttpError(400, 'Please refresh and try again.');

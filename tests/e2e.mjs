@@ -228,9 +228,11 @@ try {
   const friendCode = makeReferralCode('Mia Tan');
   const lp = await browser.newPage(); await lp.goto(BASE + '/?ref=' + friendCode); await lp.waitForTimeout(600);
   await lp.reload(); await lp.waitForTimeout(400); await lp.close(); // a second visit on the same device isn't counted again
-  x = await api({ ...base, referral: { code: friendCode } }, { 'X-Forwarded-For': '10.0.2.1' }); assert.equal(x.s, 200);
+  x = await api({ ...base, referral: { code: friendCode }, emailToken: issueVerified('bea@example.com'), contact: { ...base.contact, parentName: 'Bea Koh', email: 'bea@example.com', phone: '91110001' } }, { 'X-Forwarded-For': '10.0.2.1' }); assert.equal(x.s, 200);
+  const beaRef = x.b.ref, beaMsg = sent().find((mm) => mm.text && mm.text.includes(beaRef) && mm.text.includes('New Confetti Club request')); assert.ok(beaMsg.text.includes('Came from: Friend’s referral link'));
   x = await api({ ...base, referral: { source: 'capsule' } }, { 'X-Forwarded-For': '10.0.2.2' }); assert.equal(x.s, 200);
   const st = (await adm('test-dashboard-pass')).b;
+  { const fb = st.bookings.find((q) => q.ref === beaRef); assert.ok(fb.friendSquishy === true && fb.discountCents === 0, 'friend gets a free squishy, not $10 off'); }
   assert.equal(st.totals.capsuleScans - before0.capsuleScans, 1); assert.equal(st.totals.linkOpens - before0.linkOpens, 1);
   assert.equal(st.totals.viaFriend - before0.viaFriend, 1); assert.equal(st.totals.viaCapsule - before0.viaCapsule, 1);
   const rfr = st.referrers.find((r) => r.code === friendCode); assert.ok(rfr && rfr.opens === 1 && rfr.requests === 1 && rfr.brought.length === 1);
@@ -414,7 +416,7 @@ try {
   m2 = reqMsg(x.b.ref);
   assert.ok(m2.text.includes('their own referral code') && m2.text.includes('Same WhatsApp number'));
   const sb = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === x.b.ref); assert.ok(sb.selfReferral && sb.discountCents === 0);
-  ok('using your own referral link (same WhatsApp number, different email and name) is caught: no $10 off and no reward');
+  ok('using your own referral link (same WhatsApp number, different email and name) is caught: no free squishy and no reward');
 
 
   // The daily Telegram bump
@@ -490,6 +492,17 @@ try {
   x = await api({ ...base, emailToken: issueVerified('sara@example.com'), contact: { ...base.contact, parentName: 'Sara Lim', email: 'sara@example.com', phone: '98887777' } }, { 'X-Forwarded-For': '10.0.9.3' });
   assert.equal(x.s, 200); assert.ok(!reqMsg(x.b.ref).text.includes('Returning customer'));
   ok('a test booking can be deleted from the dashboard (reference typed to confirm, name recorded): booking, payments, reward, referral code and counts go; Activity keeps who deleted it');
+
+  // Clearing test counts: scans, link opens, visits and store-gift counts go; bookings and requests stay
+  assert.equal((await admT({ action: 'reset-counts', confirm: 'reset please' })).s, 400);
+  assert.equal((await admT({ action: 'reset-counts', confirm: 'RESET', by: '' })).s, 400);
+  const preReset = (await admT()).b; assert.ok(preReset.totals.capsuleScans > 0 && preReset.totals.linkOpens > 0);
+  assert.equal((await admT({ action: 'reset-counts', confirm: 'RESET' })).s, 200);
+  const postReset = (await admT()).b;
+  assert.deepEqual([postReset.totals.capsuleScans, postReset.totals.linkOpens], [0, 0]);
+  assert.equal(postReset.totals.requests, preReset.totals.requests); assert.equal(postReset.bookings.length, preReset.bookings.length);
+  assert.ok(postReset.referrers.every((r) => !r.opens) && !postReset.events.some((e) => ['scan', 'open', 'gift'].includes(e.type)) && postReset.events.some((e) => e.type === 'reset'));
+  ok('“Clear test counts” (type RESET, name recorded) clears scans, link opens, visits and store-gift counts; bookings and requests stay');
 
   console.log('not configured');
   const env2 = { ...env, PORT: '3101' }; delete env2.TELEGRAM_BOT_TOKEN;
