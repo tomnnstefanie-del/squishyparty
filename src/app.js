@@ -1413,8 +1413,11 @@
        B = a free jelly squishy for the birthday child. Counted once per phone, by gift and outlet only. */
     if (saved.source === 'outlet') {
       var g = ''; try { g = localStorage.getItem('cc-gift') || ''; } catch (e) {}
+      // A forwarded link carries the sender's gift (&g=…), so a husband or grandparent opening it sees the same offer.
+      // A phone that already has a gift keeps its own. Short codes rather than A/B so the link isn't obvious to edit.
+      var GCODE = {A:'q4', B:'m8'}, fromLink = String(q.g || '') === GCODE.A ? 'A' : String(q.g || '') === GCODE.B ? 'B' : '';
       if (g !== 'A' && g !== 'B') {
-        g = Math.random() < 0.5 ? 'A' : 'B';
+        g = fromLink || (Math.random() < 0.5 ? 'A' : 'B');
         try { localStorage.setItem('cc-gift', g); localStorage.setItem('cc-gift-at', String(Date.now())); } catch (e) {}
         if (isWeb()) { try { fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'gift', gift:g, outlet:saved.outlet || ''})}).catch(function(){}); } catch (e) {} }
         track('store_gift_assigned', {gift:g, outlet:saved.outlet || ''});
@@ -1422,6 +1425,8 @@
       // 14 days to lock it in with a request (or a WhatsApp message to us); after a request it stays locked
       var gAt = 0, gLocked = false; try { gAt = Number(localStorage.getItem('cc-gift-at')) || 0; gLocked = !!localStorage.getItem('cc-gift-locked'); if (!gAt) { gAt = Date.now(); localStorage.setItem('cc-gift-at', String(gAt)); } } catch (e) { gAt = Date.now(); }
       saved.giftArm = g; saved.giftAt = gAt; // still counted in its arm after it ends
+      // Put this phone's gift in the address, so copying or sharing the page passes the same gift on
+      if (src === 'outlet' && String(q.g || '') !== GCODE[g]) { try { var u = new URL(location.href); u.searchParams.set('g', GCODE[g]); history.replaceState(history.state, '', u.toString()); } catch (e) {} }
       if (!gLocked && Date.now() - gAt > 14 * 864e5) saved.giftEnded = true;
       else { saved.gift = g; saved.giftLocked = gLocked; }
     }

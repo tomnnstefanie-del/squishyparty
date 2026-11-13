@@ -104,6 +104,18 @@ for (const g of ['A', 'B']) {
   console.log('\nStore gift ' + g + ':', okG && !errs.length ? '✓' : '✗ ' + h + ' | ' + total + ' | ' + errs.join('; ')); if (!okG || errs.length) failed++;
   await q.close();
 }
+// Sharing: the address gets the phone's gift, and a new phone opening that forwarded link gets the same gift
+for (const g of ['A', 'B']) {
+  const q1 = await b.newPage(); await q1.addInitScript(v=>{ try { localStorage.setItem('cc-gift', v); } catch (e) {} }, g);
+  await q1.goto('file://'+file+'?src=store&o=wcc'); await q1.waitForTimeout(300);
+  const shared = await q1.evaluate(()=>location.href); await q1.close();
+  const ctx = await b.newContext(); const q2 = await ctx.newPage(); await q2.goto(shared); await q2.waitForTimeout(300);
+  const got = await q2.evaluate(()=>{ try { return localStorage.getItem('cc-gift'); } catch (e) { return 'no storage'; } });
+  const h2 = await q2.evaluate(()=>document.getElementById('gift-h').textContent);
+  const okS = /[?&]g=(q4|m8)/.test(shared) && got === g && (g === 'A' ? /\$10 off/ : /free jelly squishy/).test(h2);
+  console.log('\nForwarded link keeps gift ' + g + ':', okS ? '✓' : '✗ ' + shared + ' | ' + got + ' | ' + h2); if (!okS) failed++;
+  await ctx.close();
+}
 // A store gift scanned more than 14 days ago without a request has ended
 {
   const q = await b.newPage({viewport:{width:1280,height:900}});
