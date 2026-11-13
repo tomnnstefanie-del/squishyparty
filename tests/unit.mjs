@@ -20,15 +20,15 @@ const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
 const plan = (o = {}) => ({ participants: 10, experience: 'both', wax: false, addons: [], ...o });
 
 console.log('pricing');
-t('Duo, 10 participants = $280 + $150 travel = $430', () => assert.equal(priceRequest(plan()).totalCents, 43000));
-t('Duo + wax duo deal for 10 = $465 ($3.50 per person for both squishies)', () => assert.equal(priceRequest(plan({ wax: true })).totalCents, 46500));
+t('Duo, 10 participants = $300 + $150 travel = $450', () => assert.equal(priceRequest(plan()).totalCents, 45000));
+t('Duo + wax duo deal for 10 = $485 ($3.50 per person for both squishies)', () => assert.equal(priceRequest(plan({ wax: true })).totalCents, 48500));
 t('Jelly, 10 participants = $330; + wax $20 = $350', () => { assert.equal(priceRequest(plan({ experience: 'jelly' })).totalCents, 33000); assert.equal(priceRequest(plan({ experience: 'jelly', wax: true })).totalCents, 35000); });
 t('Crunchy, 10 participants = $350', () => assert.equal(priceRequest(plan({ experience: 'crunchy' })).totalCents, 35000));
-t('Minimum 10: 6 participants priced as 10', () => { const p = priceRequest(plan({ participants: 6 })); assert.equal(p.billableParticipants, 10); assert.equal(p.totalCents, 43000); });
+t('Minimum 10: 6 participants priced as 10', () => { const p = priceRequest(plan({ participants: 6 })); assert.equal(p.billableParticipants, 10); assert.equal(p.totalCents, 45000); });
 t('No deposit is worked out (nothing is paid online)', () => { const p = priceRequest(plan()); assert.equal(p.depositCents, undefined); assert.equal(p.holdCents, undefined); });
 t('Per-person add-on is charged per participant (favour bags, 10 × $6)', () => { const p = priceRequest(plan({ addons: ['s-favours'] })); assert.equal(p.addons[0].quantity, 10); assert.equal(p.addons[0].cents, 6000); });
 t('Removed vendors are no longer accepted', () => { assert.throws(() => priceRequest(plan({ addons: ['f-bento'] }))); });
-t('Cakes are on quote, never counted as $0', () => { const p = priceRequest(plan({ addons: ['bs-custom'] })); assert.equal(p.addons[0].cents, null); assert.equal(p.onQuote.length, 1); assert.equal(p.totalCents, 43000); });
+t('Cakes are on quote, never counted as $0', () => { const p = priceRequest(plan({ addons: ['bs-custom'] })); assert.equal(p.addons[0].cents, null); assert.equal(p.onQuote.length, 1); assert.equal(p.totalCents, 45000); });
 
 console.log('search (SEO)');
 {

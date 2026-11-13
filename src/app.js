@@ -27,7 +27,7 @@
     'PartyPainters.sg': {title:'PartyPainters.sg', area:'Face painting & party entertainers · Singapore', tags:['Face painting','Glitter tattoos','Balloon sculpting','Magic','Caricatures','Photography'], pill:'Activities partner', from:'From $120', icon:'i-smile', thumb:'img/partypainters/logo.png',
       note:'Any face-painting design: bring a reference photo. We book PartyPainters.sg for your date and confirm timings with them.'}
   };
-  var EXP = { jelly:{name:'Jelly',short:'Jelly',pax:1600,per:1}, crunchy:{name:'Crunchy',short:'Crunchy',pax:1800,per:1}, both:{name:'Duo: Jelly + Crunchy',short:'Duo',pax:2600,per:2} };
+  var EXP = { jelly:{name:'Jelly',short:'Jelly',pax:1600,per:1}, crunchy:{name:'Crunchy',short:'Crunchy',pax:1800,per:1}, both:{name:'Duo: Jelly + Crunchy',short:'Duo',pax:2800,per:2} };
   var CATS = [
     {id:'styling', title:'Styling', tab:'Styling', icon:'i-balloon', blurb:'Balloon backdrops, dessert tables and party favours in your colour theme.'},
     {id:'entertainment', hidden:true, title:'Other activities', tab:'Other activities', icon:'i-smile', blurb:'Face painting, glitter tattoos, balloon sculpting, magic and caricatures by PartyPainters.sg, plus photos and video by J Square Photography.'},
@@ -675,10 +675,6 @@
     {name:'Mich Lim', stars:5, when:'Sep 2026', url:'', text:'Very approachable and helpful staff! My girl thoroughly enjoyed the slime/squishy making activity. 😊'}
   ];
   var GOOGLE_REVIEWS_URL = '';   // the outlet's Google reviews page, to show the "Read our Google reviews" button
-  /* Swipeable reel of our Instagram posts. Each item: a video file (public/video/, .mp4, portrait 9:16, muted) with a
-     poster image, or a photo; ig = the post's Instagram link. Only share what you're allowed to (children's faces need consent). */
-  var REEL = [];                 // e.g. {video:'video/wax-crack.mp4', img:'img/events/wax-crack.jpg', alt:'Cracking the wax shell', ig:'https://www.instagram.com/p/...'}
-  var INSTAGRAM_URL = '';        // your Instagram profile, for the "Follow us" link
   // Horizontal catalogue: swipe on phones, arrows on computers; shows "1–2 of 5" so people know there's more.
   function scroller(track, prev, next, pos){
     function card(){ var c = track.firstElementChild; return c ? c.getBoundingClientRect().width + 14 : 300; }
@@ -717,27 +713,6 @@
     grid.hidden = !REVIEWS.length; $('rv-empty').hidden = !!REVIEWS.length;
     scroller(grid, $('rv-prev'), $('rv-next'), $('rv-pos'));
     if (GOOGLE_REVIEWS_URL) { $('google-reviews').href = GOOGLE_REVIEWS_URL; $('google-reviews').hidden = false; }
-    if (INSTAGRAM_URL) { $('ig-follow').href = INSTAGRAM_URL; $('ig-follow').hidden = false; }
-    // Videos play (muted) only while mostly on screen
-    var track = $('reel'), seen = 'IntersectionObserver' in window ? new IntersectionObserver(function(es){
-      es.forEach(function(e){ var v = e.target; if (e.isIntersecting && e.intersectionRatio > .6) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } else v.pause(); });
-    }, {threshold:[0,.6,1]}) : null;
-    REEL.forEach(function(it, idx){
-      var li = el('li','reel-item'), m;
-      li.setAttribute('aria-label', (idx + 1) + ' of ' + REEL.length);
-      if (it.video) {
-        m = document.createElement('video'); m.src = it.video; if (it.img) m.poster = it.img;
-        m.muted = true; m.loop = true; m.playsInline = true; m.setAttribute('playsinline',''); m.preload = 'none'; m.controls = true;
-        m.setAttribute('aria-label', it.alt); if (seen) seen.observe(m);
-      } else { m = document.createElement('img'); m.src = it.img; m.alt = it.alt; m.loading = 'lazy'; m.decoding = 'async'; }
-      m.addEventListener('error', function(){ li.remove(); });
-      li.appendChild(m);
-      if (it.ig) { var a = el('a','reel-ig','View on Instagram'); a.href = it.ig; a.target = '_blank'; a.rel = 'noopener'; li.appendChild(a); }
-      track.appendChild(li);
-    });
-    // Until the videos are added, small empty tiles hold their place
-    if (!REEL.length) for (var k = 0; k < 4; k++) { var ph = el('li','reel-item reel-soon'); ph.appendChild(icon('i-camera')); ph.appendChild(el('span', null, 'Video coming soon')); track.appendChild(ph); }
-    scroller(track, $('reel-prev'), $('reel-next'), null);
   }
   renderReviews();
   function makeStack(root, onStep){
