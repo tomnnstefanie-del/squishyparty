@@ -583,7 +583,7 @@ __FOOTER__
       money2.textContent = (b.paidCents ? 'Received ' + money(b.paidCents) + ' · balance ' + money(b.balanceCents) : 'Total ' + money(b.totalCents)) + (b.totalCents !== b.originalTotalCents ? ' (quoted ' + money(b.originalTotalCents) + ')' : '');
       c.appendChild(money2);
       var openRev = (b.revisions || []).filter(function(r){ return r.status === 'draft' || r.status === 'sent'; })[0], openChg = (b.changes || []).filter(function(x){ return x.status === 'open'; }).length;
-      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg || b.occasion || b.yearly || (b.returning || []).length || b.selfReferral) {
+      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg || b.occasion || b.yearly || (b.returning || []).length || b.selfReferral || b.gift) {
         var chips = el('div', 'tb-chips');
         if (openChg) chips.appendChild(el('span', 'tb-chip chg', '✏️ Change requested'));
         if (openRev) chips.appendChild(el('span', 'tb-chip rev', 'R' + openRev.n + (openRev.status === 'draft' ? ' draft' : ' pending acceptance')));
@@ -591,6 +591,7 @@ __FOOTER__
         if (b.poRef) chips.appendChild(el('span', 'tb-chip po', 'PO ' + b.poRef));
         if (b.occasion || b.yearly) chips.appendChild(el('span', 'tb-chip', (OCCN[b.occasion] || 'Company event') + (b.yearly ? ' · yearly' : '')));
         if ((b.returning || []).length) chips.appendChild(el('span', 'tb-chip', '🔁 Returning'));
+        if (b.gift) chips.appendChild(el('span', 'tb-chip gift', '🎁 ' + (b.gift.label || 'Free gift') + (b.gift.via ? ' · ' + b.gift.via : '')));
         if (b.selfReferral) chips.appendChild(el('span', 'tb-chip proc', '⛔ Own referral code'));
         b.vendors.forEach(function(v){ chips.appendChild(el('span', 'tb-chip ' + (v.ok ? 'ok' : 'wait'), (v.ok ? '✓ ' : '… ') + v.name)); });
         c.appendChild(chips);

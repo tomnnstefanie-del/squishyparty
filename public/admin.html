@@ -2371,6 +2371,7 @@ footer{background:#efece7;border-top:0}
 .sc-log h4{font-size:.875rem;margin:6px 0}.sc-log ul{list-style:none;display:grid;gap:8px;margin:0;padding:0}
 .sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
 .sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
+.tb-chip.gift{background:#fde7ef;color:#a0144d}
 </style>
 </head>
 <body>
@@ -3045,7 +3046,7 @@ footer{background:#efece7;border-top:0}
       money2.textContent = (b.paidCents ? 'Received ' + money(b.paidCents) + ' · balance ' + money(b.balanceCents) : 'Total ' + money(b.totalCents)) + (b.totalCents !== b.originalTotalCents ? ' (quoted ' + money(b.originalTotalCents) + ')' : '');
       c.appendChild(money2);
       var openRev = (b.revisions || []).filter(function(r){ return r.status === 'draft' || r.status === 'sent'; })[0], openChg = (b.changes || []).filter(function(x){ return x.status === 'open'; }).length;
-      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg || b.occasion || b.yearly || (b.returning || []).length || b.selfReferral) {
+      if (b.vendors.length || b.procurement || b.poRef || openRev || openChg || b.occasion || b.yearly || (b.returning || []).length || b.selfReferral || b.gift) {
         var chips = el('div', 'tb-chips');
         if (openChg) chips.appendChild(el('span', 'tb-chip chg', '✏️ Change requested'));
         if (openRev) chips.appendChild(el('span', 'tb-chip rev', 'R' + openRev.n + (openRev.status === 'draft' ? ' draft' : ' pending acceptance')));
@@ -3053,6 +3054,7 @@ footer{background:#efece7;border-top:0}
         if (b.poRef) chips.appendChild(el('span', 'tb-chip po', 'PO ' + b.poRef));
         if (b.occasion || b.yearly) chips.appendChild(el('span', 'tb-chip', (OCCN[b.occasion] || 'Company event') + (b.yearly ? ' · yearly' : '')));
         if ((b.returning || []).length) chips.appendChild(el('span', 'tb-chip', '🔁 Returning'));
+        if (b.gift) chips.appendChild(el('span', 'tb-chip gift', '🎁 ' + (b.gift.label || 'Free gift') + (b.gift.via ? ' · ' + b.gift.via : '')));
         if (b.selfReferral) chips.appendChild(el('span', 'tb-chip proc', '⛔ Own referral code'));
         b.vendors.forEach(function(v){ chips.appendChild(el('span', 'tb-chip ' + (v.ok ? 'ok' : 'wait'), (v.ok ? '✓ ' : '… ') + v.name)); });
         c.appendChild(chips);
