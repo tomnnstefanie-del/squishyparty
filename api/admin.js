@@ -17,7 +17,7 @@ import { clientIp, limiter, fail, HttpError, readJson, assertSameOrigin } from '
 import { readStats, markStatus, tooManyFailures, validStatus, saveSettings } from '../lib/stats.js';
 import { addPayment, reversePayment, createRevision, stepRevision, handleChange, getFull, paidCents, cleanBy, BookingError } from '../lib/bookings.js';
 import { validateRequest } from '../lib/validate.js';
-import { ADDON_LIST, EXP_NAME } from '../lib/pricing.js';
+import { ADDON_LIST, EXP_NAME, activityName } from '../lib/pricing.js';
 import { quotePdf } from '../lib/quote-pdf.js';
 import { sendMail, mailConfigured } from '../lib/mail.js';
 import { revisedQuotationEmail } from '../lib/emails.js';
@@ -41,7 +41,7 @@ async function sendRevision(ref, n, by) {
   const site = (process.env.SITE_URL || 'https://confetticlub.vercel.app').replace(/\/$/, '');
   const paid = paidCents(f.payments), c = f.contact, discount = f.booking.discountCents || 0;
   const pdf = quotePdf({ ref, issued: new Date(), plan: rev.plan, contact: c, price: rev.price, bookingFor: c.bookingFor, discountCents: discount, gift: f.booking.gift || null,
-    detailed: !!(c.corporate && c.corporate.detailed), experienceName: EXP_NAME[rev.plan.experience], revision: n, paidCents: paid, prevTotalCents: rev.prevTotalCents,
+    detailed: !!(c.corporate && c.corporate.detailed), experienceName: activityName(rev.plan), revision: n, paidCents: paid, prevTotalCents: rev.prevTotalCents,
     contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
   const filename = `Confetti-Club-Quotation-Q-${ref}-R${n}.pdf`;
   await sendMail({ to: c.email, ...revisedQuotationEmail({ ref, n, plan: rev.plan, contact: c, totalCents: rev.totalCents - discount, prevTotalCents: rev.prevTotalCents, paidCents: paid, diff: rev.diff, pdf, filename }) });

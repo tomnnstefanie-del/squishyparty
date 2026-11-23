@@ -4,8 +4,7 @@
 // Secrets stay here and only come from environment variables.
 import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
-import { priceRequest, ratesOf } from '../lib/pricing.js';
-import { CATALOGUE } from '../lib/catalogue.js';
+import { priceRequest, ratesOf, activityName } from '../lib/pricing.js';
 import { makeReferralCode, readReferralCode } from '../lib/referral.js';
 import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
 import { quotePdf } from '../lib/quote-pdf.js';
@@ -19,7 +18,6 @@ import { recordRequest, statsConfigured, vendorsOf, matchCustomer } from '../lib
 import { statusLink, changeLink } from '../lib/status-link.js';
 
 const rateLimited = limiter(5, 10 * 60 * 1000); // best-effort, per server instance
-const EXP_NAMES = Object.fromEntries(Object.entries(CATALOGUE.EXP).map(([k, e]) => [k, e.name]));
 
 function makeRef(date) {
   return 'SP-' + date.slice(2).replace(/-/g, '') + '-' + crypto.randomBytes(2).toString('hex').toUpperCase();
@@ -76,7 +74,7 @@ export default async function handler(req, res) {
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
     const discountCents = 0; // no money off any more: the offer is a free item
-    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
+    await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: activityName(data.plan), corporate: data.corporate,
       rates: ratesOf(data.plan), discountCents, gift, bookingFor: data.bookingFor, match, source: data.referral.source });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
@@ -93,7 +91,7 @@ export default async function handler(req, res) {
     {
       try {
         const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents, gift,
-          detailed: !!data.corporate?.detailed, experienceName: EXP_NAMES[data.plan.experience],
+          detailed: !!data.corporate?.detailed, experienceName: activityName(data.plan),
           contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
         quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents, gift };
         await sendTelegramDocument({ token, chatId, data: pdf, filename: quote.filename, caption: `${ref} · PDF quotation emailed to the customer${gift ? ` (includes ${gift.label})` : ''}`, apiBase: process.env.TELEGRAM_API_BASE || undefined });

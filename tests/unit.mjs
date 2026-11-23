@@ -1,6 +1,6 @@
 // Unit tests for server pricing, validation and the Telegram message.
 import assert from 'node:assert/strict';
-import { priceRequest, ratesOf } from '../lib/pricing.js';
+import { priceRequest, ratesOf, activityName } from '../lib/pricing.js';
 import { validateRequest, RequestError } from '../lib/validate.js';
 import { buildMessage, whatsappLink, customerGreeting, afterPartyMessage } from '../lib/telegram.js';
 process.env.TELEGRAM_BOT_TOKEN = 'unit:token';
@@ -128,6 +128,22 @@ t('NOMI clicker keychains: priced per person by base size, on the quote, and val
   assert.throws(() => { const b = dateOK(); b.plan.clicker = 7; validateRequest(b); }, (e) => e.field === 'clicker');
   assert.equal(validateRequest(dateOK()).plan.clicker, 0);
   assert.equal(ratesOf(vp.plan).clicker, 1300);
+});
+t('DIY activity: Squishy only, Clicker only (no squishy, capsule or wax lines) or Squishy + Clicker', () => {
+  const c = dateOK(); c.plan.activity = 'clicker'; c.plan.clicker = 5; c.plan.wax = true; c.plan.participants = 12; const vc = validateRequest(c);
+  assert.equal(vc.plan.wax, false); // no wax without a squishy
+  const pc = priceRequest(vc.plan);
+  assert.deepEqual(pc.squishy.map((l) => l.cents), [1600 * 12, 15000]); // clickers + travel & set-up only
+  assert.equal(activityName(vc.plan), 'NOMI clicker keychains');
+  assert.throws(() => { const b = dateOK(); b.plan.activity = 'clicker'; validateRequest(b); }, (e) => e.field === 'clicker'); // clicker needs a size
+  assert.throws(() => { const b = dateOK(); b.plan.activity = 'party'; validateRequest(b); }, (e) => e.field === 'activity');
+  const sq = dateOK(); sq.plan.activity = 'squishy'; sq.plan.clicker = 9; assert.equal(validateRequest(sq).plan.clicker, 0); // squishy only: clicker dropped
+  const bo = dateOK(); bo.plan.activity = 'both'; bo.plan.clicker = 3; const vb = validateRequest(bo);
+  assert.ok(priceRequest(vb.plan).squishy.some((l) => l.label.startsWith('Squishy DIY')) && priceRequest(vb.plan).squishy.some((l) => l.label.startsWith('NOMI')));
+  assert.equal(activityName(vb.plan), 'Duo: Jelly + Crunchy + NOMI clickers');
+  assert.equal(freeGift(vc.plan, { source: 'event', gift: 'jelly' }).item, 'clicker'); // clicker only: a clicker
+  assert.equal(freeGift(vb.plan, { source: 'event', gift: 'clicker' }).item, 'clicker'); // both: their pick
+  assert.equal(freeGift(validateRequest(sq).plan, { source: 'event', gift: 'clicker' }).item, 'jelly'); // squishy only: Jelly
 });
 t('free gift: one item per booking from the store, party and capsule links; no money off', () => {
   for (const src of ['wcc', 'plq', 'epm', 'event', 'capsule']) assert.equal(freeGift({ experience: 'crunchy' }, { source: src }).item, 'jelly', src);
