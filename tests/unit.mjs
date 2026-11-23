@@ -317,6 +317,22 @@ console.log('referrals (friend gets a free jelly squishy, no database)');
     assert.equal(friendSquishyFor({ ...A, code }, readReferralCode, samePerson, 'Sarah Lim'), true);
     assert.equal(storeGiftFor({ source: 'instagram', gift: 'A' }, readReferralCode, samePerson, 'Sarah Lim'), ''); // only from the store QR
   });
+  t('NOMI clickers: clicker only, squishy + clicker, and the launch-party gift follows the activity', () => {
+    const cl = priceRequest({ participants: 15, activity: 'clicker', experience: 'both', wax: false, clicker: 5, addons: [] });
+    assert.equal(cl.squishyCents, 15 * 1600 + 15000); // no squishy or capsule lines
+    assert.ok(cl.squishy.every((l) => !/Squishy DIY|capsule/.test(l.label)));
+    const both = priceRequest({ participants: 15, activity: 'both', experience: 'both', wax: false, clicker: 3, addons: [] });
+    assert.equal(both.squishyCents, 15 * 2800 + 15 * 200 + 15 * 1000 + 15000); // Duo $28 + capsule + 3-key clicker + set-up = $720
+    const g = (activity, partyItem, clicker = 3) => { const b = dateOK(); b.plan = { ...b.plan, activity, clicker }; b.referral = { source: 'event', firstAt: Date.now() - 864e5, partyItem }; return validateRequest(b); };
+    assert.equal(g('squishy', 'clicker').referral.partyItem, 'jelly'); // squishy only: always a Jelly squishy
+    assert.equal(g('clicker', 'jelly').referral.partyItem, 'clicker'); // clicker only: always a clicker
+    assert.equal(g('both', 'clicker').referral.partyItem, 'clicker'); // both: their choice
+    assert.equal(g('both', 'jelly').referral.partyItem, 'jelly');
+    assert.equal(g('squishy', '').plan.clicker, 0);
+    assert.throws(() => g('clicker', 'clicker', 7), RequestError); // not a base size we sell
+    const v = g('clicker', 'clicker', 4), m = buildMessage({ ref: 'SP-9', plan: v.plan, contact: v.contact, price: priceRequest(v.plan), clientTotalCents: null, referral: v.referral, shareCode: 'X-AB23', site: 'https://example.sg' });
+    assert.match(m, /1 free 3-key NOMI clicker/); assert.match(m, /NOMI clicker keychains: 4-key base/);
+  });
   t('launch-party QR (/gift): free jelly squishy for 2 months from the first scan, then ended', () => {
     const { readReferralCode, samePerson } = Ref;
     const fresh = dateOK(); fresh.referral = { source: 'event', firstAt: Date.now() - 30 * 864e5 }; const rf = validateRequest(fresh).referral;
