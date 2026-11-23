@@ -18,12 +18,12 @@ const Score = await import('../lib/scorecard.js');
 
 let passed = 0;
 const t = (name, fn) => { fn(); passed++; console.log('  ✓', name); };
-const plan = (o = {}) => ({ participants: 10, experience: 'both', wax: false, addons: [], ...o });
+const plan = (o = {}) => ({ participants: 10, experience: 'both', addons: [], ...o });
 
 console.log('pricing');
 t('Duo, 10 participants = $280 + $150 travel = $430', () => assert.equal(priceRequest(plan()).totalCents, 43000));
-t('Duo + wax duo deal for 10 = $465 ($3.50 per person for both squishies)', () => assert.equal(priceRequest(plan({ wax: true })).totalCents, 46500));
-t('Jelly, 10 participants = $330; + wax $20 = $350', () => { assert.equal(priceRequest(plan({ experience: 'jelly' })).totalCents, 33000); assert.equal(priceRequest(plan({ experience: 'jelly', wax: true })).totalCents, 35000); });
+t('an old plan with wax: true is priced without it (Wax Cracking is discontinued)', () => assert.equal(priceRequest(plan({ wax: true })).totalCents, priceRequest(plan()).totalCents));
+t('Jelly, 10 participants = $330; + goodie bags $60 = $390', () => { assert.equal(priceRequest(plan({ experience: 'jelly' })).totalCents, 33000); assert.equal(priceRequest(plan({ experience: 'jelly', goodie: true })).totalCents, 39000); });
 t('Crunchy, 10 participants = $350', () => assert.equal(priceRequest(plan({ experience: 'crunchy' })).totalCents, 35000));
 t('Minimum 10: 6 participants priced as 10', () => { const p = priceRequest(plan({ participants: 6 })); assert.equal(p.billableParticipants, 10); assert.equal(p.totalCents, 43000); });
 t('No deposit is worked out (nothing is paid online)', () => { const p = priceRequest(plan()); assert.equal(p.depositCents, undefined); assert.equal(p.holdCents, undefined); });
@@ -77,7 +77,7 @@ const price = priceRequest(v.plan);
 const msg = buildMessage({ ref: 'SP-TEST-0001', plan: v.plan, contact: v.contact, price, clientTotalCents: 1 });
 t('includes contact, date, venue, address, postal', () => { for (const s of ['Sarah Tan', '+65 8123 4567', 'sarah@example.com', 'Condo function room', '1 Example Road, Singapore 123456', '2:00 pm–4:00 pm']) assert.ok(msg.includes(s), s); });
 t('lists participants, squishy lines and every add-on, with no deposit or budget', () => { assert.ok(!/deposit|budget|PayNow/i.test(msg)); for (const s of ['10 participants', 'Duo: Jelly + Crunchy', 'Squishy goodie bags, 10 × $6', 'travel', 'Custom cake', 'Butter Studio', 'on quote', 'Party favour bags ×10', 'Face painting']) assert.ok(msg.includes(s), s); });
-t('Wax Cracking is discontinued: a request asking for it gets no wax line', () => { assert.equal(v.plan.wax, false); assert.ok(!/Wax/.test(msg)); });
+t('Wax Cracking is discontinued: a request asking for it gets no wax line', () => { assert.ok(!('wax' in v.plan)); assert.ok(!/Wax/.test(msg)); });
 t('squishy goodie bag: $6 per child (U.P. $7), with any DIY activity', () => { assert.equal(priceRequest(plan({ goodie: true })).totalCents - priceRequest(plan()).totalCents, 6000); assert.equal(priceRequest({ ...plan({ goodie: true }), activity: 'clicker', clicker: 3 }).squishy.filter((l) => /goodie/.test(l.label)).length, 1); });
 t('escapes HTML in customer text', () => assert.ok(msg.includes('Lift &lt;b&gt;B&lt;/b&gt;, level 2')));
 t('flags when the page total differs from the server total', () => assert.ok(msg.includes('server price above is the one to quote')));
@@ -131,9 +131,8 @@ t('NOMI clicker keychains: priced per person by base size, on the quote, and val
   assert.equal(validateRequest(dateOK()).plan.clicker, 0);
   assert.equal(ratesOf(vp.plan).clicker, 1300);
 });
-t('DIY activity: Squishy only, Clicker only (no squishy, capsule or wax lines) or Squishy + Clicker', () => {
+t('DIY activity: Squishy only, Clicker only (no squishy or capsule lines) or Squishy + Clicker', () => {
   const c = dateOK(); c.plan.activity = 'clicker'; c.plan.clicker = 5; c.plan.wax = true; c.plan.participants = 12; const vc = validateRequest(c);
-  assert.equal(vc.plan.wax, false); // no wax without a squishy
   const pc = priceRequest(vc.plan);
   assert.deepEqual(pc.squishy.map((l) => l.cents), [1600 * 12, 15000]); // clickers + travel & set-up only
   assert.equal(activityName(vc.plan), 'NOMI clicker keychains');
@@ -192,7 +191,7 @@ t('quotation package line costs exactly the same as the itemised breakdown', () 
   assert.ok(fam.includes('Birthday Party Activity Package') && fam.includes(total));
 });
 t('a revision keeps the quoted unit prices for items already on the booking', () => {
-  const p = { participants: 15, experience: 'both', wax: false, addons: [] }, rates = ratesOf(p);
+  const p = { participants: 15, experience: 'both', addons: [] }, rates = ratesOf(p);
   rates.exp.both = 2000; // as if the Duo was $20 when quoted
   assert.equal(priceRequest({ ...p, participants: 20 }, rates).squishy[0].cents, 2000 * 20);
   assert.equal(priceRequest({ ...p, participants: 20, experience: 'jelly' }, rates).squishy[0].cents, 1600 * 20); // a new choice uses today's price

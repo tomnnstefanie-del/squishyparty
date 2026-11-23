@@ -744,12 +744,6 @@ body.planning{background:var(--paper)}
 .sum-acc .breakdown{margin-top:0}
 .select-like,.field select{appearance:none;-webkit-appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232234b8' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") right 14px center/18px no-repeat;padding-right:42px}
 
-/* Duo wax deal */
-.duo-deal{display:none;align-self:flex-start;margin:4px 0 2px;padding:7px 12px;border-radius:999px;background:var(--ink);color:var(--lemon);font-weight:700;font-size:.875rem;letter-spacing:.01em}
-.duo-deal::before{content:"★ ";color:var(--lemon)}
-.is-duo .duo-deal{display:inline-block}
-.is-duo #wax-pill{display:none}
-.is-duo #wax-price{color:var(--ink);background:var(--lemon);padding:4px 10px;border-radius:999px}
 
 /* Add-on tabs (step 3) */
 #addon-tabs{margin-top:8px}
@@ -829,9 +823,8 @@ html:has(body.planning){scroll-padding-top:150px}
 .exclusive{display:inline-flex;align-items:center;gap:10px;margin:12px 0 0;padding:9px 16px;border-radius:999px;background:var(--ink);color:var(--lemon);font-weight:700;font-size:.9375rem}
 .exclusive .icon{width:16px;height:16px;fill:var(--lemon);stroke:none}
 .wstep .exclusive + .wlead{margin-top:12px}
-.duo-deal s{color:#c9c3a0;font-weight:600;margin-left:6px}
-.wax-prices{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.wax-prices s{font-size:.8125rem;color:var(--muted);font-weight:600}
+.price-stack{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.price-stack s{font-size:.8125rem;color:var(--muted);font-weight:600}
 .bakery-logos{display:flex;flex-wrap:wrap;gap:10px;margin-left:auto}
 .bakery-logos .bs-logo{height:56px;padding:8px 14px}
 .bakery-logos .bs-logo img{height:38px;max-width:140px}
@@ -857,7 +850,6 @@ html:has(body.planning){scroll-padding-top:150px}
 .pl-total strong{font-family:var(--display);font-weight:500;font-size:2rem;color:var(--lemon);font-variant-numeric:tabular-nums}
 .price-lines .fine{margin-top:10px}
 .price-lines .addon-label{margin-top:6px}
-.is-duo #wax-title{color:var(--cobalt)}
 
 .todo{background:#fff;border-radius:var(--r-lg);padding:clamp(18px,3vw,28px);box-shadow:var(--shadow-sm)}
 .todo-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
@@ -1611,24 +1603,6 @@ html:has(body.planning){scroll-padding-top:150px}
 .safe-card h3 .icon{width:22px;height:22px}
 .safe-card ul{gap:10px;font-size:1rem;line-height:1.55;color:var(--ink);padding-left:20px}
 @media (max-width:760px){.myth h3{font-size:1.0625rem}.safe-card{padding:18px}}
-/* v24 Wax Cracking add-on: full-bleed cracking photo under a cobalt wash, like the in-store card (.retail-photo) */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){color:#fff;box-shadow:none;background:linear-gradient(100deg,rgba(24,32,140,.94) 0%,rgba(24,32,140,.78) 45%,rgba(24,32,140,.25) 78%,rgba(24,32,140,.1) 100%),url('img/how/wax.jpg') 70% 55%/cover no-repeat,var(--cobalt)}
-.addon[for="wax"]:hover{box-shadow:0 0 0 2px var(--lemon)}
-.addon[for="wax"]:has(input:checked){box-shadow:0 0 0 3px var(--lemon)}
-.addon[for="wax"] .addon-title,.addon[for="wax"] #wax-title{color:#fff}
-.addon[for="wax"] .addon-copy{color:#dfe3ff}
-.addon[for="wax"] .addon-qty{color:var(--lemon)}
-.addon[for="wax"] .addon-title,.addon[for="wax"] .addon-copy,.addon[for="wax"] .addon-qty{text-shadow:0 1px 8px rgba(10,14,60,.35)}
-.addon[for="wax"] .addon-icon{background:rgba(30,42,170,.88)}
-.addon[for="wax"] .addon-icon .icon{color:var(--lemon)}
-.addon[for="wax"] .pill{background:rgba(255,255,255,.18);color:#fff}
-.addon[for="wax"] .wax-prices s{color:#fff;background:rgba(24,32,140,.6);border-radius:6px;padding:0 5px}
-.addon[for="wax"] #wax-price{color:var(--ink);background:var(--lemon);padding:4px 10px;border-radius:999px}
-.addon[for="wax"] .tickbox{background:rgba(255,255,255,.95);box-shadow:none}
-.addon[for="wax"]:has(input:checked) .tickbox{background:var(--lemon);color:var(--ink)}
-@media (max-width:640px){
-  .addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(180deg,rgba(24,32,140,.92) 0%,rgba(24,32,140,.78) 55%,rgba(24,32,140,.35) 100%),url('img/how/wax.jpg') center 60%/cover no-repeat,var(--cobalt)}
-}
 /* v25 4-step planner: the plan review lives in Request; to-do, schedule and invitation become "Get ready" next steps */
 .stepper{grid-template-columns:repeat(5,minmax(0,1fr))}
 .stepper li.ready-step a::before{background:repeating-linear-gradient(90deg,var(--step-todo) 0 6px,transparent 6px 10px)}
@@ -1922,17 +1896,6 @@ footer{background:#efece7;border-top:0}
 /* v47 in-store card: top-to-bottom wash at every size (as on phones), shop icon bottom-right */
 .retail-photo::before{background:linear-gradient(180deg,rgba(24,32,140,.88) 0%,rgba(24,32,140,.55) 45%,rgba(24,32,140,.08) 100%)}
 .retail-photo .retail-icon{margin-left:auto;align-self:flex-end}
-/* v48 Wax Cracking card: just the photo, slightly darkened for the white text. Text sits where it doesn't cover the heater or the wax ball */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){background:linear-gradient(rgba(12,16,40,.4),rgba(12,16,40,.4)),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}
-.addon[for="wax"] .addon-icon{background:rgba(12,16,40,.55)}
-.addon[for="wax"] .addon-title,.addon[for="wax"] .addon-copy,.addon[for="wax"] .addon-qty{text-shadow:0 1px 10px rgba(0,0,0,.6)}
-@media (min-width:641px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:270px;padding-left:44%;align-items:center;background-position:0% 42%}}
-.addon[for="wax"] .addon-icon{display:none}
-@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:470px;align-content:flex-end;align-items:flex-end;padding-top:250px;background:linear-gradient(rgba(12,16,40,.38),rgba(12,16,40,.38)),url('img/how/wax-full.jpg') 40% 0/cover no-repeat,#1b1f3a}}
-/* v49 Wax Cracking card: same size as the other add-on cards, the wax-cracking photo behind it, darker on the left so the text reads */
-.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:16px 18px;align-items:center;align-content:normal;background:linear-gradient(90deg,rgba(12,16,40,.82) 0%,rgba(12,16,40,.62) 50%,rgba(12,16,40,.2) 100%),url('img/how/wax-full.jpg') 50% 45%/cover no-repeat,#1b1f3a}
-.addon[for="wax"] .addon-icon{display:grid}
-@media (max-width:640px){.addon[for="wax"],.addon[for="wax"]:has(input:checked){min-height:0;padding:14px;align-items:center;background:linear-gradient(180deg,rgba(12,16,40,.8) 0%,rgba(12,16,40,.6) 60%,rgba(12,16,40,.45) 100%),url('img/how/wax-full.jpg') 50% 40%/cover no-repeat,#1b1f3a}}
 /* v50 head-start link sits under "Send my request" */
 #booking-form .ready-link{margin:18px 0 0}
 /* v51 Request received: "While we confirm" centred in the card; send another request */

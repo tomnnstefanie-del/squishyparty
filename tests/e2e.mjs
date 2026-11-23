@@ -163,7 +163,7 @@ try {
   console.log('failure handling');
   fs.writeFileSync(outbox + '.fail', '1');
   const p2 = await browser.newPage(); await p2.goto(BASE);
-  const r = await p2.evaluate(async ([date, tok]) => { const res = await fetch('/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '10.0.0.2' }, body: JSON.stringify({ v: 1, plan: { participants: 10, experience: 'jelly', wax: false, addons: [], date, start: '10:00', end: '12:00' }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', emailToken: tok }) }); return { s: res.status, b: await res.json() }; }, [date, issueVerified('a@example.com')]);
+  const r = await p2.evaluate(async ([date, tok]) => { const res = await fetch('/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': '10.0.0.2' }, body: JSON.stringify({ v: 1, plan: { participants: 10, experience: 'jelly', addons: [], date, start: '10:00', end: '12:00' }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', emailToken: tok }) }); return { s: res.status, b: await res.json() }; }, [date, issueVerified('a@example.com')]);
   assert.equal(r.s, 502); assert.equal(r.b.ok, false);
   fs.rmSync(outbox + '.fail');
   ok('if Telegram is down, the customer is told it was NOT sent (no fake confirmation)');
@@ -315,7 +315,7 @@ try {
   // Changes after booking: the customer asks, the team drafts and reviews a revision, it only replaces the booking once accepted
   console.log('booking changes');
   const { changeLink } = await import('../lib/status-link.js');
-  x = await api({ ...base, plan: { ...base.plan, participants: 10, wax: false, addons: ['bl-arch'] } }, { 'X-Forwarded-For': '10.0.5.1' });
+  x = await api({ ...base, plan: { ...base.plan, participants: 10, addons: ['bl-arch'] } }, { 'X-Forwarded-For': '10.0.5.1' });
   assert.equal(x.s, 200); const cref = x.b.ref;
   assert.ok(mails().at(-1).text.includes('/change.html?ref=' + cref)); ok('the confirmation email has the customer’s own “Request a change” link');
   const cbook = async () => (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === cref);
@@ -329,7 +329,7 @@ try {
   assert.equal(chOk, 200); assert.ok(sent().at(-1).text.includes('Change requested') && sent().at(-1).text.includes('15 kids'));
   c1 = await cbook(); assert.ok(c1.changes.length === 1 && c1.todos.some((t) => t.startsWith('Customer asked for a change')) && c1.totalCents === orig);
   ok('a customer’s change request reaches Telegram and the dashboard, and changes nothing by itself');
-  const newPlan = { participants: 15, experience: 'both', wax: false, addons: ['js-photo-1'], date: base.plan.date, start: '10:00', end: '12:00' };
+  const newPlan = { participants: 15, experience: 'both', addons: ['js-photo-1'], date: base.plan.date, start: '10:00', end: '12:00' };
   assert.equal((await admPost({ action: 'revise', ref: cref, by: '', plan: newPlan })).s, 400);
   let rvr = await admPost({ action: 'revise', ref: cref, plan: newPlan, note: 'WhatsApp 3 Nov' }); assert.equal(rvr.s, 200);
   const rev = rvr.b.revision; assert.ok(rev.n === 2 && rev.status === 'draft' && rev.diff.includes('Participants: 10 → 15') && rev.diff.some((d) => d.startsWith('Removed: ') && d.includes('balloon arch (Bloom)')) && rev.diff.some((d) => d.startsWith('Added:')));

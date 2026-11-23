@@ -8,7 +8,7 @@
      Squishy DIY: the original offer, integer cents.
      Partners: status 'demo' = placeholder partner + demo price; 'prospective' = price pending (priceCents:null, never counted);
      'approved' = agreed rates. Replace demo entries with agreed partner data before going live. */
-  var MIN_PAX = 10, CONTAINER = 200, WAX = 200, WAX_DUO = 350, WAX_DUO_UP = 400, GOODIE = 600, GOODIE_UP = 700, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
+  var MIN_PAX = 10, CONTAINER = 200, GOODIE = 600, GOODIE_UP = 700, LOGISTICS = 15000, TEAM_HOURS = 2, SETUP_MIN = 15, PLAY_MIN = 45;
   // Bakery logos load from each brand's site; if a logo can't load, the brand name shows instead.
   var LOGOS = { 'Butter Studio':'https://thebutterstudio.com/wp-content/uploads/2024/11/Butterstudio-Logo.png' };
   var BAKERIES = ['Butter Studio'];
@@ -191,7 +191,6 @@
   function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function icon(name){ var ns='http://www.w3.org/2000/svg', s=document.createElementNS(ns,'svg'), u=document.createElementNS(ns,'use'); s.setAttribute('class','icon'); s.setAttribute('aria-hidden','true'); u.setAttribute('href','#'+name); s.appendChild(u); return s; }
   function billable(n){ return Math.max(n, MIN_PAX); }
-  function waxCents(exp, n){ return exp === 'both' ? WAX_DUO * n : WAX * n * EXP[exp].per; } // Duo: one price per person for both squishies
   function clamp(n, lo, hi){ n = Math.round(Number(n)); return isNaN(n) ? lo : Math.min(hi, Math.max(lo, n)); }
   function squishyCents(exp, n){ return EXP[exp].pax * billable(n); }
   function logoEl(vendor){ vendor = vendor || 'Butter Studio'; var w = el('span','bs-logo'), im = document.createElement('img'), done = false; function fallback(){ if (done) return; done = true; if (im.parentNode) im.replaceWith(el('span','bs-word', vendor)); } if (!LOGOS[vendor]) { w.appendChild(el('span','bs-word', vendor)); return w; } im.alt = vendor; im.decoding = 'async'; im.addEventListener('error', fallback); im.addEventListener('load', function(){ if (im.naturalWidth) done = true; else fallback(); }); im.src = LOGOS[vendor]; setTimeout(function(){ if (!im.complete || !im.naturalWidth) fallback(); }, 6000); w.appendChild(im); return w; }
@@ -204,7 +203,7 @@
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, activity:'squishy', experience:'both', wax:false, goodie:false, clicker:0, selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, activity:'squishy', experience:'both', goodie:false, clicker:0, selected:[], customised:false, childName:'', childAge:'' };
 
   function foundation(s){
     var n = billable(s.participants), e = EXP[s.experience], items = [];
@@ -212,7 +211,6 @@
     items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
     items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
     if (s.goodie) items.push({label:'Squishy goodie bags, ' + n + ' × ' + short(GOODIE), sub:'Squishy goodie bags, ' + n + ' × ' + short(GOODIE) + ' (U.P. ' + short(GOODIE_UP) + ')', cents:GOODIE * n, ic:'i-sparkles'});
-    if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
     }
     if (s.clicker) items.push({label:'NOMI clicker keychains: ' + s.clicker + '-key base, ' + n + ' × ' + short(CLICKER[s.clicker]), sub:'NOMI clicker keychains, ' + s.clicker + '-key base, ' + n + ' × ' + short(CLICKER[s.clicker]), cents:CLICKER[s.clicker] * n, ic:'i-sparkles'});
     items.push({label:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', sub:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', cents:LOGISTICS, ic:'i-users'});
@@ -224,7 +222,7 @@
     var exp = EXP[s.experience];
     var blocks = [
       {m:10, t:'Welcome & arrivals', c:'Guests arrive while our squishy station is ready to go.'},
-      s.activity === 'clicker' ? {m:PLAY_MIN, t:'NOMI clicker keychains', c:'Guided making: everyone picks a base, adds initials and favourite icons, then finishes with a strap.', cls:'sq', kid:'Make their own clicker keychain'} : {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.wax ? ', finished with Wax Cracking' : '') + (s.clicker ? ', plus building their own NOMI clicker keychain.' : '.'), cls:'sq', kid:'Make their own squishies' + (s.wax ? ' + Wax Cracking' : '')}
+      s.activity === 'clicker' ? {m:PLAY_MIN, t:'NOMI clicker keychains', c:'Guided making: everyone picks a base, adds initials and favourite icons, then finishes with a strap.', cls:'sq', kid:'Make their own clicker keychain'} : {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.clicker ? ', plus building their own NOMI clicker keychain.' : '.'), cls:'sq', kid:'Make their own squishies'}
     ];
     var slotted = {}; s.selected.forEach(function(id){ var p = BYID[id]; if (p.slot && !slotted[p.slot.title]) { slotted[p.slot.title] = 1; blocks.push({m:p.slot.min, t:p.slot.title, c:p.slot.copy, cls:'food'}); } else if (p.slot && slotted[p.slot.title]) { blocks.filter(function(b){ return b.t === p.slot.title; })[0].c += ' Plus ' + p.name.toLowerCase() + '.'; } });
     var hasCake = s.selected.some(function(id){ return BYID[id].cat === 'cake'; });
@@ -623,8 +621,6 @@
   /* ================= HOW IT WORKS: card-stack carousel =================
      Edit captions and image paths here. Each image path is tried on the live site; until the file exists,
      a clearly labelled placeholder card is shown. Put photos in public/img/how/. */
-  // Optional add-on, shown after the finished squishy and before decorating the capsule.
-  var WAX_STEP = {img:'img/how/wax.jpg', title:'Viral Wax Cracking experience!', caption:'Add-on: dip the finished squishy in colourful melted wax, let it set, then crack the shell to reveal it.'};
   var HOW_STEPS = {
     jelly: [
       {img:'img/how/jelly-1.jpg', title:'Explore the setup', caption:'Your squishy station is set up and ready when the children arrive.'},
@@ -688,7 +684,7 @@
   var GOOGLE_REVIEWS_URL = '';   // the outlet's Google reviews page, to show the "Read our Google reviews" button
   /* Swipeable reel of our Instagram posts. Each item: a video file (public/video/, .mp4, portrait 9:16, muted) with a
      poster image, or a photo; ig = the post's Instagram link. Only share what you're allowed to (children's faces need consent). */
-  var REEL = [];                 // e.g. {video:'video/wax-crack.mp4', img:'img/events/wax-crack.jpg', alt:'Cracking the wax shell', ig:'https://www.instagram.com/p/...'}
+  var REEL = [];                 // e.g. {video:'video/party.mp4', img:'img/events/party.jpg', alt:'Children making squishies', ig:'https://www.instagram.com/p/...'}
   var INSTAGRAM_URL = '';        // your Instagram profile, for the "Follow us" link
   // Horizontal catalogue: swipe on phones, arrows on computers; shows "1–2 of 5" so people know there's more.
   function scroller(track, prev, next, pos){
@@ -1029,7 +1025,7 @@
     lines.push('📅 ' + d.dateLine); lines.push('⏰ ' + d.timeLine); lines.push('📍 ' + d.venue); lines.push('');
     var make = s.experience === 'both' ? 'their very own Jelly and Crunchy squishies' : 'their very own ' + e.name + ' squishy';
     if (s.activity === 'clicker') lines.push('Every little guest gets to build their very own NOMI clicker keychain, with their initials and favourite icons ✨');
-    else lines.push('Every little guest gets to make ' + make + ' and decorate a take-home squishy capsule with rhinestone stickers ✨' + (s.wax ? ' Then we’ll crack open colourful wax shells to reveal them!' : '') + (s.clicker ? ' Plus their own NOMI clicker keychain!' : '') + (s.goodie ? ' And everyone goes home with a squishy goodie bag 🎁' : ''));
+    else lines.push('Every little guest gets to make ' + make + ' and decorate a take-home squishy capsule with rhinestone stickers ✨' + (s.clicker ? ' Plus their own NOMI clicker keychain!' : '') + (s.goodie ? ' And everyone goes home with a squishy goodie bag 🎁' : ''));
     var extras = [];
     sel.forEach(function(p){
       if (p.cat === 'entertainment') extras.push(p.name.replace(/,.*$/, '').toLowerCase());
@@ -1385,7 +1381,7 @@
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.activity = ['squishy','clicker','both'].indexOf(d.get('activity')) >= 0 ? d.get('activity') : 'squishy'; S.experience = d.get('experience'); S.wax = false; S.goodie = d.has('goodie'); S.clicker = S.activity === 'squishy' ? 0 : (CLICKER[d.get('clicker')] ? Number(d.get('clicker')) : 3);
+    S.theme = d.get('theme'); S.activity = ['squishy','clicker','both'].indexOf(d.get('activity')) >= 0 ? d.get('activity') : 'squishy'; S.experience = d.get('experience'); S.goodie = d.has('goodie'); S.clicker = S.activity === 'squishy' ? 0 : (CLICKER[d.get('clicker')] ? Number(d.get('clicker')) : 3);
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
   form.addEventListener('change', function(e){
@@ -1728,7 +1724,7 @@
     var d = new FormData(bf), T = totals(S);
     var payload = {
       v: 1,
-      plan: { participants:S.participants, activity:S.activity, experience:S.experience, wax:false, goodie:S.goodie, clicker:S.clicker, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
+      plan: { participants:S.participants, activity:S.activity, experience:S.experience, goodie:S.goodie, clicker:S.clicker, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', billingContact:isCompany() ? (d.get('billingContact') || '').trim() : '', poRef:isCompany() ? (d.get('poRef') || '').trim() : '', billingNotes:isCompany() ? (d.get('billingNotes') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,

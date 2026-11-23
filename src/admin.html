@@ -597,7 +597,7 @@ __FOOTER__
       }
       // Details: everything to act on
       var det = el('details', 'tb-more'), sm = el('summary', null, 'Details'); det.appendChild(sm);
-      det.appendChild(el('p', 'tb-line', clock(b.start) + ' – ' + clock(b.end) + ' · ' + b.experience + (b.wax ? ' + Wax Cracking' : '') + (b.goodie ? ' + goodie bags' : '') + ' · ' + money(b.totalCents) + (b.onQuote && b.onQuote.length ? ' + quote items' : '')));
+      det.appendChild(el('p', 'tb-line', clock(b.start) + ' – ' + clock(b.end) + ' · ' + b.experience + (b.goodie ? ' + goodie bags' : '') + ' · ' + money(b.totalCents) + (b.onQuote && b.onQuote.length ? ' + quote items' : '')));
       det.appendChild(el('p', 'tb-line muted', (b.venue ? b.venue + ' · ' : '') + (b.area ? 'Postal area ' + b.area + ' · ' : '') + b.ref));
       b.vendors.forEach(function(v){
         var row = el('div', 'tb-vendor ' + (v.ok ? 'ok' : 'wait'));
