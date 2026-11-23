@@ -27,11 +27,12 @@
     'PartyPainters.sg': {title:'PartyPainters.sg', area:'Face painting & party entertainers · Singapore', tags:['Face painting','Glitter tattoos','Balloon sculpting','Magic','Caricatures','Photography'], pill:'Activities partner', from:'From $120', icon:'i-smile', thumb:'img/partypainters/logo.png',
       note:'Any face-painting design: bring a reference photo. We book PartyPainters.sg for your date and confirm timings with them.'}
   };
+  var CLICKER = {3:1000, 4:1300, 5:1600, 6:1800, 8:2000, 9:2300}; // NOMI clicker keychain per person, by keys on the base (event prices)
   var EXP = { jelly:{name:'Jelly',short:'Jelly',pax:1600,per:1}, crunchy:{name:'Crunchy',short:'Crunchy',pax:1800,per:1}, both:{name:'Duo: Jelly + Crunchy',short:'Duo',pax:2600,per:2} };
-  // Free gift from our links (same rule as lib/offer.js): squishy packages get a Jelly squishy, even Crunchy. Give a
-  // package gift:['clicker'] (clickers only) or gift:['jelly','clicker'] (customer picks) when clicker packages exist.
-  var GIFT_NAMES = { jelly:'Jelly squishy', clicker:'clicker' }, OFFER_SOURCES = ['wcc','plq','epm','event','capsule'];
-  function giftOpts(exp){ var g = EXP[exp] && EXP[exp].gift; return g && g.length ? g : ['jelly']; }
+  // Free gift from our links (same rule as lib/offer.js): a squishy package gets a Jelly squishy, even Crunchy; with
+  // NOMI clickers added, the customer picks a Jelly squishy or a 3-key NOMI clicker.
+  var GIFT_NAMES = { jelly:'Jelly squishy', clicker:'3-key NOMI clicker' }, OFFER_SOURCES = ['wcc','plq','epm','event','capsule'];
+  function giftOpts(){ return typeof S !== 'undefined' && S.clicker ? ['jelly','clicker'] : ['jelly']; }
   function giftOn(){ return typeof REF !== 'undefined' && (OFFER_SOURCES.indexOf(REF.source) >= 0 || /^[A-Z]{2,8}-[A-Z2-9]{4}$/.test(REF.code || '')); }
   function giftItem(exp){ var o = giftOpts(exp), p = document.querySelector('[name=giftPick]:checked'); return p && o.indexOf(p.value) >= 0 ? p.value : o[0]; }
   var CATS = [
@@ -199,13 +200,14 @@
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, experience:'both', wax:false, clicker:0, selected:[], customised:false, childName:'', childAge:'' };
 
   function foundation(s){
     var n = billable(s.participants), e = EXP[s.experience], items = [];
     items.push({label:'Squishy DIY: ' + e.name + ', ' + n + ' × ' + short(e.pax), sub:e.short + ' for ' + n + ' participants, ' + n + ' × ' + short(e.pax), cents:e.pax * n, ic:'i-sparkles'});
     items.push({label:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), sub:'Squishy capsules + rhinestone stickers, ' + n + ' × ' + short(CONTAINER), cents:CONTAINER * n, ic:'i-jar'});
     if (s.wax) items.push({label:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' squishies × ' + short(WAX), cents:waxCents(s.experience, n), sub:s.experience === 'both' ? 'Wax Cracking duo deal, ' + n + ' × ' + short(WAX_DUO) + ' (2 squishies each)' : 'Wax Cracking, ' + (n * e.per) + ' × ' + short(WAX), ic:'i-crack'});
+    if (s.clicker) items.push({label:'NOMI clicker keychains: ' + s.clicker + '-key base, ' + n + ' × ' + short(CLICKER[s.clicker]), sub:'NOMI clicker keychains, ' + s.clicker + '-key base, ' + n + ' × ' + short(CLICKER[s.clicker]), cents:CLICKER[s.clicker] * n, ic:'i-sparkles'});
     items.push({label:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', sub:'One-time travel & set-up (up to ' + TEAM_HOURS + ' hours)', cents:LOGISTICS, ic:'i-users'});
     return items;
   }
@@ -215,7 +217,7 @@
     var exp = EXP[s.experience];
     var blocks = [
       {m:10, t:'Welcome & arrivals', c:'Guests arrive while our squishy station is ready to go.'},
-      {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.wax ? ', finished with Wax Cracking.' : '.'), cls:'sq', kid:'Make their own squishies' + (s.wax ? ' + Wax Cracking' : '')}
+      {m:PLAY_MIN, t:s.experience === 'both' ? 'Squishy DIY: both textures' : 'Squishy DIY: ' + exp.name, c:'Guided making, then decorating their squishy capsule with rhinestone stickers' + (s.wax ? ', finished with Wax Cracking' : '') + (s.clicker ? ', plus building their own NOMI clicker keychain.' : '.'), cls:'sq', kid:'Make their own squishies' + (s.wax ? ' + Wax Cracking' : '')}
     ];
     var slotted = {}; s.selected.forEach(function(id){ var p = BYID[id]; if (p.slot && !slotted[p.slot.title]) { slotted[p.slot.title] = 1; blocks.push({m:p.slot.min, t:p.slot.title, c:p.slot.copy, cls:'food'}); } else if (p.slot && slotted[p.slot.title]) { blocks.filter(function(b){ return b.t === p.slot.title; })[0].c += ' Plus ' + p.name.toLowerCase() + '.'; } });
     var hasCake = s.selected.some(function(id){ return BYID[id].cat === 'cake'; });
@@ -1276,8 +1278,11 @@
     put('exp-eyebrow', dup ? 'Best value · two squishies each' : 'One squishy each');
     put('exp-copy', COPY[s.experience]); put('exp-n', s.participants);
     var fl = $('exp-feats'); fl.textContent = '';
-    [dup ? 'Two squishies each' : 'One ' + exp0.name + ' squishy each', 'Take-home squishy capsule', 'DIY rhinestone stickers', '45 minutes of guided play', 'Birthday Girl sash & tiara to wear on the day'].forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); fl.appendChild(li); });
-    var expSum = exp0.pax * n + CONTAINER * n + (s.wax ? waxCents(s.experience, n) : 0) + LOGISTICS;
+    [dup ? 'Two squishies each' : 'One ' + exp0.name + ' squishy each', 'Take-home squishy capsule', 'DIY rhinestone stickers', '45 minutes of guided play', 'Birthday Girl sash & tiara to wear on the day'].concat(s.clicker ? ['A NOMI clicker keychain each (' + s.clicker + ' keys)'] : []).forEach(function(t){ var li = el('li'); li.appendChild(icon('i-check')); li.appendChild(document.createTextNode(t)); fl.appendChild(li); });
+    var expSum = exp0.pax * n + CONTAINER * n + (s.wax ? waxCents(s.experience, n) : 0) + (s.clicker ? CLICKER[s.clicker] * n : 0) + LOGISTICS;
+    put('clicker-quantity', s.clicker ? n + ' clicker keychains, ' + s.clicker + ' keys each, at ' + short(CLICKER[s.clicker]) + ' per person' : 'Not added');
+    put('clicker-price', s.clicker ? '+' + money(CLICKER[s.clicker] * n).replace('.00','') : '');
+    $('nomi-addon').classList.toggle('on', !!s.clicker);
     put('pl-n', n); put('pl-diy', money((exp0.pax + CONTAINER) * n));
     put('pl-sub', short(exp0.pax) + ' ' + (dup ? 'Duo' : exp0.name) + ' + $2 squishy capsule, per person' + (s.participants < MIN_PAX ? ' (minimum 10)' : ''));
     put('wax-title', dup ? 'Wax Cracking duo deal!' : 'Wax Cracking');
@@ -1379,7 +1384,7 @@
     $('time-warn').hidden = S.timeOk; var ei = $('end'); if (S.timeOk) ei.removeAttribute('aria-invalid'); else ei.setAttribute('aria-invalid','true');
     put('time-hint', ok ? lengthLabel(S.length) + ' · Singapore time' : 'Singapore time');
     put('when-meta', S.date || S.venue || ok ? [S.date ? new Date(S.date + 'T00:00').toLocaleDateString('en-SG', {day:'numeric', month:'short'}) : '', ok ? clock(S.time, 0) + '–' + clock(S.time, S.length) : ''].filter(Boolean).join(' · ') || 'Optional for now' : 'Optional for now'); S.venue = (d.get('venue') || '').trim(); S.spot = (d.get('spot') || '').trim(); S.postal = String(d.get('postal') || '').replace(/\D/g, '').slice(0, 6);
-    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax');
+    S.theme = d.get('theme'); S.experience = d.get('experience'); S.wax = d.has('wax'); S.clicker = CLICKER[d.get('clicker')] ? Number(d.get('clicker')) : 0;
   }
   form.addEventListener('input', function(e){ if (e.target.dataset && e.target.dataset.todo) return; readForm(); render(false); });
   form.addEventListener('change', function(e){
@@ -1722,7 +1727,7 @@
     var d = new FormData(bf), T = totals(S);
     var payload = {
       v: 1,
-      plan: { participants:S.participants, experience:S.experience, wax:S.wax, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
+      plan: { participants:S.participants, experience:S.experience, wax:S.wax, clicker:S.clicker, addons:S.selected.slice(), date:S.date, start:S.time, end:S.end, custom:customPayload() },
       contact: { parentName:d.get('parentName'), phone:(d.get('phone') || '').trim(), phoneCountry:d.get('phoneCountry') || 'SG', email:d.get('email'), venueName:(d.get('reqSpot') || '').trim(), companyName:isCompany() ? (d.get('companyName') || '').trim() : '', companyUen:isCompany() ? (d.get('companyUen') || '').trim() : '', billingEmail:isCompany() ? (d.get('billingEmail') || '').trim() : '', billingContact:isCompany() ? (d.get('billingContact') || '').trim() : '', poRef:isCompany() ? (d.get('poRef') || '').trim() : '', billingNotes:isCompany() ? (d.get('billingNotes') || '').trim() : '', address:d.get('address'), postalCode:d.get('postalCode'), notes:d.get('notes') || '' },
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,

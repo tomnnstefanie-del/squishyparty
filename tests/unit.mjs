@@ -118,19 +118,29 @@ t('quotation email attaches the PDF, with a quotation subject', () => {
   assert.equal(e.attachments.length, 1); assert.equal(e.attachments[0].contentType, 'application/pdf');
   for (const s of ['itemised PDF quotation is attached', 'not yet confirmed', 'Confetti Club', '+ 1 free Jelly squishy']) assert.ok((e.text + e.html).includes(s), s);
 });
+t('NOMI clicker keychains: priced per person by base size, on the quote, and validated', () => {
+  const g = dateOK(); g.plan.clicker = 4; g.plan.participants = 12; const vp = validateRequest(g);
+  const pr = priceRequest(vp.plan), line = pr.squishy.find((l) => l.label.startsWith('NOMI clicker'));
+  assert.equal(line.cents, 1300 * 12); assert.equal(line.label, 'NOMI clicker keychains: 4-key base, 12 × $13');
+  assert.equal(pr.totalCents, priceRequest({ ...vp.plan, clicker: 0 }).totalCents + 15600);
+  const small = dateOK(); small.plan.clicker = 9; small.plan.participants = 6; assert.equal(priceRequest(validateRequest(small).plan).squishy.find((l) => l.label.startsWith('NOMI')).cents, 2300 * 10); // minimum 10
+  for (const [k2, c] of [[3, 1000], [4, 1300], [5, 1600], [6, 1800], [8, 2000], [9, 2300]]) { const x = dateOK(); x.plan.clicker = k2; assert.equal(priceRequest(validateRequest(x).plan).squishy.find((l) => l.label.startsWith('NOMI')).cents, c * 10, String(k2)); }
+  assert.throws(() => { const b = dateOK(); b.plan.clicker = 7; validateRequest(b); }, (e) => e.field === 'clicker');
+  assert.equal(validateRequest(dateOK()).plan.clicker, 0);
+  assert.equal(ratesOf(vp.plan).clicker, 1300);
+});
 t('free gift: one item per booking from the store, party and capsule links; no money off', () => {
-  const EXP = { jelly: {}, crunchy: {}, both: {}, clicker: { gift: ['clicker'] }, combo: { gift: ['jelly', 'clicker'] } };
-  for (const src of ['wcc', 'plq', 'epm', 'event', 'capsule']) assert.equal(freeGift({ experience: 'crunchy' }, { source: src }, EXP).item, 'jelly', src);
-  assert.equal(freeGift({ experience: 'both' }, { source: 'event' }, EXP).label, '1 free Jelly squishy');
-  assert.equal(freeGift({ experience: 'jelly' }, {}, EXP), null); // no link, no gift
-  assert.equal(freeGift({ experience: 'jelly' }, { source: 'instagram' }, EXP), null);
-  assert.equal(freeGift({ experience: 'jelly' }, {}, EXP, true).item, 'jelly'); // old friend link still honoured
-  assert.equal(freeGift({ experience: 'clicker' }, { source: 'wcc', gift: 'jelly' }, EXP).item, 'clicker'); // clickers only: a clicker
-  assert.equal(freeGift({ experience: 'combo' }, { source: 'wcc', gift: 'clicker' }, EXP).item, 'clicker'); // both: their choice
-  assert.equal(freeGift({ experience: 'combo' }, { source: 'wcc' }, EXP).item, 'jelly');
-  assert.ok(freeGift({ experience: 'combo' }, { source: 'wcc' }, EXP).choice);
-  assert.deepEqual(giftOptions('crunchy', EXP), ['jelly']);
-  const g = buildMessage({ ref: 'SP-G', plan: v.plan, contact: v.contact, price, gift: freeGift(v.plan, { source: 'plq' }, EXP) });
+  for (const src of ['wcc', 'plq', 'epm', 'event', 'capsule']) assert.equal(freeGift({ experience: 'crunchy' }, { source: src }).item, 'jelly', src);
+  assert.equal(freeGift({ experience: 'both' }, { source: 'event' }).label, '1 free Jelly squishy');
+  assert.equal(freeGift({ experience: 'jelly' }, {}), null); // no link, no gift
+  assert.equal(freeGift({ experience: 'jelly' }, { source: 'instagram' }), null);
+  assert.equal(freeGift({ experience: 'jelly' }, {}, true).item, 'jelly'); // old friend link still honoured
+  assert.equal(freeGift({ experience: 'crunchy' }, { source: 'wcc', gift: 'clicker' }).item, 'jelly'); // no clickers: can't pick one
+  assert.equal(freeGift({ experience: 'both', clicker: 4 }, { source: 'wcc', gift: 'clicker' }).label, '1 free 3-key NOMI clicker'); // squishy + clicker: their choice
+  assert.equal(freeGift({ experience: 'both', clicker: 4 }, { source: 'wcc' }).item, 'jelly');
+  assert.ok(freeGift({ experience: 'both', clicker: 4 }, { source: 'wcc' }).choice);
+  assert.deepEqual(giftOptions({ experience: 'crunchy' }), ['jelly']);
+  const g = buildMessage({ ref: 'SP-G', plan: v.plan, contact: v.contact, price, gift: freeGift(v.plan, { source: 'plq' }) });
   assert.ok(g.includes('Free gift: 1 free Jelly squishy') && g.includes('PLQ store QR') && !g.includes('$10'));
 });
 t('after-party message has care tips, the feedback link with their reference, and the party link (/gift)', () => {
@@ -272,11 +282,11 @@ console.log('old friend links (codes still recognised, no database)');
   t('a made-up or mistyped code is flagged', () => { const bad = code.slice(0, -1) + (code.endsWith('A') ? 'B' : 'A'); assert.ok(!readReferralCode(bad).valid); assert.ok(!readReferralCode('HELLO').valid); });
   t('same first name as the code is flagged as a possible self-referral', () => { assert.ok(samePerson(readReferralCode(code), 'mia lim')); assert.ok(!samePerson(readReferralCode(code), 'Sarah')); });
   const g = dateOK(); g.referral = { code, source: 'capsule', returning: true }; const vr = validateRequest(g);
-  const m = buildMessage({ ref: 'SP-1', plan: vr.plan, contact: vr.contact, price: priceRequest(vr.plan), clientTotalCents: null, referral: vr.referral, gift: freeGift(vr.plan, vr.referral, {}, true) });
+  const m = buildMessage({ ref: 'SP-1', plan: vr.plan, contact: vr.contact, price: priceRequest(vr.plan), clientTotalCents: null, referral: vr.referral, gift: freeGift(vr.plan, vr.referral, true) });
   t('Telegram shows the free gift, the old friend link, source and returning flag; no personal link to share', () => { assert.match(m, /Free gift: 1 free Jelly squishy/); assert.match(m, /old friend link/); assert.match(m, /capsule QR sticker/); assert.match(m, /booked with us before/); assert.ok(!m.includes('?ref=')); });
   t('capsule QR scans get the free gift in Telegram, with the "Made by" name', () => {
     const c = dateOK(); c.referral = { source: 'capsule', sticker: 'Mia' }; const vc = validateRequest(c);
-    const mc = buildMessage({ ref: 'SP-2', plan: vc.plan, contact: vc.contact, price: priceRequest(vc.plan), clientTotalCents: null, referral: vc.referral, gift: freeGift(vc.plan, vc.referral, {}) });
+    const mc = buildMessage({ ref: 'SP-2', plan: vc.plan, contact: vc.contact, price: priceRequest(vc.plan), clientTotalCents: null, referral: vc.referral, gift: freeGift(vc.plan, vc.referral) });
     assert.match(mc, /Free gift: 1 free Jelly squishy<\/b> \(via the capsule QR sticker\)/); assert.match(mc, /Made by: Mia/);
   });
   const fs = await import('node:fs');

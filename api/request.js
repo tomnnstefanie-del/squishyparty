@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     const match = await matchCustomer(contact, usedCode && usedCode.valid ? usedCode.code : '');
     if (match && match.previous.length) data.referral.returning = true; // a returning customer isn't on their first party
     // The free gift (lib/offer.js) replaced the $10 referral: one item per booking from our store, party or capsule links
-    const gift = freeGift(data.plan, data.referral, CATALOGUE.EXP, !!(usedCode && usedCode.valid && !(match && match.selfReferral)));
+    const gift = freeGift(data.plan, data.referral, !!(usedCode && usedCode.valid && !(match && match.selfReferral)));
     const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, gift, corporate: data.corporate, match });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {

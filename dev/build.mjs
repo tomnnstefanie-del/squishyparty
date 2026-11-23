@@ -118,6 +118,7 @@ if (process.argv.includes('--preview')) {
   prev = replaceAll(prev, 'url("fonts/flags.woff2")', `url("data:font/woff2;base64,${b64('public/fonts/flags.woff2')}")`);
   prev = replaceAll(prev, 'src="img/logo.webp"', `src="data:image/webp;base64,${b64('public/img/logo.webp')}"`);
   prev = replaceAll(prev, 'href="img/icon.png"', `href="data:image/png;base64,${b64('public/img/icon.png')}"`);
+  prev = replaceAll(prev, 'src="img/nomi/nomi-banner.webp"', `src="data:image/webp;base64,${b64('public/img/nomi/nomi-banner.webp')}"`); n++;
   prev = replaceAll(prev, 'src="img/store.jpg"', `src="data:image/jpeg;base64,${b64('public/img/store.jpg')}"`); n++;
   fs.mkdirSync(path.join(root, '.preview'), { recursive: true });
   fs.writeFileSync(path.join(root, '.preview/index.html'), prev);
