@@ -209,10 +209,10 @@ try {
   const fb = (body, ip) => p2.evaluate(async ([body, ip]) => { const res = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: JSON.stringify(body) }); return { s: res.status, b: await res.json().catch(() => ({})) }; }, [body, ip]);
   x = await fb({ ref: 'SP-261107-AB12', rating: 0 }, '10.0.1.1'); assert.equal(x.s, 400); ok('feedback without a star rating is refused');
   x = await fb({ ref: 'SP-261107-AB12', rating: 5, comment: 'The kids <loved> it' }, '10.0.1.2'); assert.equal(x.s, 200);
-  let fm = sent().at(-1).text; assert.ok(fm.includes('5/5') && fm.includes('SP-261107-AB12') && fm.includes('send their referral link') && fm.includes('&lt;loved&gt;'));
-  ok('5 stars reaches Telegram with the reference and “send their referral link”');
+  let fm = sent().at(-1).text; assert.ok(fm.includes('5/5') && fm.includes('SP-261107-AB12') && fm.includes('send them the party link') && fm.includes('&lt;loved&gt;'));
+  ok('5 stars reaches Telegram with the reference and “send them the party link”');
   x = await fb({ ref: 'SP-261107-AB12', rating: 2 }, '10.0.1.3'); assert.equal(x.s, 200);
-  fm = sent().at(-1).text; assert.ok(fm.includes('2/5') && fm.includes('call or WhatsApp them personally') && !fm.includes('send their referral link'));
+  fm = sent().at(-1).text; assert.ok(fm.includes('2/5') && fm.includes('call or WhatsApp them personally') && !fm.includes('send them the party link'));
   ok('2 stars asks for a personal follow-up instead of a referral');
   const fp = await browser.newPage(); await fp.goto(BASE + '/feedback.html?ref=SP-261107-AB12');
   await fp.click('label[for=fb-r4]'); await fp.fill('#fb-comment', 'Lovely team'); await fp.click('#fb-send');
@@ -354,39 +354,14 @@ try {
   assert.ok(c1.history.some((h) => h.what.startsWith('Applied R2') && h.by === 'Tester') && c1.history.some((h) => h.what.startsWith('Customer accepted R2')));
   ok('only after the customer accepts and every vendor step is done does R2 replace the booking: original, revised, received and balance all kept');
 
-  // Thank-you reward for the family who referred a friend
-  console.log('referral rewards');
-  x = await api({ ...base, plan: { ...base.plan, wax: false, addons: [] }, contact: { ...base.contact, parentName: 'Mia Tan' } }, { 'X-Forwarded-For': '10.0.6.1' });
-  assert.equal(x.s, 200); const miaRef = x.b.ref, miaCode = /\?ref=([A-Z]+-[A-Z0-9]{4})/.exec(sent().at(-1).text)[1];
-  const after = sent().at(-1).reply_markup.inline_keyboard.flat().find((b) => b.text.includes('After the party')).url;
-  assert.ok(decodeURIComponent(after).includes('a free squishy at any Tom & Stefanie store')); ok('the after-party message tells families about the thank-you reward');
-  x = await api({ ...base, plan: { ...base.plan, wax: false, addons: [] }, referral: { code: miaCode }, emailToken: issueVerified('sara@example.com'), contact: { ...base.contact, parentName: 'Sara Lim', email: 'sara@example.com', phone: '98887777' } }, { 'X-Forwarded-For': '10.0.6.2' });
-  const friendRef = x.b.ref, fk = sent().at(-1).reply_markup.inline_keyboard.flat();
-  const total = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === friendRef).totalCents;
-  await tap(fk.find((b) => b.text.includes('Deposit paid')).url, { amount: '100' });
-  let rws = (await adm('test-dashboard-pass')).b.rewards; assert.ok(!rws.some((r) => r.friendRef === friendRef)); // not yet paid in full
-  await tap(fk.find((b) => b.text.includes('Paid in full')).url, { amount: ((total - 10000) / 100).toFixed(2) });
-  const rmsg = sent().at(-1); assert.ok(rmsg.text.includes('Referral reward owed') && rmsg.text.includes(miaRef) && rmsg.reply_markup.inline_keyboard.flat()[0].url.startsWith('https://wa.me/'));
-  let rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef);
-  assert.ok(rw && rw.status === 'owed' && rw.referrerRef === miaRef && /^SQ-[A-Z2-9]{4}$/.test(rw.voucher));
-  ok('when a referred friend’s party is paid in full, the referring family is owed a free-squishy voucher, with a ready WhatsApp message in Telegram');
-  const fbk = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === friendRef), lastP = fbk.payments.filter((p) => p.kind !== 'reversal').at(-1);
-  await admPost({ action: 'reverse', ref: friendRef, paymentId: lastP.id, reason: 'Bank transfer bounced' });
-  rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.equal(rw.status, 'void');
-  await admPost({ action: 'payment', ref: friendRef, kind: 'payment', cents: lastP.cents, note: 'paid again' });
-  rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.equal(rw.status, 'owed');
-  ok('an unsent reward is voided if the payment is reversed, and owed again once it’s paid');
-  assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'redeemed' })).s, 409);
-  assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'sent' })).s, 200);
-  assert.equal((await admPost({ action: 'reward', ref: friendRef, step: 'redeemed' })).s, 200);
-  rw = (await adm('test-dashboard-pass')).b.rewards.find((r) => r.friendRef === friendRef); assert.ok(rw.status === 'redeemed' && rw.sent.by === 'Tester');
-  ok('the reward is marked sent, then redeemed in store, each with who and when');
+  // (The friend-referral thank-you reward isn't tested end to end any more: personal codes are no longer sent out,
+  //  so new codes can't reach a friend. lib/rewards.js still handles codes shared before the free-gift links.)
 
   // Recognising the same customer without log-ins: verified email or WhatsApp number, and company occasions
   console.log('returning customers and occasions');
   const ze = 'zoe@acme.example', reqMsg = (r) => sent().find((m) => m.text && m.text.includes(r) && m.text.includes('New Confetti Club request'));
   x = await api({ ...base, bookingFor: 'company', corporate: { occasion: 'family-day', yearly: true }, emailToken: issueVerified(ze), contact: { ...base.contact, parentName: 'Zoe Ng', email: ze, phone: '96660001', companyName: 'Zeta Pte Ltd' } }, { 'X-Forwarded-For': '10.0.7.1' });
-  assert.equal(x.s, 200); const zRef = x.b.ref, zMsg = reqMsg(zRef), zCode = /\?ref=([A-Z]+-[A-Z0-9]{4})/.exec(zMsg.text)[1];
+  assert.equal(x.s, 200); const zRef = x.b.ref, zMsg = reqMsg(zRef);
   assert.ok(zMsg.text.includes('Occasion: <b>Family day</b> · held every year') && !zMsg.text.includes('Returning customer'));
   const zb = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === zRef); assert.ok(zb.occasion === 'family-day' && zb.yearly === true && !zb.returning.length);
   ok('companies can say what the occasion is and that they hold it every year; Telegram and the dashboard show it');
@@ -400,11 +375,7 @@ try {
   assert.ok(m2.text.includes('Returning customer') && m2.text.includes(zRef) && m2.text.includes('Same email'));
   assert.deepEqual((await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === x.b.ref).returning, [zRef]);
   ok('a second request with the same verified email is flagged as a returning customer, with their earlier booking');
-  x = await api({ ...base, referral: { code: zCode }, emailToken: issueVerified('zoe.other@example.com'), contact: { ...base.contact, parentName: 'Z Ng', email: 'zoe.other@example.com', phone: '96660001' } }, { 'X-Forwarded-For': '10.0.7.3' });
-  m2 = reqMsg(x.b.ref);
-  assert.ok(m2.text.includes('their own referral code') && m2.text.includes('Same WhatsApp number'));
-  const sb = (await adm('test-dashboard-pass')).b.bookings.find((q) => q.ref === x.b.ref); assert.ok(sb.selfReferral && sb.discountCents === 0);
-  ok('using your own referral link (same WhatsApp number, different email and name) is caught: no $10 off and no reward');
+  // (Own-code detection for old friend links is covered in the unit tests and lib/stats.js matchCustomer.)
 
 
   // The daily Telegram bump

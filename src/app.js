@@ -28,6 +28,12 @@
       note:'Any face-painting design: bring a reference photo. We book PartyPainters.sg for your date and confirm timings with them.'}
   };
   var EXP = { jelly:{name:'Jelly',short:'Jelly',pax:1600,per:1}, crunchy:{name:'Crunchy',short:'Crunchy',pax:1800,per:1}, both:{name:'Duo: Jelly + Crunchy',short:'Duo',pax:2600,per:2} };
+  // Free gift from our links (same rule as lib/offer.js): squishy packages get a Jelly squishy, even Crunchy. Give a
+  // package gift:['clicker'] (clickers only) or gift:['jelly','clicker'] (customer picks) when clicker packages exist.
+  var GIFT_NAMES = { jelly:'Jelly squishy', clicker:'clicker' }, OFFER_SOURCES = ['wcc','plq','epm','event','capsule'];
+  function giftOpts(exp){ var g = EXP[exp] && EXP[exp].gift; return g && g.length ? g : ['jelly']; }
+  function giftOn(){ return typeof REF !== 'undefined' && (OFFER_SOURCES.indexOf(REF.source) >= 0 || /^[A-Z]{2,8}-[A-Z2-9]{4}$/.test(REF.code || '')); }
+  function giftItem(exp){ var o = giftOpts(exp), p = document.querySelector('[name=giftPick]:checked'); return p && o.indexOf(p.value) >= 0 ? p.value : o[0]; }
   var CATS = [
     {id:'styling', title:'Styling', tab:'Styling', icon:'i-balloon', blurb:'Balloon backdrops, dessert tables and party favours in your colour theme.'},
     {id:'entertainment', title:'Other activities', tab:'Other activities', icon:'i-smile', blurb:'Face painting, glitter tattoos, balloon sculpting, magic and caricatures by PartyPainters.sg, plus photos and video by J Square Photography.'},
@@ -1309,12 +1315,13 @@
     if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
     $('pending-note').hidden = !T.pending.length || !shown;
     if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
-    var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—', off = shown ? referralOff() : 0;
-    // A friend's code or the capsule QR: show $10 off (the server still prices the full amount; we take it off the quotation)
-    function struck(id){ var e = $(id), w = el('s', 'was', money(T.total)); e.textContent = money(T.total - off) + (T.pending.length ? '+' : ''); w.setAttribute('aria-label', 'was ' + money(T.total)); e.appendChild(w); }
-    if (off) struck('total-price'); else put('total-price', totalTxt);
-    $('ref-off').hidden = !off;
-    put('per-child', shown ? money(Math.round((T.total - off) / s.participants)) : '—');
+    var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—';
+    put('total-price', totalTxt);
+    // Came from a store, party or capsule link: 1 free item per booking (lib/offer.js). No money off.
+    var gift = giftOn() ? giftItem(s.experience) : '';
+    $('ref-off').hidden = !(gift && shown); if (gift) put('ref-off', '🎁 Includes 1 free ' + GIFT_NAMES[gift]);
+    var gp = $('gift-pick'), opts = giftOpts(s.experience); gp.hidden = !(gift && shown && opts.length > 1);
+    put('per-child', shown ? money(Math.round(T.total / s.participants)) : '—');
     $('sum-acc').hidden = !shown; $('summary-hint').hidden = shown;
 
     // included
@@ -1354,7 +1361,7 @@
     put('review-total', money(T.total) + (T.pending.length ? '+' : ''));
     put('review-note', T.pending.length ? 'Cake prices are added to your quotation.' : '');
     put('mobile-caption', shown ? s.participants + ' participants · ' + exp.short + ' · ' + s.selected.length + ' add-on' + (s.selected.length === 1 ? '' : 's') : 'Your estimate starts at step 2');
-    if (off) struck('mobile-price'); else put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.participants + ' participants');
+    put('mobile-price', shown ? money(T.total) + (T.pending.length ? '+' : '') : s.participants + ' participants');
     $('mobile-price').classList.toggle('muted-price', !shown);
     if (announce) put('live', (msg ? msg + ' ' : '') + 'Estimated total ' + money(T.total) + (T.pending.length ? ' plus items pending price' : '') + '.');
   }
@@ -1388,8 +1395,9 @@
   if (isWeb()) { var pn = $('preview-notice'); if (pn) pn.hidden = true; }
 
   /* ---------- Referrals and where people came from ----------
-     ?ref=MIA-K7Q2 is a friend's referral link (the friend's family gets nothing; the new customer gets $10 off).
-     ?src=capsule says where the link was (capsule QR sticker, Instagram...). Both are remembered for 60 days on this
+     ?src=wcc|plq|epm (store QR), ?src=event (party poster + after-party link, via /gift) and ?src=capsule give 1 free
+     item per booking (lib/offer.js). Old ?ref=MIA-K7Q2 friend links still work and get it too.
+     ?src= also says where the link was (Instagram...). Both are remembered for 60 days on this
      device and sent with the request. Analytics only learns that a code or source was present, never the code. */
   var REF = (function(){
     var KEY = 'sp-ref', saved = {}, q = {};
@@ -1409,23 +1417,9 @@
     if (!code && isWeb()) { try { if (!sessionStorage.getItem('cc-visit')) { sessionStorage.setItem('cc-visit', '1'); fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'visit', source:src || saved.source || 'direct'})}).catch(function(){}); } } catch (e) {} }
     return saved;
   })();
-  if (REF.code) { $('ref-banner').hidden = false; $('ref-code').value = REF.code; }
-  // Capsule QR sticker: one printed QR for every lid, so the offer comes from the source, not a personal code
-  if (REF.source === 'capsule') {
-    $('offer').hidden = false; $('sticker-field').hidden = false;
-    if (!REF.code) { $('ref-banner').hidden = false; $('ref-banner').querySelector('span').innerHTML = 'Scanned a squishy capsule? <b>$10 off your first hosted party</b> is added to your request.'; }
-  }
-  function referralOff(){
-    var c = $('ref-code'); if (!c || typeof REF === 'undefined') return 0;
-    var v = c.value.trim(), code = /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v);
-    return code || (!v && REF.source === 'capsule') ? 1000 : 0;
-  }
-  function refHint(){
-    var v = $('ref-code').value.trim(), ok = !v || /^[A-Za-z]{2,8}-[A-Za-z2-9]{4}$/.test(v), h = $('ref-hint');
-    h.textContent = !v ? 'From a friend? New customers get $10 off their first hosted party.' : ok ? 'Thanks! $10 off is shown in your total.' : 'Codes look like MIA-K7Q2. Please check it, or leave it empty.';
-    h.classList.toggle('err', !ok); $('ref-code').toggleAttribute('aria-invalid', !ok);
-  }
-  $('ref-code').addEventListener('input', function(){ refHint(); render(false); }); refHint();
+  if (REF.code) $('ref-code').value = REF.code;
+  if (giftOn()) { $('ref-banner').hidden = false; $('offer').hidden = false; $('sticker-field').hidden = REF.source !== 'capsule'; }
+  document.querySelectorAll('[name=giftPick]').forEach(function(r){ r.addEventListener('change', function(){ render(false); }); });
 
 
   // Header "Experiences" menu: closes after choosing a link, on a click elsewhere, or with Escape
@@ -1733,7 +1727,7 @@
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
       corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '' },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:giftOn() ? giftItem(S.experience) : '' },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';

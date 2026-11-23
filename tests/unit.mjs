@@ -6,7 +6,8 @@ import { buildMessage, whatsappLink, customerGreeting, afterPartyMessage } from 
 process.env.TELEGRAM_BOT_TOKEN = 'unit:token';
 const otp = await import('../lib/otp.js');
 const { confirmationEmail } = await import('../lib/emails.js');
-const { quotePdf, referralDiscount } = await import('../lib/quote-pdf.js');
+const { quotePdf } = await import('../lib/quote-pdf.js');
+const { freeGift, giftOptions } = await import('../lib/offer.js');
 const { validateFeedback } = await import('../lib/feedback.js');
 const Ref = await import('../lib/referral.js');
 const { statusLink, checkStatusToken } = await import('../lib/status-link.js');
@@ -112,23 +113,30 @@ t('PDF quotation is a valid PDF with every object where the index says', () => {
   assert.ok(s.includes('/DCTDecode') && s.includes('/Helvetica-Bold'));
 });
 t('quotation email attaches the PDF, with a quotation subject', () => {
-  const e = confirmationEmail({ ref: 'SP-2', plan: v.plan, contact: v.contact, price, quote: { pdf: Buffer.from('%PDF-1.4'), filename: 'Confetti-Club-Quotation-Q-SP-2.pdf', totalCents: price.totalCents - 1000, discountCents: 1000 } });
+  const e = confirmationEmail({ ref: 'SP-2', plan: v.plan, contact: v.contact, price, quote: { pdf: Buffer.from('%PDF-1.4'), filename: 'Confetti-Club-Quotation-Q-SP-2.pdf', totalCents: price.totalCents, discountCents: 0, gift: { label: '1 free Jelly squishy' } } });
   assert.equal(e.subject, 'Your Confetti Club Quotation | Q-SP-2');
   assert.equal(e.attachments.length, 1); assert.equal(e.attachments[0].contentType, 'application/pdf');
-  for (const s of ['itemised PDF quotation is attached', 'not yet confirmed', 'Confetti Club', 'with your $10 friend referral']) assert.ok((e.text + e.html).includes(s), s);
+  for (const s of ['itemised PDF quotation is attached', 'not yet confirmed', 'Confetti Club', '+ 1 free Jelly squishy']) assert.ok((e.text + e.html).includes(s), s);
 });
-t('$10 referral on the quotation: valid code or capsule, not their own, first party only', () => {
-  const { makeReferralCode, readReferralCode, samePerson } = Ref; const code = makeReferralCode('Mia Tan');
-  assert.equal(referralDiscount({ code }, readReferralCode, samePerson, 'Sarah Lim'), 1000);
-  assert.equal(referralDiscount({ code }, readReferralCode, samePerson, 'Mia Lee'), 0); // same first name: the team checks
-  assert.equal(referralDiscount({ code, returning: true }, readReferralCode, samePerson, 'Sarah Lim'), 0);
-  assert.equal(referralDiscount({ code: 'MIA-ZZZZ' }, readReferralCode, samePerson, 'Sarah Lim'), 0);
-  assert.equal(referralDiscount({ source: 'capsule' }, readReferralCode, samePerson, 'Sarah Lim'), 1000);
-  assert.equal(referralDiscount({}, readReferralCode, samePerson, 'Sarah Lim'), 0);
+t('free gift: one item per booking from the store, party and capsule links; no money off', () => {
+  const EXP = { jelly: {}, crunchy: {}, both: {}, clicker: { gift: ['clicker'] }, combo: { gift: ['jelly', 'clicker'] } };
+  for (const src of ['wcc', 'plq', 'epm', 'event', 'capsule']) assert.equal(freeGift({ experience: 'crunchy' }, { source: src }, EXP).item, 'jelly', src);
+  assert.equal(freeGift({ experience: 'both' }, { source: 'event' }, EXP).label, '1 free Jelly squishy');
+  assert.equal(freeGift({ experience: 'jelly' }, {}, EXP), null); // no link, no gift
+  assert.equal(freeGift({ experience: 'jelly' }, { source: 'instagram' }, EXP), null);
+  assert.equal(freeGift({ experience: 'jelly' }, {}, EXP, true).item, 'jelly'); // old friend link still honoured
+  assert.equal(freeGift({ experience: 'clicker' }, { source: 'wcc', gift: 'jelly' }, EXP).item, 'clicker'); // clickers only: a clicker
+  assert.equal(freeGift({ experience: 'combo' }, { source: 'wcc', gift: 'clicker' }, EXP).item, 'clicker'); // both: their choice
+  assert.equal(freeGift({ experience: 'combo' }, { source: 'wcc' }, EXP).item, 'jelly');
+  assert.ok(freeGift({ experience: 'combo' }, { source: 'wcc' }, EXP).choice);
+  assert.deepEqual(giftOptions('crunchy', EXP), ['jelly']);
+  const g = buildMessage({ ref: 'SP-G', plan: v.plan, contact: v.contact, price, gift: freeGift(v.plan, { source: 'plq' }, EXP) });
+  assert.ok(g.includes('Free gift: 1 free Jelly squishy') && g.includes('PLQ store QR') && !g.includes('$10'));
 });
-t('after-party message has care tips, the feedback link with their reference, and their referral link', () => {
-  const m = afterPartyMessage({ ref: 'SP-261107-AB12', contact: v.contact, shareCode: 'SARAH-AB23', site: 'https://example.sg' });
-  for (const x of ['https://example.sg/#care', 'https://example.sg/feedback.html?ref=SP-261107-AB12', '?ref=SARAH-AB23']) assert.ok(m.includes(x), x);
+t('after-party message has care tips, the feedback link with their reference, and the party link (/gift)', () => {
+  const m = afterPartyMessage({ ref: 'SP-261107-AB12', contact: v.contact, site: 'https://example.sg' });
+  for (const x of ['https://example.sg/#care', 'https://example.sg/feedback.html?ref=SP-261107-AB12', 'https://example.sg/gift', 'free squishy']) assert.ok(m.includes(x), x);
+  assert.ok(!m.includes('$10'));
 });
 t('feedback: 1-5 stars only, unknown references dropped, photo must be a JPEG', () => {
   assert.throws(() => validateFeedback({ rating: 6 }), (e) => e.field === 'rating');
@@ -188,7 +196,7 @@ t('scorecard: paid parties, revenue, contribution, CAC by touchpoint and ROI fol
   assert.deepEqual([cap.visits, cap.paid, cap.newCustomers, cap.costCents, cap.cacCents], [30, 1, 1, 2000 + 1000, 3000]);
   assert.deepEqual([fr.visits, fr.costCents, fr.cacCents], [4, 1000 + 600, 1600]);
   assert.deepEqual([so.visits, so.requests, so.paid, so.newCustomers, so.costCents, so.cacCents], [16, 2, 1, 0, 3000, null]); // search/social/direct: C (returning) paid, D didn't
-  assert.deepEqual(s.kpis.bestCac, { touch: 'Friend’s WhatsApp referral link', cents: 1600 });
+  assert.deepEqual(s.kpis.bestCac, { touch: 'Party poster / after-party link', cents: 1600 });
   // Gross profit (before marketing costs): A 22000 + B 20000 + C 45000 = 87000; programme = 2000+3000 + 2000 discounts + 600 reward = 7600
   assert.equal(s.money.programmeCents, 7600); assert.equal(s.kpis.roiPct, Math.round((87000 - 7600) / 7600 * 100));
   assert.equal(s.kpis.blendedCacCents, 3800); assert.equal(s.kpis.ltvCents, 29000); assert.equal(s.kpis.ltvCac, 7.6); // 29000 ÷ 3800
@@ -256,7 +264,7 @@ t('moodboard images must be small JPEG/PNG, at most 3 per item', () => {
   assert.throws(() => validateRequest(withCustom(['bl-fabric-std'], { 'bl-fabric-std': { images: [JPG, JPG, JPG, JPG] } })), (e) => e.field === 'custom');
   assert.throws(() => validateRequest(withCustom(['bl-fabric-std'], { 'bl-fabric-std': { images: ['data:image/jpeg;base64,' + 'A'.repeat(470000)] } })), (e) => e.field === 'custom');
 });
-console.log('referrals (friend gets $10 off, no database)');
+console.log('old friend links (codes still recognised, no database)');
 {
   const { makeReferralCode, readReferralCode, samePerson } = await import('../lib/referral.js');
   const code = makeReferralCode('Mia Tan');
@@ -264,14 +272,15 @@ console.log('referrals (friend gets $10 off, no database)');
   t('a made-up or mistyped code is flagged', () => { const bad = code.slice(0, -1) + (code.endsWith('A') ? 'B' : 'A'); assert.ok(!readReferralCode(bad).valid); assert.ok(!readReferralCode('HELLO').valid); });
   t('same first name as the code is flagged as a possible self-referral', () => { assert.ok(samePerson(readReferralCode(code), 'mia lim')); assert.ok(!samePerson(readReferralCode(code), 'Sarah')); });
   const g = dateOK(); g.referral = { code, source: 'capsule', returning: true }; const vr = validateRequest(g);
-  const m = buildMessage({ ref: 'SP-1', plan: vr.plan, contact: vr.contact, price: priceRequest(vr.plan), clientTotalCents: null, referral: vr.referral, shareCode: 'SARAH-AB23', site: 'https://example.sg' });
-  t('Telegram shows the referral, source, returning flag and their own link to share', () => { assert.match(m, /Referred by a friend/); assert.match(m, /capsule QR sticker/); assert.match(m, /booked with us before/); assert.match(m, /https:\/\/example\.sg\/\?ref=SARAH-AB23/); });
-  t('capsule QR scans get the $10 offer in Telegram, with the "Made by" name', () => {
+  const m = buildMessage({ ref: 'SP-1', plan: vr.plan, contact: vr.contact, price: priceRequest(vr.plan), clientTotalCents: null, referral: vr.referral, gift: freeGift(vr.plan, vr.referral, {}, true) });
+  t('Telegram shows the free gift, the old friend link, source and returning flag; no personal link to share', () => { assert.match(m, /Free gift: 1 free Jelly squishy/); assert.match(m, /old friend link/); assert.match(m, /capsule QR sticker/); assert.match(m, /booked with us before/); assert.ok(!m.includes('?ref=')); });
+  t('capsule QR scans get the free gift in Telegram, with the "Made by" name', () => {
     const c = dateOK(); c.referral = { source: 'capsule', sticker: 'Mia' }; const vc = validateRequest(c);
-    const mc = buildMessage({ ref: 'SP-2', plan: vc.plan, contact: vc.contact, price: priceRequest(vc.plan), clientTotalCents: null, referral: vc.referral, shareCode: 'X-AB23', site: 'https://example.sg' });
-    assert.match(mc, /Capsule QR offer<\/b>: \$10 off their first hosted party/); assert.match(mc, /Made by: Mia/);
+    const mc = buildMessage({ ref: 'SP-2', plan: vc.plan, contact: vc.contact, price: priceRequest(vc.plan), clientTotalCents: null, referral: vc.referral, gift: freeGift(vc.plan, vc.referral, {}) });
+    assert.match(mc, /Free gift: 1 free Jelly squishy<\/b> \(via the capsule QR sticker\)/); assert.match(mc, /Made by: Mia/);
   });
   const fs = await import('node:fs');
+  t('the store and party short links open the offer', () => { const r = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).redirects; for (const [p, s] of [['/gift', 'event'], ['/wcc', 'wcc'], ['/plq', 'plq'], ['/epm', 'epm']]) assert.ok(r.some((x) => x.source === p && x.destination === `/?src=${s}#offer`), p); });
   t('the sticker short link /c is counted, then opens the capsule offer', () => { const r = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8')).rewrites; assert.ok(r.some((x) => x.source === '/c' && x.destination === '/api/scan')); assert.ok(fs.readFileSync(new URL('../api/scan.js', import.meta.url), 'utf8').includes("'/?src=capsule#offer'")); });
   t('a bad source value is dropped', () => { const b = dateOK(); b.referral = { source: '<script>' }; assert.equal(validateRequest(b).referral.source, ''); });
 }

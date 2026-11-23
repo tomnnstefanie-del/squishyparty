@@ -1343,6 +1343,7 @@ footer{background:#efece7;border-top:0}
 
 /* Referral: $10 off shown on the total */
 .total .was,.mobile-bar .was{font-size:.55em;font-weight:600;opacity:.65;margin-right:4px;text-decoration-thickness:2px}
+.gift-pick{display:flex;gap:12px;margin-top:6px;font-size:.8rem}.gift-pick[hidden]{display:none}.gift-pick label{display:flex;align-items:center;gap:4px;min-height:32px}
 .ref-off{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;background:var(--lemon);color:var(--ink);font-size:.75rem;font-weight:700}
 /* v52 Country flags: Twemoji flags (CC-BY 4.0, via country-flag-emoji-polyfill) only for flag characters, so Windows shows flags too */
 @font-face{font-family:"Flags";src:url("fonts/flags.woff2") format("woff2");unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E007F;font-display:swap}

@@ -30,6 +30,9 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
 http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const handler = ROUTES[url.pathname];
+  // Same as the vercel.json redirects: the party poster / after-party link and the three store QR codes
+  const REDIRECTS = { '/gift': 'event', '/wcc': 'wcc', '/plq': 'plq', '/epm': 'epm' };
+  if (REDIRECTS[url.pathname]) { res.statusCode = 307; res.setHeader('Location', `/?src=${REDIRECTS[url.pathname]}#offer`); return res.end(); }
   if (handler) {
     res.status = (c) => { res.statusCode = c; return res; };
     res.json = (o) => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(o)); return res; };

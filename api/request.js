@@ -6,9 +6,10 @@ import crypto from 'node:crypto';
 import { validateRequest } from '../lib/validate.js';
 import { priceRequest, ratesOf } from '../lib/pricing.js';
 import { CATALOGUE } from '../lib/catalogue.js';
-import { makeReferralCode, readReferralCode, samePerson } from '../lib/referral.js';
+import { makeReferralCode, readReferralCode } from '../lib/referral.js';
 import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
-import { quotePdf, referralDiscount } from '../lib/quote-pdf.js';
+import { quotePdf } from '../lib/quote-pdf.js';
+import { freeGift } from '../lib/offer.js';
 import { addonName } from '../lib/pricing.js';
 import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpError } from '../lib/http.js';
 import { checkVerified } from '../lib/otp.js';
@@ -56,10 +57,12 @@ export default async function handler(req, res) {
     const usedCode = data.referral.code ? readReferralCode(data.referral.code) : null;
     const match = await matchCustomer(contact, usedCode && usedCode.valid ? usedCode.code : '');
     if (match && match.previous.length) data.referral.returning = true; // a returning customer isn't on their first party
-    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, shareCode, site, corporate: data.corporate, match });
+    // The free gift (lib/offer.js) replaced the $10 referral: one item per booking from our store, party or capsule links
+    const gift = freeGift(data.plan, data.referral, CATALOGUE.EXP, !!(usedCode && usedCode.valid && !(match && match.selfReferral)));
+    const text = buildMessage({ ref, plan: data.plan, contact, price, clientTotalCents: data.clientTotalCents, referral: data.referral, gift, corporate: data.corporate, match });
     const buttonUrl = whatsappLink(contact.phone, customerGreeting({ ref, plan: data.plan, contact }));
     try {
-      const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, shareCode, site }));
+      const afterUrl = whatsappLink(contact.phone, afterPartyMessage({ ref, contact, site }));
       // With the dashboard connected, buttons record when we got back to them, confirmed, got paid, and each partner confirmed
       const statusUrls = statsConfigured() ? { contacted: statusLink(site, ref, 'contacted'), confirmed: statusLink(site, ref, 'confirmed'), paid: statusLink(site, ref, 'paid'),
         vendors: vendorsOf(price).slice(0, 10).map((v, i) => ({ name: v.name, url: statusLink(site, ref, 'v' + i) })) } : null;
@@ -72,9 +75,9 @@ export default async function handler(req, res) {
 
     // Dashboard numbers: how they found us, and this family's own code so their referrals can be traced back
     const via = usedCode ? (usedCode.valid ? 'friend' : 'unknown-code') : data.referral.source === 'capsule' ? 'capsule' : '';
-    const discountCents = referralDiscount(data.referral, readReferralCode, (u, n) => !!(match && match.selfReferral) || samePerson(u, n), contact.parentName);
+    const discountCents = 0; // no money off any more: the offer is a free item
     await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
-      rates: ratesOf(data.plan), discountCents, bookingFor: data.bookingFor, match, source: data.referral.source });
+      rates: ratesOf(data.plan), discountCents, gift, bookingFor: data.bookingFor, match, source: data.referral.source });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {
@@ -89,11 +92,11 @@ export default async function handler(req, res) {
     let quote = null;
     {
       try {
-        const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents,
+        const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents, gift,
           detailed: !!data.corporate?.detailed, experienceName: EXP_NAMES[data.plan.experience],
           contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
-        quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents };
-        await sendTelegramDocument({ token, chatId, data: pdf, filename: quote.filename, caption: `${ref} · PDF quotation emailed to the customer${discountCents ? ' (includes $10 referral discount)' : ''}`, apiBase: process.env.TELEGRAM_API_BASE || undefined });
+        quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents, gift };
+        await sendTelegramDocument({ token, chatId, data: pdf, filename: quote.filename, caption: `${ref} · PDF quotation emailed to the customer${gift ? ` (includes ${gift.label})` : ''}`, apiBase: process.env.TELEGRAM_API_BASE || undefined });
       } catch (e) { console.error('[request] quotation copy failed', ref, e.message); }
     }
 

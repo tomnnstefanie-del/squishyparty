@@ -70,6 +70,12 @@
       "destination": "/api/scan"
     }
   ],
+  "redirects": [
+    { "source": "/gift", "destination": "/?src=event#offer", "permanent": false },
+    { "source": "/wcc", "destination": "/?src=wcc#offer", "permanent": false },
+    { "source": "/plq", "destination": "/?src=plq#offer", "permanent": false },
+    { "source": "/epm", "destination": "/?src=epm#offer", "permanent": false }
+  ],
   "crons": [
     {
       "path": "/api/digest",
