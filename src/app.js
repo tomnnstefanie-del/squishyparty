@@ -1319,11 +1319,11 @@
 
     // summary
     put('summary-exp', s.activity === 'clicker' ? 'NOMI clicker' : s.activity === 'both' ? 'Squishy ' + exp.short + ' + clicker' : 'Squishy ' + exp.short); put('summary-participants', s.participants); put('summary-length', lengthLabel(s.length));
-    put('squishy-count', s.participants * exp.per); put('partner-count', s.selected.length);
+    put('squishy-count', s.participants * (s.activity === 'clicker' ? 1 : exp.per) + (s.activity === 'both' ? s.participants : 0)); put('squishy-unit', s.activity === 'clicker' ? 'clickers' : s.activity === 'both' ? 'items to make' : 'squishies'); put('partner-count', s.selected.length);
     var bd = $('breakdown'); bd.textContent = '';
     function row(dt, dd, cls, ddcls){ var d = el('div', cls); d.appendChild(el('dt', null, dt)); d.appendChild(el('dd', ddcls, dd)); bd.appendChild(d); }
     bd.appendChild(el('div','grp','Main activity'));
-    row('Squishy DIY total', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)));
+    row('DIY activity total', money(T.found.reduce(function(a, f){ return a + f.cents; }, 0)));
     T.found.forEach(function(f){ row(f.sub, money(f.cents), 'bd-sub'); });
     if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
     $('pending-note').hidden = !T.pending.length || !shown;
