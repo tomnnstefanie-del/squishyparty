@@ -1283,7 +1283,7 @@
     if (T.partners.length) { bd.appendChild(el('div','grp','Partner services')); T.partners.forEach(function(x){ row((x.p.cat === 'cake' ? x.p.vendor + ': ' + x.p.name : x.p.name) + (x.p.basis === 'child' || x.p.basis === 'pax' ? ', ' + x.qty : '') + (x.p.status === 'demo' ? ' (demo price)' : ''), x.cents == null ? 'On quote' : money(x.cents), null, x.cents == null ? 'pend' : null); }); }
     $('pending-note').hidden = !T.pending.length || !shown;
     if (T.pending.length) put('pending-note', 'Not yet in your total: ' + T.pending.map(function(p){ return p.vendor + ' ' + p.name; }).join(', ') + '. Cake prices depend on size and flavour, so we add it to your quotation.');
-    if (shown && (storeGift() === 'B' || friendCode())) { bd.appendChild(el('div','grp', friendCode() ? 'Your friend’s referral' : 'Your store gift')); row('Jelly squishy for the birthday child (worth $18)', 'Free'); }
+    if (shown && (storeGift() === 'B' || friendCode() || partyGift())) { bd.appendChild(el('div','grp', friendCode() ? 'Your friend’s referral' : partyGift() ? 'Your party gift' : 'Your store gift')); row('Jelly squishy for the birthday child (worth $18)', 'Free'); }
     var totalTxt = shown ? money(T.total) + (T.pending.length ? '+' : '') : '—', off = shown ? referralOff() : 0;
     // The capsule QR or store gift A: show $10 off (the server still prices the full amount; we take it off the quotation)
     function struck(id){ var e = $(id), w = el('s', 'was', money(T.total)); e.textContent = money(T.total - off) + (T.pending.length ? '+' : ''); w.setAttribute('aria-label', 'was ' + money(T.total)); e.appendChild(w); }
@@ -1405,6 +1405,13 @@
       if (!gLocked && Date.now() - gAt > 14 * 864e5) saved.giftEnded = true;
       else { saved.gift = g; saved.giftLocked = gLocked; }
     }
+    // Launch-party QR (/gift): a free jelly squishy, valid 2 months from the first time this phone opened the link.
+    // Kept in its own key, so a re-scan (or the 60-day reset above) doesn't restart the 2 months.
+    if (saved.source === 'event') {
+      var pAt = 0; try { pAt = Number(localStorage.getItem('cc-party-at')) || 0; if (!pAt) { pAt = Date.now(); localStorage.setItem('cc-party-at', String(pAt)); } } catch (e) { pAt = Date.now(); }
+      var pu = new Date(pAt); pu.setMonth(pu.getMonth() + 2);
+      saved.partyAt = pAt; saved.partyUntil = pu.getTime(); saved.party = Date.now() <= saved.partyUntil; saved.partyEnded = !saved.party;
+    }
     return saved;
   })();
   if (REF.code) { $('ref-banner').hidden = false; $('ref-code').value = REF.code; }
@@ -1421,6 +1428,14 @@
     if (!REF.code) { var rb = $('ref-banner'); rb.hidden = false; var sp = rb.querySelector('span'); sp.textContent = 'Your store gift: '; sp.appendChild(el('b', null, GB ? 'a free jelly squishy for the birthday child' : '$10 off your first party')); sp.appendChild(document.createTextNode(' is added to your request.')); }
   }
   if (REF.giftEnded && !REF.code) { var rbe = $('ref-banner'); rbe.hidden = false; rbe.querySelector('span').textContent = 'Your store gift has ended (it needed a message within 14 days of scanning). Ask us about current offers in your request.'; }
+  /** The launch-party gift that applies right now: none once a friend's code is typed (it's the same squishy). */
+  function partyGift(){ var c = $('ref-code'); return typeof REF !== 'undefined' && !!REF.party && !(c && c.value.trim()); }
+  if (REF.partyUntil && !REF.code) {
+    var pDay = new Date(REF.partyUntil).toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}), prb = $('ref-banner'), psp = prb.querySelector('span');
+    prb.hidden = false;
+    if (REF.party) { psp.textContent = 'Your party gift: '; psp.appendChild(el('b', null, 'a free jelly squishy for the birthday child')); psp.appendChild(document.createTextNode(' is added to your request. Valid until ' + pDay + '.')); }
+    else psp.textContent = 'The free squishy from your party link ended on ' + pDay + '. You can still plan and book your party here.';
+  }
   /** The store gift that applies right now: none once a friend's code is typed (one offer per booking). */
   function storeGift(){ var c = $('ref-code'); return typeof REF !== 'undefined' && REF.gift && !(c && c.value.trim()) ? REF.gift : ''; }
   // Capsule QR sticker: one printed QR for every lid, so the offer comes from the source, not a personal code
@@ -1748,7 +1763,7 @@
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
       corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:REF.giftArm || '', giftAt:REF.giftAt || 0, outlet:REF.outlet || '' },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:REF.giftArm || '', giftAt:REF.giftAt || 0, outlet:REF.outlet || '', firstAt:REF.partyAt || 0 },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';

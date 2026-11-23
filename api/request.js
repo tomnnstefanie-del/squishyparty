@@ -8,7 +8,8 @@ import { priceRequest, ratesOf } from '../lib/pricing.js';
 import { CATALOGUE } from '../lib/catalogue.js';
 import { makeReferralCode, readReferralCode, samePerson } from '../lib/referral.js';
 import { buildMessage, afterPartyMessage, customerGreeting, sendTelegram, sendTelegramPhoto, sendTelegramDocument, whatsappLink } from '../lib/telegram.js';
-import { quotePdf, referralDiscount, storeGiftFor, friendSquishyFor } from '../lib/quote-pdf.js';
+import { quotePdf, referralDiscount, storeGiftFor, friendSquishyFor, partyGiftFor } from '../lib/quote-pdf.js';
+import { partyGiftUntil } from '../lib/gift.js';
 import { giftArm, giftDepositBy } from '../lib/gift.js';
 import { addonName } from '../lib/pricing.js';
 import { postOnly, readJson, assertSameOrigin, clientIp, limiter, fail, HttpError } from '../lib/http.js';
@@ -77,10 +78,12 @@ export default async function handler(req, res) {
     const discountCents = referralDiscount(data.referral, readReferralCode, own, contact.parentName);
     const gift = storeGiftFor(data.referral, readReferralCode, own, contact.parentName); // store QR gift actually given
     const friendSquishy = friendSquishyFor(data.referral, readReferralCode, own, contact.parentName); // friend's referral gift
+    const partyGift = partyGiftFor(data.referral, readReferralCode, own, contact.parentName); // launch-party QR gift (/gift)
+    const partyUntil = partyGift ? partyGiftUntil(data.referral.firstAt) : 0;
     const giftBy = gift ? giftDepositBy() : ''; // this request locks the gift in; the deposit is due within 30 days
     await recordRequest({ ref, plan: data.plan, price, contact, via, code: usedCode ? usedCode.code : '', shareCode, experienceName: EXP_NAMES[data.plan.experience], corporate: data.corporate,
       rates: ratesOf(data.plan), discountCents, friendSquishy, bookingFor: data.bookingFor, match, source: data.referral.source,
-      giftArm: giftArm(data.referral), gift, giftBy, outlet: data.referral.outlet });
+      giftArm: giftArm(data.referral), gift, giftBy, outlet: data.referral.outlet, partyGift });
 
     // Moodboard images follow the message. A failed photo doesn't undo the request, which has already reached you.
     for (let i = 0; i < data.images.length; i++) {
@@ -95,10 +98,10 @@ export default async function handler(req, res) {
     let quote = null;
     {
       try {
-        const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents, friendSquishy, gift, giftBy,
+        const pdf = quotePdf({ ref, issued: new Date(), plan: data.plan, contact, price, bookingFor: data.bookingFor, discountCents, friendSquishy, gift, giftBy, partyGift, partyUntil,
           detailed: !!data.corporate?.detailed, experienceName: EXP_NAMES[data.plan.experience],
           contactEmail: process.env.MAIL_REPLY_TO || process.env.SMTP_USER || '', site });
-        quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents, freeSquishy: friendSquishy || gift === 'B' };
+        quote = { pdf, filename: `Confetti-Club-Quotation-Q-${ref}.pdf`, totalCents: price.totalCents - discountCents, discountCents, freeSquishy: friendSquishy || gift === 'B' || partyGift };
         await sendTelegramDocument({ token, chatId, data: pdf, filename: quote.filename, caption: `${ref} · PDF quotation emailed to the customer${discountCents ? ' (includes $10 off)' : ''}`, apiBase: process.env.TELEGRAM_API_BASE || undefined });
       } catch (e) { console.error('[request] quotation copy failed', ref, e.message); }
     }

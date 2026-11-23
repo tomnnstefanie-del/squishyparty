@@ -75,5 +75,12 @@
       "path": "/api/digest",
       "schedule": "0 1 * * *"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/gift",
+      "destination": "/?src=event",
+      "permanent": false
+    }
   ]
 }

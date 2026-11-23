@@ -6,7 +6,7 @@ import { buildMessage, whatsappLink, customerGreeting, afterPartyMessage } from 
 process.env.TELEGRAM_BOT_TOKEN = 'unit:token';
 const otp = await import('../lib/otp.js');
 const { confirmationEmail } = await import('../lib/emails.js');
-const { quotePdf, referralDiscount, friendSquishyFor } = await import('../lib/quote-pdf.js');
+const { quotePdf, referralDiscount, friendSquishyFor, partyGiftFor } = await import('../lib/quote-pdf.js');
 const { validateFeedback } = await import('../lib/feedback.js');
 const Ref = await import('../lib/referral.js');
 const { statusLink, checkStatusToken } = await import('../lib/status-link.js');
@@ -316,6 +316,24 @@ console.log('referrals (friend gets a free jelly squishy, no database)');
     assert.equal(referralDiscount({ ...A, code }, readReferralCode, samePerson, 'Sarah Lim'), 0); // not $10 off on top
     assert.equal(friendSquishyFor({ ...A, code }, readReferralCode, samePerson, 'Sarah Lim'), true);
     assert.equal(storeGiftFor({ source: 'instagram', gift: 'A' }, readReferralCode, samePerson, 'Sarah Lim'), ''); // only from the store QR
+  });
+  t('launch-party QR (/gift): free jelly squishy for 2 months from the first scan, then ended', () => {
+    const { readReferralCode, samePerson } = Ref;
+    const fresh = dateOK(); fresh.referral = { source: 'event', firstAt: Date.now() - 30 * 864e5 }; const rf = validateRequest(fresh).referral;
+    assert.equal(rf.partyExpired, false); assert.equal(partyGiftFor(rf, readReferralCode, samePerson, 'Sarah Lim'), true);
+    assert.equal(referralDiscount(rf, readReferralCode, samePerson, 'Sarah Lim'), 0); // a squishy, not $10 off
+    const old = dateOK(); old.referral = { source: 'event', firstAt: Date.now() - 70 * 864e5 }; const ro = validateRequest(old).referral;
+    assert.equal(ro.partyExpired, true); assert.equal(partyGiftFor(ro, readReferralCode, samePerson, 'Sarah Lim'), false);
+    assert.equal(partyGiftFor({ ...rf, returning: true }, readReferralCode, samePerson, 'Sarah Lim'), false); // first party only
+    const code = Ref.makeReferralCode('Mia Tan');
+    assert.equal(partyGiftFor({ ...rf, code }, readReferralCode, samePerson, 'Sarah Lim'), false); // the friend's code gives the squishy instead
+    assert.equal(friendSquishyFor({ ...rf, code }, readReferralCode, samePerson, 'Sarah Lim'), true);
+    const v = validateRequest(fresh), m = buildMessage({ ref: 'SP-7', plan: v.plan, contact: v.contact, price: priceRequest(v.plan), clientTotalCents: null, referral: rf, shareCode: 'X-AB23', site: 'https://example.sg' });
+    assert.match(m, /Launch-party gift/); assert.match(m, /Link valid until/); assert.match(m, /Launch-party QR \(\/gift\)/);
+    const mo = buildMessage({ ref: 'SP-8', plan: v.plan, contact: v.contact, price: priceRequest(v.plan), clientTotalCents: null, referral: ro, shareCode: 'X-AB23', site: 'https://example.sg' });
+    assert.match(mo, /gift has ended/);
+    const vj = JSON.parse(nodeFs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+    assert.deepEqual(vj.redirects.find((r) => r.source === '/gift'), { source: '/gift', destination: '/?src=event', permanent: false }); // temporary, so it stays editable
   });
   t('store gift time limits: 14 days from the scan to send a request, then 30 days to pay the deposit', () => {
     const { readReferralCode, samePerson } = Ref; const G = { source: 'outlet', gift: 'B' };
