@@ -1430,11 +1430,11 @@
   if (REF.giftEnded && !REF.code) { var rbe = $('ref-banner'); rbe.hidden = false; rbe.querySelector('span').textContent = 'Your store gift has ended (it needed a message within 14 days of scanning). Ask us about current offers in your request.'; }
   /** The launch-party gift that applies right now: none once a friend's code is typed (it's the same squishy). */
   function partyGift(){ var c = $('ref-code'); return typeof REF !== 'undefined' && !!REF.party && !(c && c.value.trim()); }
-  if (REF.partyUntil && !REF.code) {
+  // After the 2 months the page looks like it does for anyone else (no mention of a gift that ended)
+  if (REF.party && !REF.code) {
     var pDay = new Date(REF.partyUntil).toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}), prb = $('ref-banner'), psp = prb.querySelector('span');
     prb.hidden = false;
-    if (REF.party) { psp.textContent = 'Your party gift: '; psp.appendChild(el('b', null, 'a free jelly squishy for the birthday child')); psp.appendChild(document.createTextNode(' is added to your request. Valid until ' + pDay + '.')); }
-    else psp.textContent = 'The free squishy from your party link ended on ' + pDay + '. You can still plan and book your party here.';
+    psp.textContent = 'Your party gift: '; psp.appendChild(el('b', null, 'a free jelly squishy for the birthday child')); psp.appendChild(document.createTextNode(' is added to your request. Valid until ' + pDay + '.'));
   }
   /** The store gift that applies right now: none once a friend's code is typed (one offer per booking). */
   function storeGift(){ var c = $('ref-code'); return typeof REF !== 'undefined' && REF.gift && !(c && c.value.trim()) ? REF.gift : ''; }
