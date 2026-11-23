@@ -1505,7 +1505,7 @@
     if (k !== cur || planV.hidden) track('step_viewed', {step:k, step_name:STEPS[k - 1]});
     cur = k;
     if (k >= 2 && !S.started) { S.started = true; render(false); }
-    homeV.hidden = true; planV.hidden = false; document.body.classList.add('planning'); document.body.classList.toggle('ready-view', k === READY);
+    homeV.hidden = true; planV.hidden = false; document.body.classList.add('planning'); document.body.classList.toggle('ready-view', k === READY); document.body.classList.toggle('early-step', k <= 2); // Basics and DIY activity: just the step, no estimate box
     for (var i = 1; i <= READY; i++) $(SECTION[i]).hidden = i !== k;
     $('stepper').querySelectorAll('li').forEach(function(li, i){
       if (i + 1 === READY) li.className = 'ready-step ' + (k === READY ? 'current' : reached >= LAST || S.requested ? 'open' : 'locked');

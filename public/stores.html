@@ -2371,6 +2371,10 @@ footer{background:#efece7;border-top:0}
 .sc-log li{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1.5px var(--line);font-size:.8125rem;display:flex;flex-direction:column;gap:2px}
 .sc-log .sc-why{color:#1d2b4f}.sc-log small{color:var(--muted)}
 .tb-chip.gift{background:#fde7ef;color:#a0144d}
+/* Basics and DIY activity show only the step itself: the estimate box joins from Add-ons on */
+body.early-step .wiz-body{grid-template-columns:minmax(0,1fr)}
+body.early-step .wiz-body .summary{display:none}
+body.early-step .wiz-body > :not(.summary){max-width:860px}
 </style>
 </head>
 <body>
