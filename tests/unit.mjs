@@ -79,6 +79,13 @@ t('includes contact, date, venue, address, postal', () => { for (const s of ['Sa
 t('lists participants, squishy lines and every add-on, with no deposit or budget', () => { assert.ok(!/deposit|budget|PayNow/i.test(msg)); for (const s of ['10 participants', 'Duo: Jelly + Crunchy', 'Squishy goodie bags, 10 × $6', 'travel', 'Custom cake', 'Butter Studio', 'on quote', 'Party favour bags ×10', 'Face painting']) assert.ok(msg.includes(s), s); });
 t('Wax Cracking is discontinued: a request asking for it gets no wax line', () => { assert.ok(!('wax' in v.plan)); assert.ok(!/Wax/.test(msg)); });
 t('squishy goodie bag: $6 per child (U.P. $7), with any DIY activity', () => { assert.equal(priceRequest(plan({ goodie: true })).totalCents - priceRequest(plan()).totalCents, 6000); assert.equal(priceRequest({ ...plan({ goodie: true }), activity: 'clicker', clicker: 3 }).squishy.filter((l) => /goodie/.test(l.label)).length, 1); });
+t('launch-party link: valid for 2 months from the first scan, then no free gift', () => {
+  const scan = Date.UTC(2026, 10, 23, 4), plan2 = { experience: 'both', activity: 'squishy' };
+  const g = freeGift(plan2, { source: 'event', firstAt: scan }, false, Date.UTC(2027, 0, 22));
+  assert.equal(g.item, 'jelly'); assert.equal(new Date(g.until).toISOString().slice(0, 10), '2027-01-23');
+  assert.equal(freeGift(plan2, { source: 'event', firstAt: scan }, false, Date.UTC(2027, 0, 24)), null);
+  assert.ok(freeGift(plan2, { source: 'wcc', firstAt: scan }, false, Date.UTC(2027, 5, 1))); // store QR codes don't expire
+});
 t('escapes HTML in customer text', () => assert.ok(msg.includes('Lift &lt;b&gt;B&lt;/b&gt;, level 2')));
 t('flags when the page total differs from the server total', () => assert.ok(msg.includes('server price above is the one to quote')));
 t('confirmation email: we’ll WhatsApp them to confirm availability, nothing to pay', () => {

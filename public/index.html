@@ -1950,6 +1950,7 @@ footer{background:#efece7;border-top:0}
 .total .was,.mobile-bar .was{font-size:.55em;font-weight:600;opacity:.65;margin-right:4px;text-decoration-thickness:2px}
 .act-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 18px}.act-tile{position:relative;display:flex;flex-direction:column;gap:2px;min-height:64px;padding:10px 12px;border:2px solid #e3e1f0;border-radius:14px;background:#fff;cursor:pointer;font-size:.8rem;line-height:1.25}.act-tile b{font-size:.9rem}.act-tile span{color:#6b6f8f}.act-tile input{position:absolute;opacity:0;pointer-events:none}.act-tile:has(input:checked){border-color:var(--cobalt);background:#f1f2ff}.act-tile:has(input:focus-visible){outline:2px solid var(--cobalt);outline-offset:2px}
 #wstep-2.is-clicker .sq-only{display:none!important}#wstep-2.is-clicker .price-lines{margin-top:0;padding-top:0;border-top:0}#wstep-2:not(.has-clicker) .cl-only{display:none!important}
+.ref-until{font-weight:700;white-space:nowrap}.ref-banner.is-ended{background:#f3f3f7;color:#4a4d68}.offer-until{display:block;margin-top:4px;font-weight:700;color:var(--cobalt)}
 /* NOMI clicker card: banner, then base-size chips that look like the clicker itself */
 .nomi-card{margin-top:12px;border-radius:22px;background:#fff;box-shadow:0 1px 0 rgba(20,24,60,.04),0 10px 28px -18px rgba(34,52,184,.45),inset 0 0 0 1px #ecebf6;overflow:hidden}
 .nomi-card .nomi-img{display:block;width:100%;height:auto;background:#fdeef3}
@@ -1983,6 +1984,7 @@ footer{background:#efece7;border-top:0}
 #wstep-2.is-clicker .nomi-card{margin-top:0}
 .addon-nomi{display:grid;grid-template-columns:1fr;align-items:center;gap:10px 14px;margin-top:10px}.addon-nomi .pill{white-space:nowrap}.addon-nomi .nomi-img{grid-column:1/-1;width:100%;height:auto;border-radius:12px}.addon-nomi.on{outline:2px solid var(--pink);outline-offset:2px}.nomi-ctl{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px}@media (min-width:640px){.act-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 18px}.act-tile{position:relative;display:flex;flex-direction:column;gap:2px;min-height:64px;padding:10px 12px;border:2px solid #e3e1f0;border-radius:14px;background:#fff;cursor:pointer;font-size:.8rem;line-height:1.25}.act-tile b{font-size:.9rem}.act-tile span{color:#6b6f8f}.act-tile input{position:absolute;opacity:0;pointer-events:none}.act-tile:has(input:checked){border-color:var(--cobalt);background:#f1f2ff}.act-tile:has(input:focus-visible){outline:2px solid var(--cobalt);outline-offset:2px}
 #wstep-2.is-clicker .sq-only{display:none!important}#wstep-2.is-clicker .price-lines{margin-top:0;padding-top:0;border-top:0}#wstep-2:not(.has-clicker) .cl-only{display:none!important}
+.ref-until{font-weight:700;white-space:nowrap}.ref-banner.is-ended{background:#f3f3f7;color:#4a4d68}.offer-until{display:block;margin-top:4px;font-weight:700;color:var(--cobalt)}
 /* NOMI clicker card: banner, then base-size chips that look like the clicker itself */
 .nomi-card{margin-top:12px;border-radius:22px;background:#fff;box-shadow:0 1px 0 rgba(20,24,60,.04),0 10px 28px -18px rgba(34,52,184,.45),inset 0 0 0 1px #ecebf6;overflow:hidden}
 .nomi-card .nomi-img{display:block;width:100%;height:auto;background:#fdeef3}
@@ -2450,7 +2452,7 @@ footer{background:#efece7;border-top:0}
           <li><b>We confirm on WhatsApp</b><span>Your free item is on your quotation and comes with us on the day. Nothing to pay now.</span></li>
         </ol>
         <a class="btn btn-primary btn-xl" href="#plan-1">Build my party <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-        <p class="offer-terms">One free item per booking, on parties of 10 or more.</p>
+        <p class="offer-terms">One free item per booking, on parties of 10 or more.<span class="offer-until" id="offer-until" hidden></span></p>
       </div>
     </div>
   </section>
@@ -3127,7 +3129,9 @@ footer{background:#efece7;border-top:0}
   function hasSq(s){ return s.activity !== 'clicker'; }
   function actShort(s){ return s.activity === 'clicker' ? 'NOMI clickers' : s.activity === 'both' ? EXP[s.experience].short + ' + clickers' : EXP[s.experience].short; }
   function actName(s){ return s.activity === 'clicker' ? 'NOMI clicker keychains' : s.activity === 'both' ? EXP[s.experience].name + ' + NOMI clickers' : EXP[s.experience].name; }
-  function giftOn(){ return typeof REF !== 'undefined' && (OFFER_SOURCES.indexOf(REF.source) >= 0 || /^[A-Z]{2,8}-[A-Z2-9]{4}$/.test(REF.code || '')); }
+  var OFFER_MONTHS = {event:2}; // the launch-party link (/gift): 2 months from the first scan on this phone
+  function addMonths(t, m){ var d = new Date(t); d.setMonth(d.getMonth() + m); return d.getTime(); }
+  function giftOn(){ return typeof REF !== 'undefined' && ((OFFER_SOURCES.indexOf(REF.source) >= 0 && !REF.expired) || /^[A-Z]{2,8}-[A-Z2-9]{4}$/.test(REF.code || '')); }
   function giftItem(exp){ var o = giftOpts(exp), p = document.querySelector('[name=giftPick]:checked'); return p && o.indexOf(p.value) >= 0 ? p.value : o[0]; }
   var CATS = [
     {id:'styling', title:'Styling', tab:'Styling', icon:'i-balloon', blurb:'Balloon backdrops, dessert tables and party favours in your colour theme.'},
@@ -4494,7 +4498,9 @@ footer{background:#efece7;border-top:0}
   var REF = (function(){
     var KEY = 'sp-ref', saved = {}, q = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
-    if (saved.at && Date.now() - saved.at > 60 * 864e5) saved = {};
+    var now = Date.now();
+    if (saved.at && now - saved.at > 60 * 864e5) { delete saved.code; saved.at = now; } // old friend links: 60 days
+    saved.first = saved.first || {}; // first time this phone opened each offer link (kept, so a re-scan doesn't restart the 2 months)
     try { new URLSearchParams(location.search).forEach(function(v, k){ q[k] = v; }); } catch (e) {}
     var code = String(q.ref || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 16);
     var src = String(q.src || q.utm_source || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 24);
@@ -4503,14 +4509,24 @@ footer{background:#efece7;border-top:0}
       if (code !== saved.code && isWeb()) { try { fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'link_open', code:code})}).catch(function(){}); } catch (e) {} }
       saved.code = code; saved.at = Date.now(); track('referral_link_opened', {});
     }
-    if (src) { saved.source = src; saved.at = saved.at || Date.now(); track('arrived_from', {source:src}); }
+    if (src) { saved.source = src; saved.at = saved.at || now; if (OFFER_SOURCES.indexOf(src) >= 0 && !saved.first[src]) saved.first[src] = now; track('arrived_from', {source:src}); }
     try { if (code || src) localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
     // One visit per browser session for the dashboard scorecard, counted by source only (friend links count as link opens)
     if (!code && isWeb()) { try { if (!sessionStorage.getItem('cc-visit')) { sessionStorage.setItem('cc-visit', '1'); fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'visit', source:src || saved.source || 'direct'})}).catch(function(){}); } } catch (e) {} }
+    saved.firstAt = saved.first[saved.source] || 0;
+    saved.until = OFFER_MONTHS[saved.source] && saved.firstAt ? addMonths(saved.firstAt, OFFER_MONTHS[saved.source]) : 0;
+    saved.expired = !!(saved.until && now > saved.until);
     return saved;
   })();
   if (REF.code) $('ref-code').value = REF.code;
   if (giftOn()) { $('ref-banner').hidden = false; $('offer').hidden = false; $('sticker-field').hidden = REF.source !== 'capsule'; }
+  (function(){ // the launch-party link shows how long the free gift lasts, or that it has ended
+    if (!REF.until) return;
+    var day = new Date(REF.until).toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}), b = $('ref-banner'), t = b.querySelector('span');
+    if (REF.expired) { if (giftOn()) return; b.hidden = false; b.classList.add('is-ended'); t.textContent = 'The free gift from your party link ended on ' + day + '. You can still plan and book your party here.'; return; }
+    var u = el('span', 'ref-until', ' Valid until ' + day + '.'); t.appendChild(u);
+    var o = $('offer-until'); if (o) { o.textContent = 'Your free gift is valid until ' + day + '.'; o.hidden = false; }
+  })();
   document.querySelectorAll('[name=giftPick]').forEach(function(r){ r.addEventListener('change', function(){ render(false); }); });
 
 
@@ -4819,7 +4835,7 @@ footer{background:#efece7;border-top:0}
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
       corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:giftOn() ? giftItem(S.experience) : '' },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:giftOn() ? giftItem(S.experience) : '', firstAt:REF.firstAt || 0 },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';

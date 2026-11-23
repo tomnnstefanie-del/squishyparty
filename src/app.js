@@ -37,7 +37,9 @@
   function hasSq(s){ return s.activity !== 'clicker'; }
   function actShort(s){ return s.activity === 'clicker' ? 'NOMI clickers' : s.activity === 'both' ? EXP[s.experience].short + ' + clickers' : EXP[s.experience].short; }
   function actName(s){ return s.activity === 'clicker' ? 'NOMI clicker keychains' : s.activity === 'both' ? EXP[s.experience].name + ' + NOMI clickers' : EXP[s.experience].name; }
-  function giftOn(){ return typeof REF !== 'undefined' && (OFFER_SOURCES.indexOf(REF.source) >= 0 || /^[A-Z]{2,8}-[A-Z2-9]{4}$/.test(REF.code || '')); }
+  var OFFER_MONTHS = {event:2}; // the launch-party link (/gift): 2 months from the first scan on this phone
+  function addMonths(t, m){ var d = new Date(t); d.setMonth(d.getMonth() + m); return d.getTime(); }
+  function giftOn(){ return typeof REF !== 'undefined' && ((OFFER_SOURCES.indexOf(REF.source) >= 0 && !REF.expired) || /^[A-Z]{2,8}-[A-Z2-9]{4}$/.test(REF.code || '')); }
   function giftItem(exp){ var o = giftOpts(exp), p = document.querySelector('[name=giftPick]:checked'); return p && o.indexOf(p.value) >= 0 ? p.value : o[0]; }
   var CATS = [
     {id:'styling', title:'Styling', tab:'Styling', icon:'i-balloon', blurb:'Balloon backdrops, dessert tables and party favours in your colour theme.'},
@@ -1404,7 +1406,9 @@
   var REF = (function(){
     var KEY = 'sp-ref', saved = {}, q = {};
     try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
-    if (saved.at && Date.now() - saved.at > 60 * 864e5) saved = {};
+    var now = Date.now();
+    if (saved.at && now - saved.at > 60 * 864e5) { delete saved.code; saved.at = now; } // old friend links: 60 days
+    saved.first = saved.first || {}; // first time this phone opened each offer link (kept, so a re-scan doesn't restart the 2 months)
     try { new URLSearchParams(location.search).forEach(function(v, k){ q[k] = v; }); } catch (e) {}
     var code = String(q.ref || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 16);
     var src = String(q.src || q.utm_source || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 24);
@@ -1413,14 +1417,24 @@
       if (code !== saved.code && isWeb()) { try { fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'link_open', code:code})}).catch(function(){}); } catch (e) {} }
       saved.code = code; saved.at = Date.now(); track('referral_link_opened', {});
     }
-    if (src) { saved.source = src; saved.at = saved.at || Date.now(); track('arrived_from', {source:src}); }
+    if (src) { saved.source = src; saved.at = saved.at || now; if (OFFER_SOURCES.indexOf(src) >= 0 && !saved.first[src]) saved.first[src] = now; track('arrived_from', {source:src}); }
     try { if (code || src) localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
     // One visit per browser session for the dashboard scorecard, counted by source only (friend links count as link opens)
     if (!code && isWeb()) { try { if (!sessionStorage.getItem('cc-visit')) { sessionStorage.setItem('cc-visit', '1'); fetch('/api/event', {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'visit', source:src || saved.source || 'direct'})}).catch(function(){}); } } catch (e) {} }
+    saved.firstAt = saved.first[saved.source] || 0;
+    saved.until = OFFER_MONTHS[saved.source] && saved.firstAt ? addMonths(saved.firstAt, OFFER_MONTHS[saved.source]) : 0;
+    saved.expired = !!(saved.until && now > saved.until);
     return saved;
   })();
   if (REF.code) $('ref-code').value = REF.code;
   if (giftOn()) { $('ref-banner').hidden = false; $('offer').hidden = false; $('sticker-field').hidden = REF.source !== 'capsule'; }
+  (function(){ // the launch-party link shows how long the free gift lasts, or that it has ended
+    if (!REF.until) return;
+    var day = new Date(REF.until).toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}), b = $('ref-banner'), t = b.querySelector('span');
+    if (REF.expired) { if (giftOn()) return; b.hidden = false; b.classList.add('is-ended'); t.textContent = 'The free gift from your party link ended on ' + day + '. You can still plan and book your party here.'; return; }
+    var u = el('span', 'ref-until', ' Valid until ' + day + '.'); t.appendChild(u);
+    var o = $('offer-until'); if (o) { o.textContent = 'Your free gift is valid until ' + day + '.'; o.hidden = false; }
+  })();
   document.querySelectorAll('[name=giftPick]').forEach(function(r){ r.addEventListener('change', function(){ render(false); }); });
 
 
@@ -1729,7 +1743,7 @@
       consent: true, website: d.get('website') || '', // agreed by sending, as the notice under the form says
       bookingFor: isCompany() ? 'company' : 'family', wantQuote: true,
       corporate: isCompany() ? { detailed: !$('corp-package').checked, procurement: $('corp-procurement').checked, occasion: $('corp-occasion').value, yearly: $('corp-yearly').checked } : null,
-      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:giftOn() ? giftItem(S.experience) : '' },
+      referral: { code:($('ref-code').value || '').trim(), source:REF.source || '', sticker:REF.source === 'capsule' ? ($('sticker-name').value || '').trim() : '', gift:giftOn() ? giftItem(S.experience) : '', firstAt:REF.firstAt || 0 },
       client: { totalCents:T.total }, emailToken: OTP.verified && OTP.email === normEmail(d.get('email')) ? OTP.verified : ''
     };
     var btn = $('booking-submit'); btn.setAttribute('aria-busy','true'); btn.disabled = true; btn.textContent = 'Sending…';
