@@ -2375,6 +2375,12 @@ footer{background:#efece7;border-top:0}
 body.early-step .wiz-body{grid-template-columns:minmax(0,1fr)}
 body.early-step .wiz-body .summary{display:none}
 body.early-step .wiz-body > :not(.summary){max-width:860px}
+/* Squishy + Clicker is the default pick, marked with a badge like the Duo's */
+.act-picker{padding-top:10px}
+.act-tile.act-best{padding-top:16px}
+.act-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:var(--ink);color:var(--lemon);font-size:.6875rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.act-tile.act-best > span:last-child{color:var(--cobalt);font-weight:700}
+.act-tile .act-badge{color:var(--lemon)}
 </style>
 </head>
 <body>
@@ -2808,9 +2814,9 @@ body.early-step .wiz-body > :not(.summary){max-width:860px}
           <p class="wlead">Priced per person. A one-time $150 travel &amp; set-up fee is added once.</p>
           <p class="sel-label" id="act-label">What would you like to make?</p>
           <div class="act-picker" role="radiogroup" aria-labelledby="act-label">
-            <label class="act-tile"><input type="radio" name="activity" value="squishy" checked><b>Squishy only</b><span>Jelly, Crunchy or Duo</span></label>
+            <label class="act-tile"><input type="radio" name="activity" value="squishy"><b>Squishy only</b><span>Jelly, Crunchy or Duo</span></label>
             <label class="act-tile"><input type="radio" name="activity" value="clicker"><b>Clicker only</b><span>NOMI clicker keychains</span></label>
-            <label class="act-tile"><input type="radio" name="activity" value="both"><b>Squishy + Clicker</b><span>Make both</span></label>
+            <label class="act-tile act-best"><input type="radio" name="activity" value="both" checked><span class="act-badge">Best of both</span><b>Squishy + Clicker</b><span>Both DIY activities!</span></label>
           </div>
           <p class="sel-label sq-only" id="exp-label">Select experience: <b id="exp-chosen">Duo: Jelly + Crunchy</b></p>
           <div class="exp-picker sq-only" role="radiogroup" aria-labelledby="exp-label">
@@ -3302,7 +3308,7 @@ body.early-step .wiz-body > :not(.summary){max-width:860px}
   function mins(t){ if (!t) return null; var a = t.split(':'); return (+a[0]) * 60 + (+a[1]); }
 
   /* ================= STATE ================= */
-  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, activity:'squishy', experience:'both', goodie:false, clicker:0, selected:[], customised:false, childName:'', childAge:'' };
+  var S = { participants:15, started:false, date:'', time:'14:00', length:120, end:'16:00', postal:'', timeOk:true, venue:'', theme:'cobalt', tpl:'disco', rsvp:'', captionEdited:false, done:{}, requested:false, activity:'both', experience:'both', goodie:false, clicker:3, selected:[], customised:false, childName:'', childAge:'' };
 
   function foundation(s){
     var n = billable(s.participants), e = EXP[s.experience], items = [];
