@@ -72,11 +72,13 @@ t('rejects participants outside 1–60', () => { bad((g) => { g.plan.participant
 t('old children/adults/budget fields are not accepted or passed on', () => { const g = dateOK(); delete g.plan.participants; g.plan.children = 10; assert.throws(() => validateRequest(g), (e) => e.field === 'participants'); const ok = validateRequest({ ...dateOK(), plan: { ...dateOK().plan, budgetCents: 5 } }); assert.equal(ok.plan.budgetCents, undefined); });
 
 console.log('telegram message');
-const v = validateRequest({ ...dateOK(), plan: { ...dateOK().plan, wax: true, addons: ['bs-custom', 's-favours', 'pp-face-2'] }, contact: { ...dateOK().contact, notes: 'Lift <b>B</b>, level 2' } });
+const v = validateRequest({ ...dateOK(), plan: { ...dateOK().plan, wax: true, goodie: true, addons: ['bs-custom', 's-favours', 'pp-face-2'] }, contact: { ...dateOK().contact, notes: 'Lift <b>B</b>, level 2' } });
 const price = priceRequest(v.plan);
 const msg = buildMessage({ ref: 'SP-TEST-0001', plan: v.plan, contact: v.contact, price, clientTotalCents: 1 });
 t('includes contact, date, venue, address, postal', () => { for (const s of ['Sarah Tan', '+65 8123 4567', 'sarah@example.com', 'Condo function room', '1 Example Road, Singapore 123456', '2:00 pm–4:00 pm']) assert.ok(msg.includes(s), s); });
-t('lists participants, squishy lines and every add-on, with no deposit or budget', () => { assert.ok(!/deposit|budget|PayNow/i.test(msg)); for (const s of ['10 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Custom cake', 'Butter Studio', 'on quote', 'Party favour bags ×10', 'Face painting']) assert.ok(msg.includes(s), s); });
+t('lists participants, squishy lines and every add-on, with no deposit or budget', () => { assert.ok(!/deposit|budget|PayNow/i.test(msg)); for (const s of ['10 participants', 'Duo: Jelly + Crunchy', 'Squishy goodie bags, 10 × $6', 'travel', 'Custom cake', 'Butter Studio', 'on quote', 'Party favour bags ×10', 'Face painting']) assert.ok(msg.includes(s), s); });
+t('Wax Cracking is discontinued: a request asking for it gets no wax line', () => { assert.equal(v.plan.wax, false); assert.ok(!/Wax/.test(msg)); });
+t('squishy goodie bag: $6 per child (U.P. $7), with any DIY activity', () => { assert.equal(priceRequest(plan({ goodie: true })).totalCents - priceRequest(plan()).totalCents, 6000); assert.equal(priceRequest({ ...plan({ goodie: true }), activity: 'clicker', clicker: 3 }).squishy.filter((l) => /goodie/.test(l.label)).length, 1); });
 t('escapes HTML in customer text', () => assert.ok(msg.includes('Lift &lt;b&gt;B&lt;/b&gt;, level 2')));
 t('flags when the page total differs from the server total', () => assert.ok(msg.includes('server price above is the one to quote')));
 t('confirmation email: we’ll WhatsApp them to confirm availability, nothing to pay', () => {

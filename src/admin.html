@@ -506,7 +506,7 @@ __FOOTER__
     var pax = field('Participants', input('number', p.participants)); pax.min = 1;
     var date = field('Date', input('date', p.date)), st = field('Start', input('time', p.start)), en = field('End', input('time', p.end));
     var ex = el('select'); Object.keys(last.experiences || {}).forEach(function(k){ var o = el('option', null, last.experiences[k]); o.value = k; ex.appendChild(o); }); ex.value = p.experience; field('Squishy DIY', ex);
-    var wx = input('checkbox', ''); wx.checked = !!p.wax; field('Wax Cracking', wx);
+    var wx = input('checkbox', ''); wx.checked = !!p.goodie; field('Squishy goodie bags', wx);
     d.appendChild(g);
     var al = el('div', 'mg-addons'); d.appendChild(al);
     var byId = {}; (last.addonList || []).forEach(function(a){ byId[a.id] = a; });
@@ -520,7 +520,7 @@ __FOOTER__
     drawAdds();
     var note = el('input'); note.placeholder = 'Note (optional), e.g. customer WhatsApp 3 Nov'; note.className = 'mg-note'; d.appendChild(note);
     d.appendChild(btn('Create draft revision', 'go', function(){
-      post({ action:'revise', ref:b.ref, note:note.value, plan:{ participants:+pax.value, date:date.value, start:st.value, end:en.value, experience:ex.value, wax:wx.checked, addons:adds } });
+      post({ action:'revise', ref:b.ref, note:note.value, plan:{ participants:+pax.value, date:date.value, start:st.value, end:en.value, experience:ex.value, goodie:wx.checked, addons:adds } });
     }));
     d.appendChild(el('p', 'mg-fine', 'Priced on the server. Items already quoted keep their original price; new items use today’s price. Nothing is sent until you review it.'));
     return f;
@@ -597,7 +597,7 @@ __FOOTER__
       }
       // Details: everything to act on
       var det = el('details', 'tb-more'), sm = el('summary', null, 'Details'); det.appendChild(sm);
-      det.appendChild(el('p', 'tb-line', clock(b.start) + ' – ' + clock(b.end) + ' · ' + b.experience + (b.wax ? ' + Wax Cracking' : '') + ' · ' + money(b.totalCents) + (b.onQuote && b.onQuote.length ? ' + quote items' : '')));
+      det.appendChild(el('p', 'tb-line', clock(b.start) + ' – ' + clock(b.end) + ' · ' + b.experience + (b.wax ? ' + Wax Cracking' : '') + (b.goodie ? ' + goodie bags' : '') + ' · ' + money(b.totalCents) + (b.onQuote && b.onQuote.length ? ' + quote items' : '')));
       det.appendChild(el('p', 'tb-line muted', (b.venue ? b.venue + ' · ' : '') + (b.area ? 'Postal area ' + b.area + ' · ' : '') + b.ref));
       b.vendors.forEach(function(v){
         var row = el('div', 'tb-vendor ' + (v.ok ? 'ok' : 'wait'));

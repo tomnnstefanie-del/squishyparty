@@ -30,8 +30,8 @@ async function run(label, width, setup){
   await f.click(next); ok('Next -> step 2', await vis('#wstep-2'));
   await f.click('.exp-tile:has(input[value=jelly])'); ok('pick Jelly', (await txt('#exp-title'))==='Jelly');
   await f.click('.exp-tile:has(input[value=both])'); ok('pick Duo', (await txt('#exp-title')).startsWith('Duo'));
-  await f.click('label.addon'); ok('wax add-on toggles', await f.isChecked('#wax'));
-  ok('Duo deal label shows', await vis('#duo-deal'));
+  await f.click('label.addon-goodie'); ok('goodie bag add-on toggles', await f.isChecked('#goodie'));
+  ok('no Wax Cracking add-on', !(await f.evaluate(()=>!!document.getElementById('wax'))));
   await f.click(next); ok('Next -> step 3', await vis('#wstep-3'));
   ok('step 3 opens on the add-on tabs (no plan-so-far box)', !(await f.evaluate(()=>!!document.querySelector('.rec-acc'))) && await vis('#addon-tabs'));
   await f.click('#tab-a-styling'); ok('add-on tab Styling', await vis('#panel-a-styling'));

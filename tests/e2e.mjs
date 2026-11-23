@@ -51,7 +51,7 @@ try {
   await page.fill('#venue', '1 Example Road');
   await page.fill('#postal', '123456');
   await page.click('#wiz-next');
-  await page.click('label.addon'); // wax duo deal
+  await page.click('label.addon-goodie'); // squishy goodie bag
   await page.click('#wiz-next');
   assert.equal(await page.locator('.rec-acc, #use-rec').count(), 0); ok('step 3 has no "Your plan so far" box: the add-on tabs come straight after the intro');
   // Bloom: personalise the Standard fabric backdrop
@@ -114,7 +114,7 @@ try {
   assert.equal(msgs.length, 1);
   const m = msgs[0];
   assert.equal(m.token, 'test:token'); assert.equal(m.chat_id, '4242'); assert.equal(m.parse_mode, 'HTML');
-  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Wax Cracking duo deal', 'travel', 'Lift lobby B, level 2'])
+  for (const s of [ref, 'Sarah Tan', '+65 8123 4567', 'sarah@example.com ✅ verified', 'Clubhouse II, function room L2', 'Block B, 1 Example Road, Singapore 123456', '2:00 pm–4:30 pm', '12 participants', 'Duo: Jelly + Crunchy', 'Squishy goodie bags, 12 × $6', 'travel', 'Lift lobby B, level 2'])
     assert.ok(m.text.includes(s), 'message missing: ' + s);
   ok('owner gets one Telegram message with contact, date/time, venue, address, guests, order and notes');
   assert.ok(m.text.includes(`Estimated total: ${pageTotal}`), `server total should match page total ${pageTotal}`);
@@ -169,17 +169,17 @@ try {
   ok('if Telegram is down, the customer is told it was NOT sent (no fake confirmation)');
 
   const api = (body, headers = {}) => p2.evaluate(async ([body, headers]) => { const res = await fetch('/api/request', { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) }); return { s: res.status, b: await res.json().catch(() => ({})) }; }, [body, headers]);
-  const base = { v: 1, plan: { participants: 10, experience: 'both', wax: true, addons: [], date, start: '10:00', end: '12:00' }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', client: { totalCents: 1 }, emailToken: issueVerified('a@example.com') };
+  const base = { v: 1, plan: { participants: 10, experience: 'both', goodie: true, addons: [], date, start: '10:00', end: '12:00' }, contact: { parentName: 'Ann Lee', phone: '91234567', email: 'a@example.com', venueName: 'Home', address: '2 Example Ave', postalCode: '654321', notes: '' }, consent: true, website: '', client: { totalCents: 1 }, emailToken: issueVerified('a@example.com') };
 
   console.log('security');
   let x = await api({ ...base, plan: { ...base.plan, addons: ['free-unicorn'] } }, { 'X-Forwarded-For': '10.0.0.3' });
   assert.equal(x.s, 400); ok('tampered add-on id is rejected (400)');
   const before = sent().length;
   x = await api(base, { 'X-Forwarded-For': '10.0.0.4' });
-  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 46500);
+  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 49000);
   const last = sent().at(-1).text;
   assert.ok(last.includes('Page showed $0.01'));
-  ok('a fake $0.01 total from the browser is ignored; server prices it at $465 and flags the mismatch');
+  ok('a fake $0.01 total from the browser is ignored; server prices it at $490 and flags the mismatch');
   x = await api({ ...base, wantQuote: true }, { 'X-Forwarded-For': '10.0.0.5' });
   assert.equal(x.s, 200); assert.equal(x.b.quoted, true);
   const qm = mails().at(-1); assert.ok(qm.subject.startsWith('Your Confetti Club Quotation | Q-SP-')); assert.deepEqual(qm.attachments, [`Confetti-Club-Quotation-Q-${x.b.ref}.pdf`]);
@@ -190,11 +190,11 @@ try {
   x = await api({ ...base, emailToken: issueVerified('someone-else@example.com') }, { 'X-Forwarded-For': '10.0.0.7' });
   assert.equal(x.s, 400); ok('a verified token for a different email is refused');
   x = await api({ ...base, bookingFor: 'company', wantQuote: true, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingEmail: 'finance@acme.sg' } }, { 'X-Forwarded-For': '10.0.0.8' });
-  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 46500);
+  assert.equal(x.s, 200); assert.equal(x.b.bookingFor, 'company'); assert.equal(x.b.totalCents, 49000);
   assert.ok(sent().at(-1).text.includes('CORPORATE BOOKING: yes') && mails().at(-1).text.includes('nothing to pay at this stage') && mails().at(-1).attachments.length === 1 && mails().at(-1).subject.includes('Quotation'));
   ok('company booking: same price, invoice requested on Telegram and in the email');
   x = await api({ ...base, bookingFor: 'company', wantQuote: true, corporate: { procurement: true }, contact: { ...base.contact, companyName: 'Acme Pte Ltd', billingContact: 'Finance Team', poRef: 'PO-77', billingNotes: 'Two invoices please' } }, { 'X-Forwarded-For': '10.0.4.1' });
-  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 46500);
+  assert.equal(x.s, 200); assert.equal(x.b.totalCents, 49000);
   const ct = sent().at(-1).text;
   assert.ok(ct.includes('CORPORATE BOOKING: yes') && ct.includes('corporate-friendly package') && ct.includes('PO reference: <b>PO-77</b>') && ct.includes('Finance Team') && ct.includes('Two invoices please') && ct.includes('VENDOR REGISTRATION / PROCUREMENT SUPPORT REQUESTED'));
   assert.ok(mails().at(-1).text.includes('assist with the necessary procurement documentation'));

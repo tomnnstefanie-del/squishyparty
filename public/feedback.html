@@ -1988,8 +1988,70 @@ footer{background:#efece7;border-top:0}
 .total .was,.mobile-bar .was{font-size:.55em;font-weight:600;opacity:.65;margin-right:4px;text-decoration-thickness:2px}
 .act-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 18px}.act-tile{position:relative;display:flex;flex-direction:column;gap:2px;min-height:64px;padding:10px 12px;border:2px solid #e3e1f0;border-radius:14px;background:#fff;cursor:pointer;font-size:.8rem;line-height:1.25}.act-tile b{font-size:.9rem}.act-tile span{color:#6b6f8f}.act-tile input{position:absolute;opacity:0;pointer-events:none}.act-tile:has(input:checked){border-color:var(--cobalt);background:#f1f2ff}.act-tile:has(input:focus-visible){outline:2px solid var(--cobalt);outline-offset:2px}
 #wstep-2.is-clicker .sq-only{display:none!important}#wstep-2.is-clicker .price-lines{margin-top:0;padding-top:0;border-top:0}#wstep-2:not(.has-clicker) .cl-only{display:none!important}
+/* NOMI clicker card: banner, then base-size chips that look like the clicker itself */
+.nomi-card{margin-top:12px;border-radius:22px;background:#fff;box-shadow:0 1px 0 rgba(20,24,60,.04),0 10px 28px -18px rgba(34,52,184,.45),inset 0 0 0 1px #ecebf6;overflow:hidden}
+.nomi-card .nomi-img{display:block;width:100%;height:auto;background:#fdeef3}
+.nomi-in{padding:16px 18px 18px}
+.nomi-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
+.nomi-head h3{margin:0;font-size:1.125rem;font-weight:800;letter-spacing:-.01em}
+.nomi-from{font-size:.8125rem;font-weight:700;color:#c2185b;background:#fde7ef;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.nomi-copy{margin:6px 0 0;color:var(--muted);font-size:.9375rem;line-height:1.5}
+.nomi-sizes{border:0;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nomi-sizes legend{padding:0;margin-bottom:8px;font-size:.8125rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.nomi-size{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:44px;padding:12px 6px 10px;border-radius:14px;background:#f7f7fb;box-shadow:inset 0 0 0 1.5px transparent;cursor:pointer;transition:background .15s ease,box-shadow .15s ease,transform .1s ease}
+.nomi-size:hover{background:#f0f0fa}
+.nomi-size:active{transform:scale(.97)}
+.nomi-size input{position:absolute;opacity:0;pointer-events:none}
+.ns-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;max-width:58px;min-height:22px;align-content:center}
+.ns-dots i{width:9px;height:9px;border-radius:3px;background:#d5d6e6}
+.nomi-size:has(input[value="6"]) .ns-dots,.nomi-size:has(input[value="9"]) .ns-dots{max-width:33px}.nomi-size:has(input[value="8"]) .ns-dots{max-width:45px}
+.ns-keys{font-size:.8125rem;font-weight:700;color:var(--ink)}
+.ns-price{font-size:.8125rem;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.nomi-size:has(input:checked){background:#fff;box-shadow:inset 0 0 0 2px var(--cobalt),0 6px 14px -8px rgba(34,52,184,.6)}
+.nomi-size:has(input:checked) .ns-dots i{background:#ff5c93}
+.nomi-size:has(input:checked) .ns-dots i:nth-child(3n+2){background:#41c7b9}
+.nomi-size:has(input:checked) .ns-dots i:nth-child(3n){background:var(--lemon,#ffd84d)}
+.nomi-size:has(input:checked) .ns-price{color:var(--cobalt)}
+.nomi-size:has(input:focus-visible){outline:2px solid var(--cobalt);outline-offset:2px}
+.nomi-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px;padding-top:14px;border-top:1px dashed #e3e2ef}
+.nomi-foot span{font-size:.9375rem;font-weight:600;color:var(--muted)}
+.nomi-foot strong{font-family:var(--display);font-weight:500;font-size:1.5rem;font-variant-numeric:tabular-nums;color:var(--ink)}
+@media (min-width:640px){.nomi-sizes{grid-template-columns:repeat(6,1fr)}.nomi-in{padding:18px 22px 20px}}
+@media (prefers-reduced-motion:reduce){.nomi-size{transition:none}.nomi-size:active{transform:none}}
+#wstep-2.is-clicker .nomi-card{margin-top:0}
 .addon-nomi{display:grid;grid-template-columns:1fr;align-items:center;gap:10px 14px;margin-top:10px}.addon-nomi .pill{white-space:nowrap}.addon-nomi .nomi-img{grid-column:1/-1;width:100%;height:auto;border-radius:12px}.addon-nomi.on{outline:2px solid var(--pink);outline-offset:2px}.nomi-ctl{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px}@media (min-width:640px){.act-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 18px}.act-tile{position:relative;display:flex;flex-direction:column;gap:2px;min-height:64px;padding:10px 12px;border:2px solid #e3e1f0;border-radius:14px;background:#fff;cursor:pointer;font-size:.8rem;line-height:1.25}.act-tile b{font-size:.9rem}.act-tile span{color:#6b6f8f}.act-tile input{position:absolute;opacity:0;pointer-events:none}.act-tile:has(input:checked){border-color:var(--cobalt);background:#f1f2ff}.act-tile:has(input:focus-visible){outline:2px solid var(--cobalt);outline-offset:2px}
 #wstep-2.is-clicker .sq-only{display:none!important}#wstep-2.is-clicker .price-lines{margin-top:0;padding-top:0;border-top:0}#wstep-2:not(.has-clicker) .cl-only{display:none!important}
+/* NOMI clicker card: banner, then base-size chips that look like the clicker itself */
+.nomi-card{margin-top:12px;border-radius:22px;background:#fff;box-shadow:0 1px 0 rgba(20,24,60,.04),0 10px 28px -18px rgba(34,52,184,.45),inset 0 0 0 1px #ecebf6;overflow:hidden}
+.nomi-card .nomi-img{display:block;width:100%;height:auto;background:#fdeef3}
+.nomi-in{padding:16px 18px 18px}
+.nomi-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
+.nomi-head h3{margin:0;font-size:1.125rem;font-weight:800;letter-spacing:-.01em}
+.nomi-from{font-size:.8125rem;font-weight:700;color:#c2185b;background:#fde7ef;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.nomi-copy{margin:6px 0 0;color:var(--muted);font-size:.9375rem;line-height:1.5}
+.nomi-sizes{border:0;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nomi-sizes legend{padding:0;margin-bottom:8px;font-size:.8125rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.nomi-size{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:44px;padding:12px 6px 10px;border-radius:14px;background:#f7f7fb;box-shadow:inset 0 0 0 1.5px transparent;cursor:pointer;transition:background .15s ease,box-shadow .15s ease,transform .1s ease}
+.nomi-size:hover{background:#f0f0fa}
+.nomi-size:active{transform:scale(.97)}
+.nomi-size input{position:absolute;opacity:0;pointer-events:none}
+.ns-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;max-width:58px;min-height:22px;align-content:center}
+.ns-dots i{width:9px;height:9px;border-radius:3px;background:#d5d6e6}
+.nomi-size:has(input[value="6"]) .ns-dots,.nomi-size:has(input[value="9"]) .ns-dots{max-width:33px}.nomi-size:has(input[value="8"]) .ns-dots{max-width:45px}
+.ns-keys{font-size:.8125rem;font-weight:700;color:var(--ink)}
+.ns-price{font-size:.8125rem;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.nomi-size:has(input:checked){background:#fff;box-shadow:inset 0 0 0 2px var(--cobalt),0 6px 14px -8px rgba(34,52,184,.6)}
+.nomi-size:has(input:checked) .ns-dots i{background:#ff5c93}
+.nomi-size:has(input:checked) .ns-dots i:nth-child(3n+2){background:#41c7b9}
+.nomi-size:has(input:checked) .ns-dots i:nth-child(3n){background:var(--lemon,#ffd84d)}
+.nomi-size:has(input:checked) .ns-price{color:var(--cobalt)}
+.nomi-size:has(input:focus-visible){outline:2px solid var(--cobalt);outline-offset:2px}
+.nomi-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px;padding-top:14px;border-top:1px dashed #e3e2ef}
+.nomi-foot span{font-size:.9375rem;font-weight:600;color:var(--muted)}
+.nomi-foot strong{font-family:var(--display);font-weight:500;font-size:1.5rem;font-variant-numeric:tabular-nums;color:var(--ink)}
+@media (min-width:640px){.nomi-sizes{grid-template-columns:repeat(6,1fr)}.nomi-in{padding:18px 22px 20px}}
+@media (prefers-reduced-motion:reduce){.nomi-size{transition:none}.nomi-size:active{transform:none}}
+#wstep-2.is-clicker .nomi-card{margin-top:0}
 .addon-nomi{grid-template-columns:1fr auto}.nomi-ctl{flex-direction:column;align-items:flex-end;gap:4px}}.nomi-ctl select{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line,#ddd);background:#fff;font:inherit}
 .gift-pick{display:flex;gap:12px;margin-top:6px;font-size:.8rem}.gift-pick[hidden]{display:none}.gift-pick label{display:flex;align-items:center;gap:4px;min-height:32px}
 .ref-off{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;background:var(--lemon);color:var(--ink);font-size:.75rem;font-weight:700}
