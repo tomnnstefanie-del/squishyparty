@@ -1450,9 +1450,9 @@
   function partyGift(){ var c = $('ref-code'); return typeof REF !== 'undefined' && !!REF.party && !(c && c.value.trim()); }
   // After the 2 months the page looks like it does for anyone else (no mention of a gift that ended)
   if (REF.party && !REF.code) {
-    var pDay = new Date(REF.partyUntil).toLocaleDateString('en-SG', {day:'numeric', month:'short', year:'numeric'}), prb = $('ref-banner'), psp = prb.querySelector('span');
+    var pDay = new Date(REF.partyUntil).toLocaleDateString('en-SG', {day:'numeric', month:'short'}), prb = $('ref-banner'), psp = prb.querySelector('span');
     prb.hidden = false;
-    psp.textContent = 'Your party gift: '; psp.appendChild(el('b', null, '1 free Jelly squishy or NOMI clicker')); psp.appendChild(document.createTextNode(', to match the activity you choose. Valid until ' + pDay + '.'));
+    psp.textContent = 'Your party gift: '; psp.appendChild(el('b', null, '1 free Jelly squishy or NOMI clicker')); psp.appendChild(document.createTextNode(', to match the activity you choose. Send us your request by ' + pDay + ' to lock in your FREE gift!'));
   }
   document.querySelectorAll('[name=giftPick]').forEach(function(r){ r.addEventListener('change', function(){ render(false); }); });
   /** The store gift that applies right now: none once a friend's code is typed (one offer per booking). */
